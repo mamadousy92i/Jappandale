@@ -6,3 +6,4 @@ backend/.venv/
 *.pyc
 backend/staticfiles/
 backend/media/
+.superpowers/
