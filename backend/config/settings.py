@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     # Apps Jappandale
     "apps.accounts",
+    "apps.core",
 ]
 
 MIDDLEWARE = [
