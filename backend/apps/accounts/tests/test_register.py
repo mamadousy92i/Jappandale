@@ -52,3 +52,13 @@ def test_inscription_mot_de_passe_faible_refusee():
     )
     assert response.status_code == 400
     assert "password" in response.data
+
+
+@pytest.mark.django_db
+def test_inscription_prenom_et_nom_obligatoires():
+    client = APIClient()
+    donnees = {k: v for k, v in DONNEES_VALIDES.items() if k not in ("first_name", "last_name")}
+    response = client.post("/api/auth/register/", donnees, format="json")
+    assert response.status_code == 400
+    assert "first_name" in response.data
+    assert "last_name" in response.data

@@ -10,6 +10,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         choices=[User.Role.PORTEUR, User.Role.CONTRIBUTEUR],
         default=User.Role.CONTRIBUTEUR,
     )
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
 
     class Meta:
         model = User
