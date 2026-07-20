@@ -32,7 +32,7 @@ export function Header() {
                 >
                   {(user.first_name || user.email).charAt(0).toUpperCase()}
                 </span>
-                <span className="hidden truncate text-sm font-medium text-ink-secondary transition-colors group-hover:text-ink sm:inline">
+                <span className="sr-only truncate text-sm font-medium text-ink-secondary transition-colors group-hover:text-ink sm:not-sr-only">
                   {user.first_name || user.email}
                 </span>
               </Link>
