@@ -76,13 +76,24 @@ Anticipation phase 2 : les campagnes et contributions conservent toutes les donn
 - **Modération** : rejet de campagne ou de KYC toujours accompagné d'un motif transmis par e-mail.
 - **Intégrité financière** : le montant collecté d'une campagne est recalculé depuis les contributions confirmées (pas de compteur modifiable à la main) ; mises à jour en transaction base de données.
 
-## 6. Tests
+## 6. Direction design et interface
+
+**Ambition :** un rendu très professionnel et épuré, digne des grandes plateformes du secteur (Kickstarter, GoFundMe, KissKissBankBank), tout en portant l'identité YAMB (or `#FAC502` sur fond blanc, Playfair Display pour les titres, Inter pour le corps).
+
+- **Épure d'abord** : beaucoup d'espace blanc, hiérarchie typographique forte, l'or utilisé avec parcimonie (boutons d'action, accents, barres de progression) — jamais en aplat massif.
+- **Composants** : shadcn/ui comme socle, personnalisé aux couleurs et rayons de la charte (boutons arrondis, cartes à ombre douce et bordure or au survol, labels de section en petites majuscules dorées).
+- **Pages soignées en priorité** : page d'accueil (héro + campagnes en vedette), page publique de campagne (la « vitrine » du produit), parcours de don, tableaux de bord.
+- **Images** : photos libres de droits (Unsplash, Pexels) sur les thèmes entrepreneuriat africain/sénégalais, artisanat, commerce, agriculture — cohérentes entre elles (lumière chaude, tons naturels). Licences vérifiées avant usage.
+- **Micro-interactions** : animations d'apparition douces héritées de la charte (fadeInUp, transitions `cubic-bezier`), états de survol travaillés, squelettes de chargement.
+- **Responsive mobile-first** : le cahier des charges cible un public sur mobile avec connexions à faible débit — images optimisées, pages légères.
+
+## 7. Tests
 
 - **Backend :** pytest + pytest-django — tests unitaires des règles métier (statuts, clôture automatique, recalcul des montants) et tests d'API (permissions par rôle, parcours de contribution).
 - **Frontend :** Vitest + React Testing Library sur les composants critiques (formulaire de don, création de campagne).
 - **Critère de recette MVP :** parcours complet démontrable — inscription → KYC validé → campagne publiée → don simulé confirmé → progression visible → e-mails reçus.
 
-## 7. Étapes de construction
+## 8. Étapes de construction
 
 1. Fondations (repo, Django + DRF, React + Vite + Tailwind + shadcn, charte, PostgreSQL, `.env`).
 2. Comptes et rôles (inscription, connexion JWT, profils).
