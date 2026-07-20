@@ -86,6 +86,6 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "API Jappandale",
-    "DESCRIPTION": "Plateforme de crowdfunding de YAMB International",
+    "DESCRIPTION": "Plateforme sénégalaise de financement participatif",
     "VERSION": "0.1.0",
 }

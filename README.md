@@ -1,6 +1,6 @@
 # Jappandale
 
-Plateforme sénégalaise de crowdfunding et de mise en relation financière, portée par YAMB International.
+Plateforme sénégalaise de crowdfunding et de mise en relation financière.
 
 ## Stack
 
@@ -18,7 +18,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # puis renseigner les identifiants PostgreSQL
 python manage.py migrate
-python manage.py runserver
+python manage.py runserver 8001
 ```
 
 ### Frontend
@@ -29,7 +29,7 @@ npm install
 npm run dev
 ```
 
-Application sur http://localhost:5173, API sur http://localhost:8000/api/.
+Application sur http://localhost:5173, API sur http://localhost:8001/api/.
 
 ### Tests
 

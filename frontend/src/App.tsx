@@ -14,7 +14,7 @@ function App() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
       <span className="text-xs font-semibold uppercase tracking-[4px] text-gold-dark">
-        YAMB International
+        Financement participatif
       </span>
       <h1 className="font-heading text-5xl">Jappandale</h1>
       <p className="max-w-md text-ink-secondary">
