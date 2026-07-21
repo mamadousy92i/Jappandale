@@ -7,3 +7,4 @@ backend/.venv/
 backend/staticfiles/
 backend/media/
 .superpowers/
+.claude/
