@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.core",
     "apps.kyc",
+    "apps.campaigns",
 ]
 
 MIDDLEWARE = [

@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/health/", health),
     path("api/auth/", include("apps.accounts.urls")),
     path("api/kyc/", include("apps.kyc.urls")),
+    path("api/campaigns/", include("apps.campaigns.urls")),
 ]
 
 if settings.DEBUG:

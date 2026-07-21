@@ -7,3 +7,4 @@ drf-spectacular>=0.28
 django-cors-headers>=4.7
 pytest>=8.3
 pytest-django>=4.11
+Pillow>=11.0
