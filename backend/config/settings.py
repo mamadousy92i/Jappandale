@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # Apps Jappandale
     "apps.accounts",
     "apps.core",
+    "apps.kyc",
 ]
 
 MIDDLEWARE = [

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import type { FormEvent } from "react"
-import { ShieldCheck } from "lucide-react"
 
+import { KycSection } from "@/components/account/KycSection"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -162,26 +162,9 @@ function AccountPage() {
           </Button>
         </form>
 
-        {/* Vérification d'identité (à venir) */}
-        <div className="animate-in fade-in fill-mode-backwards mt-6 flex items-start gap-4 rounded-[20px] border border-black/5 bg-surface-alt p-6 delay-300 duration-700 motion-reduce:animate-none">
-          <span
-            aria-hidden="true"
-            className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gold/15 text-gold-dark"
-          >
-            <ShieldCheck className="size-5" />
-          </span>
-          <div>
-            <p className="flex items-center gap-2 font-heading text-lg font-bold text-ink">
-              Vérification d'identité
-              <span className="rounded-full bg-gold/15 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-gold-dark uppercase">
-                Bientôt
-              </span>
-            </p>
-            <p className="mt-1 text-sm leading-relaxed text-ink-secondary">
-              La vérification de votre identité (KYC) sera bientôt disponible. Elle vous
-              permettra de créer des campagnes et de contribuer en toute confiance.
-            </p>
-          </div>
+        {/* Vérification d'identité (KYC) */}
+        <div className="animate-in fade-in fill-mode-backwards mt-6 delay-300 duration-700 motion-reduce:animate-none">
+          <KycSection status={user.kyc_status} />
         </div>
       </div>
     </section>

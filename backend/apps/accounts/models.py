@@ -36,12 +36,35 @@ class User(AbstractUser):
         CONTRIBUTEUR = "CONTRIBUTEUR", "Contributeur"
         ADMIN = "ADMIN", "Administrateur"
 
+    class KycStatus(models.TextChoices):
+        NON_SOUMIS = "NON_SOUMIS", "Non soumis"
+        EN_ATTENTE = "EN_ATTENTE", "En attente de validation"
+        VALIDE = "VALIDE", "Validé"
+        REJETE = "REJETE", "Rejeté"
+
     username = None
     email = models.EmailField("adresse e-mail", unique=True)
     role = models.CharField(
         "rôle", max_length=20, choices=Role.choices, default=Role.CONTRIBUTEUR
     )
     phone = models.CharField("téléphone", max_length=20, blank=True)
+
+    kyc_status = models.CharField(
+        "statut KYC",
+        max_length=20,
+        choices=KycStatus.choices,
+        default=KycStatus.NON_SOUMIS,
+    )
+    kyc_review_note = models.TextField("motif de la décision KYC", blank=True)
+    kyc_reviewed_at = models.DateTimeField("date de revue KYC", null=True, blank=True)
+    kyc_reviewed_by = models.ForeignKey(
+        "self",
+        verbose_name="revu par",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="kyc_reviews",
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
