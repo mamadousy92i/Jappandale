@@ -3,6 +3,8 @@ import { Route, Routes } from "react-router-dom"
 import { RequireAuth } from "@/components/RequireAuth"
 import { Layout } from "@/components/layout/Layout"
 import AccountPage from "@/pages/AccountPage"
+import CampaignDetailPage from "@/pages/CampaignDetailPage"
+import CampaignsPage from "@/pages/CampaignsPage"
 import HomePage from "@/pages/HomePage"
 import LoginPage from "@/pages/LoginPage"
 import RegisterPage from "@/pages/RegisterPage"
@@ -12,6 +14,8 @@ function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/campagnes" element={<CampaignsPage />} />
+        <Route path="/campagnes/:slug" element={<CampaignDetailPage />} />
         <Route path="/connexion" element={<LoginPage />} />
         <Route path="/inscription" element={<RegisterPage />} />
         <Route

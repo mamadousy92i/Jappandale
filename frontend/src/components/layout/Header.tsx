@@ -21,7 +21,9 @@ export function Header() {
             width={640}
             height={640}
           />
-          <span>
+          {/* Sur très petit écran, seul le rond du logo est visible : le nom
+              reste lisible par les lecteurs d'écran via `sr-only`. */}
+          <span className="sr-only sm:not-sr-only">
             Jappandale
             <span className="text-gold transition-transform duration-300 [display:inline-block] group-hover:-translate-y-0.5">
               .
@@ -30,6 +32,12 @@ export function Header() {
         </Link>
 
         <nav aria-label="Navigation principale" className="flex items-center gap-1.5 sm:gap-3">
+          <Link
+            to="/campagnes"
+            className="rounded-full px-2.5 py-1.5 text-sm font-medium text-ink-secondary transition-colors outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-gold-dark/50 sm:px-3"
+          >
+            Découvrir
+          </Link>
           {user ? (
             <div className="flex items-center gap-2 sm:gap-4" data-testid="header-user">
               <Link
