@@ -1,6 +1,8 @@
 import { Route, Routes } from "react-router-dom"
 
+import { RequireAuth } from "@/components/RequireAuth"
 import { Layout } from "@/components/layout/Layout"
+import AccountPage from "@/pages/AccountPage"
 import HomePage from "@/pages/HomePage"
 import LoginPage from "@/pages/LoginPage"
 import RegisterPage from "@/pages/RegisterPage"
@@ -12,6 +14,14 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/connexion" element={<LoginPage />} />
         <Route path="/inscription" element={<RegisterPage />} />
+        <Route
+          path="/compte"
+          element={
+            <RequireAuth>
+              <AccountPage />
+            </RequireAuth>
+          }
+        />
       </Route>
     </Routes>
   )
