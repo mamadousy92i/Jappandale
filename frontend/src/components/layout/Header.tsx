@@ -11,11 +11,21 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:h-[4.5rem] sm:px-6">
         <Link
           to="/"
-          className="group rounded-md font-heading text-xl font-bold tracking-tight text-ink transition-colors outline-none hover:text-ink/80 focus-visible:ring-2 focus-visible:ring-gold-dark/50 sm:text-2xl"
+          className="group flex items-center gap-2.5 rounded-md font-heading text-xl font-bold tracking-tight text-ink transition-colors outline-none hover:text-ink/80 focus-visible:ring-2 focus-visible:ring-gold-dark/50 sm:text-2xl"
         >
-          Jappandale
-          <span className="text-gold transition-transform duration-300 [display:inline-block] group-hover:-translate-y-0.5">
-            .
+          <img
+            src="/logo-mark.png"
+            alt=""
+            aria-hidden="true"
+            className="size-9 shrink-0 rounded-full object-cover transition-transform duration-300 group-hover:rotate-6 sm:size-10"
+            width={640}
+            height={640}
+          />
+          <span>
+            Jappandale
+            <span className="text-gold transition-transform duration-300 [display:inline-block] group-hover:-translate-y-0.5">
+              .
+            </span>
           </span>
         </Link>
 

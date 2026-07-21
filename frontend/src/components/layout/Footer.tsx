@@ -6,8 +6,18 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="flex flex-col items-start justify-between gap-10 sm:flex-row sm:items-center">
           <div className="max-w-sm space-y-3">
-            <p className="font-heading text-2xl font-bold text-ink">
-              Jappandale<span className="text-gold">.</span>
+            <p className="flex items-center gap-2.5 font-heading text-2xl font-bold text-ink">
+              <img
+                src="/logo-mark.png"
+                alt=""
+                aria-hidden="true"
+                className="size-10 rounded-full object-cover"
+                width={640}
+                height={640}
+              />
+              <span>
+                Jappandale<span className="text-gold">.</span>
+              </span>
             </p>
             <div aria-hidden="true" className="h-[3px] w-20 rounded-full bg-gradient-to-r from-gold to-gold-dark" />
             <p className="text-sm leading-relaxed text-ink-secondary">
