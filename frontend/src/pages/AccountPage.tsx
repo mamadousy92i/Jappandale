@@ -2,6 +2,7 @@ import { useState } from "react"
 import type { FormEvent } from "react"
 
 import { KycSection } from "@/components/account/KycSection"
+import { MyCampaigns } from "@/components/account/MyCampaigns"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -166,6 +167,13 @@ function AccountPage() {
         <div className="animate-in fade-in fill-mode-backwards mt-6 delay-300 duration-700 motion-reduce:animate-none">
           <KycSection status={user.kyc_status} />
         </div>
+
+        {/* Mes campagnes (porteurs uniquement) */}
+        {user.role === "PORTEUR" && (
+          <div className="animate-in fade-in fill-mode-backwards mt-6 delay-500 duration-700 motion-reduce:animate-none">
+            <MyCampaigns />
+          </div>
+        )}
       </div>
     </section>
   )
