@@ -30,6 +30,7 @@ class OwnerSerializer(serializers.Serializer):
 
 class CampaignListSerializer(serializers.ModelSerializer):
     category_display = serializers.CharField(source="get_category_display", read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
     progress_percent = serializers.IntegerField(read_only=True)
     days_left = serializers.IntegerField(read_only=True)
 
@@ -48,6 +49,9 @@ class CampaignListSerializer(serializers.ModelSerializer):
             "cover_image",
             "deadline",
             "status",
+            "status_display",
+            "moderation_note",
+            "suspension_note",
             "progress_percent",
             "days_left",
         ]

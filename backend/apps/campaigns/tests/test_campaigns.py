@@ -130,6 +130,48 @@ def test_mine_liste_les_campagnes_du_porteur():
 
 
 @pytest.mark.django_db
+def test_mine_expose_le_motif_de_rejet_au_porteur():
+    porteur = _porteur_valide()
+    _creer_campagne(
+        porteur,
+        status=Campaign.Status.REJETEE,
+        moderation_note="Le budget doit être détaillé.",
+    )
+    client = APIClient()
+    client.force_authenticate(porteur)
+
+    response = client.get("/api/campaigns/mine/")
+
+    assert response.status_code == 200
+    assert response.data[0]["moderation_note"] == "Le budget doit être détaillé."
+
+
+@pytest.mark.django_db
+def test_porteur_modifie_une_campagne_suspendue_et_la_renvoie_en_validation():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(
+        porteur,
+        status=Campaign.Status.SUSPENDUE,
+        suspension_note="Le calendrier doit être corrigé.",
+    )
+    client = APIClient()
+    client.force_authenticate(porteur)
+
+    modification = client.patch(
+        f"/api/campaigns/{campagne.slug}/",
+        {"project_timeline": "Achat — semaine 1\nInstallation — semaine 2"},
+        format="json",
+    )
+    assert modification.status_code == 200
+
+    soumission = client.post(f"/api/campaigns/{campagne.slug}/submit/")
+    assert soumission.status_code == 200
+    campagne.refresh_from_db()
+    assert campagne.status == Campaign.Status.EN_MODERATION
+    assert campagne.suspension_note == ""
+
+
+@pytest.mark.django_db
 def test_objectif_minimum_valide():
     client = APIClient()
     client.force_authenticate(_porteur_valide())

@@ -45,6 +45,8 @@ Le principal bloc fonctionnel restant avant une mise en production réelle est l
 - page de détail avec progression, échéance, informations du projet et porteur ;
 - bouton direct « Créer une campagne » et accès rapide à « Mes campagnes » ;
 - création guidée d’une campagne par un porteur autorisé ;
+- modification des brouillons et des campagnes rejetées ou suspendues avec formulaire prérempli ;
+- affichage au porteur du motif de rejet ou de suspension puis renvoi en validation après correction ;
 - brouillon, soumission, modération, publication, rejet, suspension, réactivation et clôture ;
 - affectation des campagnes à un administrateur ;
 - motif obligatoire pour les décisions sensibles ;
@@ -145,7 +147,7 @@ Si PayDunya n’est pas retenu, il faudra obtenir séparément auprès de Wave e
 
 ## 5. Validations techniques au 22 juillet 2026
 
-- backend : **72 tests réussis** ;
+- backend : **75 tests réussis** ;
 - Django : `manage.py check` sans erreur ;
 - migrations : aucune migration manquante ;
 - frontend : **6 tests réussis** avec Vitest et Testing Library ;

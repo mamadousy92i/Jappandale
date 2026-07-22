@@ -70,9 +70,13 @@ class CampaignViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         campaign = self.get_object()
-        if campaign.status not in (Campaign.Status.BROUILLON, Campaign.Status.REJETEE):
+        if campaign.status not in (
+            Campaign.Status.BROUILLON,
+            Campaign.Status.REJETEE,
+            Campaign.Status.SUSPENDUE,
+        ):
             raise ValidationError(
-                "Seule une campagne en brouillon ou rejetée peut être modifiée."
+                "Seule une campagne en brouillon, rejetée ou suspendue peut être modifiée."
             )
         return super().update(request, *args, **kwargs)
 
@@ -94,7 +98,11 @@ class CampaignViewSet(viewsets.ModelViewSet):
         campaign = self.get_object()
         if campaign.owner_id != request.user.id:
             raise PermissionDenied("Cette campagne ne vous appartient pas.")
-        if campaign.status not in (Campaign.Status.BROUILLON, Campaign.Status.REJETEE):
+        if campaign.status not in (
+            Campaign.Status.BROUILLON,
+            Campaign.Status.REJETEE,
+            Campaign.Status.SUSPENDUE,
+        ):
             raise ValidationError("Cette campagne ne peut pas être soumise à modération.")
         required_fields = {
             "location": "Indiquez la localisation du projet.",
@@ -112,7 +120,10 @@ class CampaignViewSet(viewsets.ModelViewSet):
         previous_status = campaign.status
         campaign.status = Campaign.Status.EN_MODERATION
         campaign.moderation_note = ""
-        campaign.save(update_fields=["status", "moderation_note"])
+        campaign.suspension_note = ""
+        campaign.save(
+            update_fields=["status", "moderation_note", "suspension_note"]
+        )
         CampaignAuditLog.objects.create(
             campaign=campaign,
             actor=request.user,

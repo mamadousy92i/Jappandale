@@ -18,6 +18,9 @@ const campaign: CampaignListItem = {
   cover_image: null,
   deadline: "2026-09-01",
   status: "PUBLIEE",
+  status_display: "Publiée",
+  moderation_note: "",
+  suspension_note: "",
   progress_percent: 40,
   days_left: 20,
 };

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ImagePlus,
   Plus,
@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import type { CampaignCategory } from "@/lib/types";
+import type { CampaignCategory, CampaignDetail } from "@/lib/types";
 
 const categories: { code: CampaignCategory; label: string }[] = [
   { code: "ARTISANAT", label: "Artisanat" },
@@ -60,6 +60,33 @@ function toMessage(value: unknown): string {
   return String(value);
 }
 
+function parseFundingPlan(value: string): FundingItem[] {
+  const items = value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [label, ...amountParts] = line.split("—");
+      return {
+        label: label.trim(),
+        amount: amountParts.join("—").replace(/[^0-9]/g, ""),
+      };
+    });
+  return items.length ? items : [{ label: "", amount: "" }];
+}
+
+function parseTimeline(value: string): TimelineItem[] {
+  const items = value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [step, ...periodParts] = line.split("—");
+      return { step: step.trim(), period: periodParts.join("—").trim() };
+    });
+  return items.length ? items : [{ step: "", period: "" }];
+}
+
 /** Écran affiché quand l'utilisateur n'a pas le droit de créer une campagne. */
 function AccessNotice({
   title,
@@ -84,26 +111,38 @@ function AccessNotice({
   );
 }
 
-function CreateCampaignForm() {
+function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
   const { authFetch } = useAuth();
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const [beneficiaries, setBeneficiaries] = useState("");
+  const [title, setTitle] = useState(campaign?.title ?? "");
+  const [summary, setSummary] = useState(campaign?.summary ?? "");
+  const [description, setDescription] = useState(campaign?.description ?? "");
+  const [location, setLocation] = useState(campaign?.location ?? "");
+  const [beneficiaries, setBeneficiaries] = useState(
+    campaign?.beneficiaries ?? "",
+  );
   const [fundingItems, setFundingItems] = useState<FundingItem[]>([
-    { label: "", amount: "" },
+    ...(campaign
+      ? parseFundingPlan(campaign.funding_plan)
+      : [{ label: "", amount: "" }]),
   ]);
   const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([
-    { step: "", period: "" },
+    ...(campaign
+      ? parseTimeline(campaign.project_timeline)
+      : [{ step: "", period: "" }]),
   ]);
-  const [category, setCategory] = useState<CampaignCategory>("ARTISANAT");
-  const [goalAmount, setGoalAmount] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [category, setCategory] = useState<CampaignCategory>(
+    campaign?.category ?? "ARTISANAT",
+  );
+  const [goalAmount, setGoalAmount] = useState(
+    campaign ? String(campaign.goal_amount) : "",
+  );
+  const [deadline, setDeadline] = useState(campaign?.deadline ?? "");
   const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(
+    campaign?.cover_image ?? null,
+  );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -172,8 +211,11 @@ function CreateCampaignForm() {
     if (coverImage) data.append("cover_image", coverImage);
 
     try {
-      await authFetch("/campaigns/", { method: "POST", body: data });
-      navigate("/compte");
+      await authFetch(
+        campaign ? `/campaigns/${campaign.slug}/` : "/campaigns/",
+        { method: campaign ? "PATCH" : "POST", body: data },
+      );
+      navigate("/campagnes?vue=mes-campagnes");
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) {
         setGlobalError(
@@ -574,24 +616,63 @@ function CreateCampaignForm() {
         className="mt-10 h-14 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30 sm:w-auto sm:px-12"
       >
         <Sparkles aria-hidden="true" className="size-4" />
-        {submitting ? "Création…" : "Créer ma campagne"}
+        {submitting
+          ? campaign
+            ? "Enregistrement…"
+            : "Création…"
+          : campaign
+            ? "Enregistrer les modifications"
+            : "Créer ma campagne"}
       </Button>
       <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-        Votre campagne sera d'abord enregistrée en brouillon. Vous pourrez la
-        soumettre à validation depuis votre espace « Mes campagnes ».
+        {campaign
+          ? "Après vos corrections, revenez dans « Mes campagnes » pour la renvoyer en validation."
+          : "Votre campagne sera d'abord enregistrée en brouillon. Vous pourrez la soumettre à validation depuis votre espace « Mes campagnes »."}
       </p>
     </form>
   );
 }
 
 function CreateCampaignPage() {
-  const { user } = useAuth();
+  const { slug } = useParams<{ slug: string }>();
+  const { user, authFetch } = useAuth();
+  const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
+  const [loadingCampaign, setLoadingCampaign] = useState(Boolean(slug));
+  const [campaignError, setCampaignError] = useState(false);
+
+  useEffect(() => {
+    if (!slug) return;
+    let cancelled = false;
+    authFetch(`/campaigns/${slug}/`)
+      .then((data) => {
+        if (!cancelled) setCampaign(data as CampaignDetail);
+      })
+      .catch(() => {
+        if (!cancelled) setCampaignError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingCampaign(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authFetch, slug]);
 
   // La route est protégée par RequireAuth : user est garanti non nul ici.
   if (!user) return null;
 
   let content: ReactNode;
-  if (user.role !== "PORTEUR") {
+  if (loadingCampaign) {
+    content = (
+      <div className="mt-10 h-96 animate-pulse rounded-[28px] bg-black/[0.05]" />
+    );
+  } else if (campaignError) {
+    content = (
+      <AccessNotice title="Campagne inaccessible">
+        <p>Cette campagne n’existe pas ou ne vous appartient pas.</p>
+      </AccessNotice>
+    );
+  } else if (user.role !== "PORTEUR") {
     content = (
       <AccessNotice title="Espace réservé aux porteurs de projet">
         <p>
@@ -617,8 +698,20 @@ function CreateCampaignPage() {
         </Button>
       </AccessNotice>
     );
+  } else if (
+    campaign &&
+    !["BROUILLON", "REJETEE", "SUSPENDUE"].includes(campaign.status)
+  ) {
+    content = (
+      <AccessNotice title="Modification indisponible">
+        <p>
+          Une campagne en modération, publiée ou clôturée ne peut pas être
+          modifiée depuis cet espace.
+        </p>
+      </AccessNotice>
+    );
   } else {
-    content = <CreateCampaignForm />;
+    content = <CreateCampaignForm campaign={campaign ?? undefined} />;
   }
 
   return (
@@ -631,18 +724,19 @@ function CreateCampaignPage() {
       <div className="relative mx-auto flex max-w-5xl flex-col px-5 pt-16 pb-24 sm:px-8 sm:pt-24 sm:pb-32">
         <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-center text-center duration-700 motion-reduce:animate-none">
           <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-            Nouvelle campagne
+            {campaign ? "Correction de campagne" : "Nouvelle campagne"}
           </span>
           <h1 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-            Lancer votre campagne
+            {campaign ? "Modifier votre campagne" : "Lancer votre campagne"}
           </h1>
           <div
             aria-hidden="true"
             className="mt-6 h-[3px] w-16 rounded-full bg-gradient-to-r from-gold to-gold-dark"
           />
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-secondary">
-            Présentez votre projet avec soin : notre équipe le relira avant
-            publication pour garantir la confiance des contributeurs.
+            {campaign
+              ? "Corrigez les informations signalées, enregistrez vos modifications puis renvoyez la campagne en validation."
+              : "Présentez votre projet avec soin : notre équipe le relira avant publication pour garantir la confiance des contributeurs."}
           </p>
         </div>
 
