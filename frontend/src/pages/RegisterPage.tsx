@@ -73,7 +73,7 @@ function RegisterPage() {
 
     try {
       await register(data)
-      navigate("/compte")
+      navigate("/verifier-email")
     } catch (err) {
       if (err instanceof ApiError && err.details) {
         const nextErrors: Record<string, string> = {}

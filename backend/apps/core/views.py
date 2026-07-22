@@ -3,6 +3,7 @@ from rest_framework import generics, permissions, serializers
 from rest_framework.throttling import ScopedRateThrottle
 
 from .models import SupportRequest
+from apps.notifications.services import notify_admins
 
 
 def health(request):
@@ -24,4 +25,8 @@ class SupportRequestCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user if self.request.user.is_authenticated else None
-        serializer.save(user=user)
+        support = serializer.save(user=user)
+        notify_admins(
+            subject="Nouvelle demande d’assistance",
+            message=f"{support.name} demande de l’aide : {support.subject}",
+        )

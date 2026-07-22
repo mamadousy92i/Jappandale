@@ -3,11 +3,12 @@ from datetime import timedelta
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from apps.campaigns.models import Campaign, CampaignReport
-from apps.core.models import SupportRequest
+from apps.campaigns.models import Campaign, CampaignAuditLog, CampaignReport
+from apps.core.models import SupportReply, SupportRequest
 from apps.kyc.models import KycAuditLog, KycDocument
 from apps.notifications.models import Notification
 
@@ -111,6 +112,9 @@ def test_admin_can_publish_campaign():
     campaign.refresh_from_db()
     assert campaign.status == Campaign.Status.PUBLIEE
     assert campaign.published_at is not None
+    assert CampaignAuditLog.objects.filter(
+        campaign=campaign, action=CampaignAuditLog.Action.PUBLISHED, actor=admin
+    ).exists()
 
 
 @pytest.mark.django_db
@@ -164,3 +168,90 @@ def test_admin_can_close_report_and_support_request():
     support.refresh_from_db()
     assert report.status == CampaignReport.Status.RESOLU
     assert support.status == SupportRequest.Status.RESOLUE
+
+
+@pytest.mark.django_db
+def test_admin_can_suspend_and_reactivate_campaign():
+    admin = _admin()
+    owner = User.objects.create_user(email="workflow@test.sn", password="MotDePasse123!")
+    campaign = _campaign(owner, Campaign.Status.PUBLIEE)
+    client = APIClient()
+    client.force_authenticate(admin)
+
+    suspended = client.post(
+        f"/api/backoffice/campaigns/{campaign.id}/workflow/",
+        {"action": "SUSPEND", "note": "Vérification complémentaire en cours."},
+        format="json",
+    )
+    assert suspended.status_code == 200
+    campaign.refresh_from_db()
+    assert campaign.status == Campaign.Status.SUSPENDUE
+
+    reactivated = client.post(
+        f"/api/backoffice/campaigns/{campaign.id}/workflow/",
+        {"action": "REACTIVATE", "note": ""},
+        format="json",
+    )
+    assert reactivated.status_code == 200
+    campaign.refresh_from_db()
+    assert campaign.status == Campaign.Status.PUBLIEE
+
+
+@pytest.mark.django_db
+def test_admin_can_search_and_disable_user_but_not_self():
+    admin = _admin()
+    member = User.objects.create_user(
+        email="searchable@test.sn", password="MotDePasse123!", first_name="Mariama"
+    )
+    client = APIClient()
+    client.force_authenticate(admin)
+
+    listed = client.get("/api/backoffice/users/?search=Mariama")
+    assert listed.status_code == 200
+    assert listed.data["count"] == 1
+
+    disabled = client.patch(
+        f"/api/backoffice/users/{member.id}/", {"is_active": False}, format="json"
+    )
+    assert disabled.status_code == 200
+    member.refresh_from_db()
+    assert not member.is_active
+
+    self_disabled = client.patch(
+        f"/api/backoffice/users/{admin.id}/", {"is_active": False}, format="json"
+    )
+    assert self_disabled.status_code == 400
+
+
+@pytest.mark.django_db
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+def test_admin_can_reply_to_support_from_dashboard():
+    admin = _admin()
+    support = SupportRequest.objects.create(
+        name="Awa", email="reply@test.sn", subject="Question", message="Bonjour"
+    )
+    client = APIClient()
+    client.force_authenticate(admin)
+
+    response = client.post(
+        f"/api/backoffice/support/{support.id}/reply/",
+        {"subject": "Re: Question", "message": "Bonjour Awa, voici notre réponse."},
+        format="json",
+    )
+    assert response.status_code == 200
+    assert SupportReply.objects.filter(
+        support_request=support, delivery_status=SupportReply.DeliveryStatus.SENT
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_export_ticket_produces_downloadable_csv():
+    admin = _admin()
+    client = APIClient()
+    client.force_authenticate(admin)
+    ticket = client.post("/api/backoffice/exports/users/ticket/")
+    assert ticket.status_code == 200
+
+    exported = APIClient().get(ticket.data["url"])
+    assert exported.status_code == 200
+    assert exported["Content-Type"].startswith("text/csv")

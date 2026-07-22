@@ -1,11 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
+import logging
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from rest_framework import serializers
 
 from .models import User
+
+logger = logging.getLogger(__name__)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -24,6 +27,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
+        from .services import send_email_verification_otp
         from apps.notifications.models import Notification
         from apps.notifications.services import notify_user
 
@@ -37,18 +41,31 @@ class RegisterSerializer(serializers.ModelSerializer):
             ),
             action_url="/compte",
         )
+        try:
+            send_email_verification_otp(user)
+        except Exception:
+            logger.exception("Échec de l’envoi de l’OTP de vérification", extra={"user_id": user.id})
         return user
 
 
 class UserSerializer(serializers.ModelSerializer):
+    email_verified = serializers.BooleanField(source="is_email_verified", read_only=True)
+
     class Meta:
         model = User
-        fields = ["id", "email", "first_name", "last_name", "role", "phone", "kyc_status"]
+        fields = ["id", "email", "email_verified", "first_name", "last_name", "role", "phone", "organization_name", "city", "bio", "kyc_status"]
         read_only_fields = ["id", "email", "role", "kyc_status"]
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
+
+class EmailVerificationSerializer(serializers.Serializer):
+    code = serializers.RegexField(
+        r"^\d{6}$",
+        error_messages={"invalid": "Saisissez les six chiffres du code."},
+    )
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):

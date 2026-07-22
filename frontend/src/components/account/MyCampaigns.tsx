@@ -13,6 +13,7 @@ const statusBadges: Record<CampaignStatus, { label: string; className: string }>
   EN_MODERATION: { label: "En modération", className: "bg-gold/15 text-gold-dark" },
   PUBLIEE: { label: "Publiée", className: "bg-emerald-100 text-emerald-700" },
   REJETEE: { label: "Rejetée", className: "bg-red-100 text-red-700" },
+  SUSPENDUE: { label: "Suspendue", className: "bg-red-100 text-red-700" },
   CLOTUREE: { label: "Clôturée", className: "bg-ink/85 text-surface" },
 }
 

@@ -11,9 +11,13 @@ class Notification(models.Model):
         KYC_REJECTED = "KYC_REJECTED", "KYC rejeté"
         CAMPAIGN_PUBLISHED = "CAMPAIGN_PUBLISHED", "Campagne publiée"
         CAMPAIGN_REJECTED = "CAMPAIGN_REJECTED", "Campagne rejetée"
+        CAMPAIGN_SUSPENDED = "CAMPAIGN_SUSPENDED", "Campagne suspendue"
+        CAMPAIGN_REACTIVATED = "CAMPAIGN_REACTIVATED", "Campagne réactivée"
+        CAMPAIGN_CLOSED = "CAMPAIGN_CLOSED", "Campagne clôturée"
         CONTRIBUTION_CONFIRMED = "CONTRIBUTION_CONFIRMED", "Contribution confirmée"
         CONTRIBUTION_RECEIVED = "CONTRIBUTION_RECEIVED", "Contribution reçue"
         GOAL_REACHED = "GOAL_REACHED", "Objectif atteint"
+        ADMIN_ACTION_REQUIRED = "ADMIN_ACTION_REQUIRED", "Action administrateur requise"
 
     class DeliveryStatus(models.TextChoices):
         PENDING = "PENDING", "En attente"

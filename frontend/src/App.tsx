@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom"
 
 import { RequireAuth } from "@/components/RequireAuth"
 import { RequireAdmin } from "@/components/RequireAdmin"
+import { RequireVerifiedEmail } from "@/components/RequireVerifiedEmail"
 import { Layout } from "@/components/layout/Layout"
 import AccountPage from "@/pages/AccountPage"
 import AdminDashboardPage from "@/pages/AdminDashboardPage"
@@ -21,6 +22,7 @@ import RegisterPage from "@/pages/RegisterPage"
 import ReportCampaignPage from "@/pages/ReportCampaignPage"
 import ResetPasswordPage from "@/pages/ResetPasswordPage"
 import TrustPage from "@/pages/TrustPage"
+import VerifyEmailPage from "@/pages/VerifyEmailPage"
 
 function App() {
   return (
@@ -32,7 +34,7 @@ function App() {
           path="/campagnes/nouvelle"
           element={
             <RequireAuth>
-              <CreateCampaignPage />
+              <RequireVerifiedEmail><CreateCampaignPage /></RequireVerifiedEmail>
             </RequireAuth>
           }
         />
@@ -44,12 +46,12 @@ function App() {
         <Route path="/confidentialite" element={<PrivacyPage />} />
         <Route path="/conditions" element={<TermsPage />} />
         <Route path="/campagnes/:slug/actualites/nouvelle" element={<RequireAuth><CreateCampaignUpdatePage /></RequireAuth>} />
-        <Route path="/campagnes/:slug/signaler" element={<RequireAuth><ReportCampaignPage /></RequireAuth>} />
+        <Route path="/campagnes/:slug/signaler" element={<RequireAuth><RequireVerifiedEmail><ReportCampaignPage /></RequireVerifiedEmail></RequireAuth>} />
         <Route
           path="/campagnes/:slug/contribuer"
           element={
             <RequireAuth>
-              <ContributionPage />
+              <RequireVerifiedEmail><ContributionPage /></RequireVerifiedEmail>
             </RequireAuth>
           }
         />
@@ -58,6 +60,7 @@ function App() {
         <Route path="/mot-de-passe/reinitialiser/:uid/:token" element={<ResetPasswordPage />} />
         <Route path="/inscription" element={<RegisterPage />} />
         <Route path="/notifications" element={<RequireAuth><NotificationsPage /></RequireAuth>} />
+        <Route path="/verifier-email" element={<RequireAuth><VerifyEmailPage /></RequireAuth>} />
         <Route path="/administration" element={<RequireAdmin><AdminDashboardPage /></RequireAdmin>} />
         <Route
           path="/compte"

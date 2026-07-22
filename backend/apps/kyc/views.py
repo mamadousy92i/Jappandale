@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import User
+from apps.notifications.services import notify_admins
 
 from .models import KycAuditLog, KycDocument
 from .serializers import KycDocumentSerializer
@@ -55,6 +56,10 @@ class KycView(APIView):
             action=KycAuditLog.Action.DOCUMENT_SUBMITTED,
             previous_status=previous_status,
             new_status=request.user.kyc_status,
+        )
+        notify_admins(
+            subject="Nouveau dossier KYC à vérifier",
+            message=f"{request.user.email} a transmis une pièce d’identité.",
         )
 
         return Response(_kyc_state(request.user), status=status.HTTP_201_CREATED)

@@ -11,5 +11,6 @@ class IsKycValidated(permissions.BasePermission):
         return bool(
             user
             and user.is_authenticated
+            and user.is_email_verified
             and user.kyc_status == User.KycStatus.VALIDE
         )

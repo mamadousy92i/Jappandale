@@ -18,6 +18,7 @@ def _porteur_valide(email="porteur@test.sn"):
         kyc_status=User.KycStatus.VALIDE,
         first_name="Awa",
         last_name="Diop",
+        email_verified_at=timezone.now(),
     )
 
 
@@ -196,7 +197,7 @@ def test_membre_peut_signaler_une_campagne_publiee():
     porteur = _porteur_valide()
     campagne = _creer_campagne(porteur, status=Campaign.Status.PUBLIEE)
     reporter = User.objects.create_user(
-        email="signalement@test.sn", password="MotDePasse123!"
+        email="signalement@test.sn", password="MotDePasse123!", email_verified_at=timezone.now()
     )
     client = APIClient()
     client.force_authenticate(reporter)
@@ -215,7 +216,7 @@ def test_membre_peut_signaler_une_campagne_publiee():
 def test_un_membre_ne_peut_pas_signaler_deux_fois_la_meme_campagne():
     porteur = _porteur_valide()
     campagne = _creer_campagne(porteur, status=Campaign.Status.PUBLIEE)
-    reporter = User.objects.create_user(email="doublon@test.sn", password="MotDePasse123!")
+    reporter = User.objects.create_user(email="doublon@test.sn", password="MotDePasse123!", email_verified_at=timezone.now())
     CampaignReport.objects.create(
         campaign=campagne, reporter=reporter, reason=CampaignReport.Reason.AUTRE, details="Premier signalement"
     )

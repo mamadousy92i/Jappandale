@@ -5,10 +5,14 @@ export type KycStatus = "NON_SOUMIS" | "EN_ATTENTE" | "VALIDE" | "REJETE"
 export interface User {
   id: number
   email: string
+  email_verified: boolean
   first_name: string
   last_name: string
   role: Role
   phone: string
+  organization_name: string
+  city: string
+  bio: string
   kyc_status: KycStatus
 }
 
@@ -36,6 +40,7 @@ export type CampaignStatus =
   | "EN_MODERATION"
   | "PUBLIEE"
   | "REJETEE"
+  | "SUSPENDUE"
   | "CLOTUREE"
 
 export interface CampaignListItem {
@@ -75,7 +80,8 @@ export interface CampaignDetail extends CampaignListItem {
   project_timeline: string
   status_display: string
   moderation_note: string
-  owner: { first_name: string; last_name: string }
+  suspension_note: string
+  owner: { first_name: string; last_name: string; organization_name: string; city: string; bio: string }
   updates: CampaignUpdate[]
   recent_contributors: RecentContributor[]
   created_at: string

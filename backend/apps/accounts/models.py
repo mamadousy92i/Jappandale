@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.hashers import check_password, make_password
 from django.db import models
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -48,6 +50,20 @@ class User(AbstractUser):
         "rôle", max_length=20, choices=Role.choices, default=Role.CONTRIBUTEUR
     )
     phone = models.CharField("téléphone", max_length=20, blank=True)
+    organization_name = models.CharField("organisation", max_length=160, blank=True)
+    city = models.CharField("ville", max_length=120, blank=True)
+    bio = models.TextField("présentation publique", max_length=700, blank=True)
+    email_verified_at = models.DateTimeField(
+        "adresse e-mail vérifiée le", null=True, blank=True
+    )
+    kyc_assigned_to = models.ForeignKey(
+        "self",
+        verbose_name="dossier KYC attribué à",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_kyc_users",
+    )
 
     kyc_status = models.CharField(
         "statut KYC",
@@ -77,3 +93,35 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    @property
+    def is_email_verified(self):
+        return self.email_verified_at is not None
+
+
+class EmailVerificationOtp(models.Model):
+    """Code à usage unique envoyé uniquement par e-mail."""
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="email_verification_otps"
+    )
+    code_hash = models.CharField(max_length=128)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "OTP de vérification e-mail"
+        verbose_name_plural = "OTP de vérification e-mail"
+
+    def set_code(self, code):
+        self.code_hash = make_password(code)
+
+    def check_code(self, code):
+        return check_password(code, self.code_hash)
+
+    @property
+    def is_valid(self):
+        return self.used_at is None and self.expires_at > timezone.now() and self.attempts < 5

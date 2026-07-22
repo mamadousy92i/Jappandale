@@ -41,6 +41,7 @@ for key, profile in PORTEURS.items():
     user.last_name = profile["last_name"]
     user.role = User.Role.PORTEUR
     user.kyc_status = User.KycStatus.VALIDE
+    user.email_verified_at = timezone.now()
     user.set_password("MotDePasse123!")
     user.save()
     porteurs[key] = user
@@ -53,6 +54,7 @@ contributor.first_name = "Mariama"
 contributor.last_name = "Fall"
 contributor.role = User.Role.CONTRIBUTEUR
 contributor.kyc_status = User.KycStatus.VALIDE
+contributor.email_verified_at = timezone.now()
 contributor.set_password("MotDePasse123!")
 contributor.save()
 
@@ -65,6 +67,7 @@ administrator.last_name = "Jappandale"
 administrator.role = User.Role.ADMIN
 administrator.is_staff = False
 administrator.kyc_status = User.KycStatus.VALIDE
+administrator.email_verified_at = timezone.now()
 administrator.set_password("MotDePasse123!")
 administrator.save()
 

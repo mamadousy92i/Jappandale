@@ -23,6 +23,9 @@ class OwnerSerializer(serializers.Serializer):
 
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+    organization_name = serializers.CharField()
+    city = serializers.CharField()
+    bio = serializers.CharField()
 
 
 class CampaignListSerializer(serializers.ModelSerializer):
@@ -105,6 +108,7 @@ class CampaignDetailSerializer(serializers.ModelSerializer):
             "status",
             "status_display",
             "moderation_note",
+            "suspension_note",
             "progress_percent",
             "days_left",
             "owner",

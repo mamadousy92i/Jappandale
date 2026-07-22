@@ -117,7 +117,9 @@ function DonationCard({ campaign }: { campaign: CampaignDetail }) {
         </Button>
       ) : (
         <Button disabled className="mt-6 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink">
-          Campagne clôturée
+          {campaign.status === "SUSPENDUE"
+            ? "Campagne temporairement suspendue"
+            : "Campagne clôturée"}
         </Button>
       )}
       <p className="mt-3 text-center text-xs leading-relaxed text-ink-muted">
@@ -348,6 +350,8 @@ function CampaignDetailPage() {
               une garantie de résultat ni un conseil d’investissement.
             </p>
           </section>
+
+          {(campaign.owner.organization_name || campaign.owner.bio) && <section className="mt-10 rounded-[20px] border border-black/5 bg-surface p-6 shadow-sm" aria-labelledby="porteur-profil"><p className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">Le porteur du projet</p><h2 id="porteur-profil" className="mt-3 font-heading text-2xl font-bold text-ink">{campaign.owner.organization_name || ownerName(campaign.owner)}</h2>{campaign.owner.city && <p className="mt-1 text-sm text-ink-muted">{campaign.owner.city}</p>}{campaign.owner.bio && <p className="mt-4 leading-relaxed text-ink-secondary">{campaign.owner.bio}</p>}</section>}
 
           {campaign.recent_contributors.length > 0 && (
             <section className="mt-12" aria-labelledby="contributeurs">

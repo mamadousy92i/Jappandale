@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { ApiError } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import type { Role } from "@/lib/types"
+import { Link } from "react-router-dom"
 
 const roleLabels: Record<Role, string> = {
   PORTEUR: "Porteur de projet",
@@ -24,6 +25,9 @@ function AccountPage() {
   const [firstName, setFirstName] = useState(user?.first_name ?? "")
   const [lastName, setLastName] = useState(user?.last_name ?? "")
   const [phone, setPhone] = useState(user?.phone ?? "")
+  const [organizationName, setOrganizationName] = useState(user?.organization_name ?? "")
+  const [city, setCity] = useState(user?.city ?? "")
+  const [bio, setBio] = useState(user?.bio ?? "")
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -39,7 +43,7 @@ function AccountPage() {
     try {
       await authFetch("/auth/me/", {
         method: "PATCH",
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone }),
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone, organization_name: organizationName, city, bio }),
       })
       await refreshUser()
       setSaved(true)
@@ -87,6 +91,8 @@ function AccountPage() {
         </div>
 
         {/* Formulaire de profil */}
+        {!user.email_verified && <div className="mt-8 flex flex-col justify-between gap-4 rounded-[20px] border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center"><div><p className="font-semibold text-amber-900">Adresse e-mail non vérifiée</p><p className="mt-1 text-sm text-amber-800">Saisissez le code reçu par e-mail pour sécuriser votre compte.</p></div><Button asChild className="shrink-0 rounded-full bg-ink text-white"><Link to="/verifier-email">Vérifier maintenant</Link></Button></div>}
+
         <form
           data-testid="account-form"
           onSubmit={handleSubmit}
@@ -154,6 +160,7 @@ function AccountPage() {
                 className="h-11 rounded-xl px-3.5"
               />
             </div>
+            {user.role === "PORTEUR" && <><div className="space-y-2"><Label htmlFor="organization">Organisation <span className="font-normal text-ink-muted">(facultatif)</span></Label><Input id="organization" value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} placeholder="Nom de l’association ou de l’activité" className="h-11 rounded-xl" /></div><div className="space-y-2"><Label htmlFor="city">Ville</Label><Input id="city" value={city} onChange={(event) => setCity(event.target.value)} placeholder="Dakar" className="h-11 rounded-xl" /></div><div className="space-y-2 sm:col-span-2"><Label htmlFor="bio">Présentation publique</Label><textarea id="bio" rows={4} maxLength={700} value={bio} onChange={(event) => setBio(event.target.value)} placeholder="Présentez votre expérience et ce qui vous motive…" className="w-full rounded-xl border border-input bg-transparent px-3 py-3 text-sm text-ink outline-none focus:ring-2 focus:ring-gold-dark/30" /><p className="text-right text-xs text-ink-muted">{bio.length}/700</p></div></>}
           </div>
 
           <Button

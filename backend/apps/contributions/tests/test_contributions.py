@@ -21,6 +21,7 @@ def make_user(email, role=User.Role.CONTRIBUTEUR, kyc=User.KycStatus.VALIDE):
         kyc_status=kyc,
         first_name="Aminata",
         last_name="Ndiaye",
+        email_verified_at=timezone.now(),
     )
 
 

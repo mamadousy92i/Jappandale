@@ -6,7 +6,8 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 
-from .models import Campaign, CampaignReport
+from .models import Campaign, CampaignAuditLog, CampaignReport
+from apps.notifications.services import notify_admins
 from .permissions import IsOwner, IsValidatedPorteur
 from .serializers import (
     CampaignDetailSerializer,
@@ -39,7 +40,12 @@ class CampaignViewSet(viewsets.ModelViewSet):
             if self.request.user.is_authenticated:
                 visible |= Q(owner=self.request.user)
                 if self.request.user.is_staff or self.request.user.role == "ADMIN":
-                    visible |= Q(status=Campaign.Status.EN_MODERATION)
+                    visible |= Q(
+                        status__in=[
+                            Campaign.Status.EN_MODERATION,
+                            Campaign.Status.SUSPENDUE,
+                        ]
+                    )
             return base.filter(visible)
         if self.action == "list":
             queryset = base.filter(status__in=PUBLIC_STATUSES)
@@ -103,9 +109,21 @@ class CampaignViewSet(viewsets.ModelViewSet):
         }
         if missing:
             raise ValidationError(missing)
+        previous_status = campaign.status
         campaign.status = Campaign.Status.EN_MODERATION
         campaign.moderation_note = ""
         campaign.save(update_fields=["status", "moderation_note"])
+        CampaignAuditLog.objects.create(
+            campaign=campaign,
+            actor=request.user,
+            action=CampaignAuditLog.Action.SUBMITTED,
+            previous_status=previous_status,
+            new_status=campaign.status,
+        )
+        notify_admins(
+            subject="Nouvelle campagne à modérer",
+            message=f"La campagne « {campaign.title} » vient d’être soumise.",
+        )
         return Response(CampaignDetailSerializer(campaign).data)
 
     @action(detail=True, methods=["post"], url_path="updates")
@@ -129,6 +147,8 @@ class CampaignViewSet(viewsets.ModelViewSet):
         url_path="report",
     )
     def report(self, request, slug=None):
+        if not request.user.is_email_verified:
+            raise PermissionDenied("Vérifiez votre adresse e-mail avant de signaler une campagne.")
         campaign = self.get_object()
         if campaign.owner_id == request.user.id:
             raise ValidationError("Vous ne pouvez pas signaler votre propre campagne.")
@@ -136,5 +156,9 @@ class CampaignViewSet(viewsets.ModelViewSet):
             raise ValidationError("Vous avez déjà signalé cette campagne.")
         serializer = CampaignReportSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(campaign=campaign, reporter=request.user)
+        report = serializer.save(campaign=campaign, reporter=request.user)
+        notify_admins(
+            subject="Nouveau signalement de campagne",
+            message=f"La campagne « {campaign.title} » a été signalée : {report.get_reason_display()}.",
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)

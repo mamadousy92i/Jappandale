@@ -5,7 +5,7 @@ from django.utils import timezone
 from apps.notifications.models import Notification
 from apps.notifications.services import notify_user
 
-from .models import Campaign, CampaignReport, CampaignUpdate
+from .models import Campaign, CampaignAuditLog, CampaignReport, CampaignUpdate
 
 
 class CampaignUpdateInline(admin.TabularInline):
@@ -34,10 +34,18 @@ class CampaignAdmin(admin.ModelAdmin):
     def publier(self, request, queryset):
         mis_a_jour = 0
         for campaign in queryset:
+            previous_status = campaign.status
             campaign.status = Campaign.Status.PUBLIEE
             campaign.published_at = timezone.now()
             campaign.moderation_note = ""
             campaign.save(update_fields=["status", "published_at", "moderation_note"])
+            CampaignAuditLog.objects.create(
+                campaign=campaign,
+                actor=request.user,
+                action=CampaignAuditLog.Action.PUBLISHED,
+                previous_status=previous_status,
+                new_status=campaign.status,
+            )
             notify_user(
                 recipient=campaign.owner,
                 kind=Notification.Kind.CAMPAIGN_PUBLISHED,
@@ -56,8 +64,17 @@ class CampaignAdmin(admin.ModelAdmin):
             if not campaign.moderation_note.strip():
                 skipped.append(campaign.title)
                 continue
+            previous_status = campaign.status
             campaign.status = Campaign.Status.REJETEE
             campaign.save(update_fields=["status"])
+            CampaignAuditLog.objects.create(
+                campaign=campaign,
+                actor=request.user,
+                action=CampaignAuditLog.Action.REJECTED,
+                previous_status=previous_status,
+                new_status=campaign.status,
+                note=campaign.moderation_note,
+            )
             notify_user(
                 recipient=campaign.owner,
                 kind=Notification.Kind.CAMPAIGN_REJECTED,
@@ -83,4 +100,17 @@ class CampaignReportAdmin(admin.ModelAdmin):
     readonly_fields = ("campaign", "reporter", "reason", "details", "created_at", "updated_at")
 
     def has_add_permission(self, request):
+        return False
+
+
+@admin.register(CampaignAuditLog)
+class CampaignAuditLogAdmin(admin.ModelAdmin):
+    list_display = ("campaign", "action", "actor", "created_at")
+    list_filter = ("action", "created_at")
+    readonly_fields = ("campaign", "actor", "action", "previous_status", "new_status", "note", "created_at")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
         return False

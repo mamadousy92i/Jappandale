@@ -10,6 +10,17 @@
 - une base PostgreSQL et un stockage média sauvegardés
 - un serveur SMTP réel pour la récupération de mot de passe et les notifications
 
+Configuration e-mail retenue :
+
+- serveur sortant : `smtp.hostinger.com`
+- port : `465`
+- sécurité : SSL (`EMAIL_USE_SSL=True`, `EMAIL_USE_TLS=False`)
+- compte : `contact@yambinternational.com`
+- le mot de passe doit être fourni uniquement via `EMAIL_HOST_PASSWORD`
+
+Les OTP sont envoyés exclusivement par e-mail. Aucun OTP SMS ou WhatsApp n’est
+activé dans cette version.
+
 ## Protections HTTPS
 
 Après validation du certificat et du proxy :

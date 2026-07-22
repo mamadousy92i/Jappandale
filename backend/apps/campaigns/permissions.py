@@ -18,6 +18,7 @@ class IsValidatedPorteur(permissions.BasePermission):
         return bool(
             user
             and user.is_authenticated
+            and user.is_email_verified
             and user.role == User.Role.PORTEUR
             and user.kyc_status == User.KycStatus.VALIDE
         )

@@ -112,6 +112,8 @@ REST_FRAMEWORK = {
         "password_reset_confirm": "10/hour",
         "support": "10/hour",
         "campaign_report": "5/hour",
+        "email_otp_send": "5/hour",
+        "email_otp_verify": "20/hour",
     },
 }
 
@@ -132,6 +134,39 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = env(
     "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
 )
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Jappandale <noreply@jappandale.sn>")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.hostinger.com")
+EMAIL_PORT = env.int("EMAIL_PORT", default=465)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="contact@yambinternational.com")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=True)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
+DEFAULT_FROM_EMAIL = env(
+    "DEFAULT_FROM_EMAIL",
+    default="Jappandale <contact@yambinternational.com>",
+)
+EMAIL_LOGO_PATH = env(
+    "EMAIL_LOGO_PATH",
+    default=str(BASE_DIR.parent / "frontend" / "public" / "logo-mark.png"),
+)
+EMAIL_OTP_TTL = env.int("EMAIL_OTP_TTL", default=600)
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173")
 PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT", default=3600)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "{asctime} {levelname} {name} {message}",
+            "style": "{",
+        }
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "standard"}
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": env("DJANGO_LOG_LEVEL", default="INFO"),
+    },
+}

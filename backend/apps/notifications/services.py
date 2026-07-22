@@ -1,6 +1,6 @@
-from django.conf import settings
-from django.core.mail import send_mail
 from django.utils import timezone
+
+from apps.core.email import send_branded_email
 
 from .models import Notification
 
@@ -15,11 +15,11 @@ def notify_user(*, recipient, kind, subject, message, action_url=""):
         action_url=action_url,
     )
     try:
-        sent = send_mail(
+        sent = send_branded_email(
             subject=subject,
             message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[recipient.email],
+            action_url=action_url,
             fail_silently=False,
         )
         notification.delivery_status = (
@@ -35,3 +35,21 @@ def notify_user(*, recipient, kind, subject, message, action_url=""):
         update_fields=["delivery_status", "delivery_error", "sent_at"]
     )
     return notification
+
+
+def notify_admins(*, subject, message, action_url="/administration"):
+    """Informe les comptes administrateurs actifs d'une nouvelle tâche."""
+    from apps.accounts.models import User
+
+    notifications = []
+    for admin in User.objects.filter(role=User.Role.ADMIN, is_active=True):
+        notifications.append(
+            notify_user(
+                recipient=admin,
+                kind=Notification.Kind.ADMIN_ACTION_REQUIRED,
+                subject=subject,
+                message=message,
+                action_url=action_url,
+            )
+        )
+    return notifications

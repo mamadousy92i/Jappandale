@@ -22,6 +22,7 @@ class Campaign(models.Model):
         EN_MODERATION = "EN_MODERATION", "En modération"
         PUBLIEE = "PUBLIEE", "Publiée"
         REJETEE = "REJETEE", "Rejetée"
+        SUSPENDUE = "SUSPENDUE", "Suspendue"
         CLOTUREE = "CLOTUREE", "Clôturée"
 
     owner = models.ForeignKey(
@@ -51,6 +52,16 @@ class Campaign(models.Model):
         "statut", max_length=20, choices=Status.choices, default=Status.BROUILLON
     )
     moderation_note = models.TextField("motif de modération", blank=True)
+    moderation_assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_campaigns",
+        verbose_name="modération attribuée à",
+    )
+    suspension_note = models.TextField("motif de suspension", blank=True)
+    suspended_at = models.DateTimeField("suspendue le", null=True, blank=True)
     created_at = models.DateTimeField("créée le", auto_now_add=True)
     updated_at = models.DateTimeField("mise à jour le", auto_now=True)
     published_at = models.DateTimeField("publiée le", null=True, blank=True)
@@ -141,6 +152,14 @@ class CampaignReport(models.Model):
         "statut", max_length=20, choices=Status.choices, default=Status.NOUVEAU
     )
     admin_note = models.TextField("note interne", blank=True)
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_campaign_reports",
+        verbose_name="attribué à",
+    )
     created_at = models.DateTimeField("signalé le", auto_now_add=True)
     updated_at = models.DateTimeField("mise à jour le", auto_now=True)
 
@@ -156,3 +175,36 @@ class CampaignReport(models.Model):
 
     def __str__(self):
         return f"{self.campaign.title} — {self.get_reason_display()}"
+
+
+class CampaignAuditLog(models.Model):
+    """Historique append-only des décisions prises sur une campagne."""
+
+    class Action(models.TextChoices):
+        SUBMITTED = "SUBMITTED", "Soumise à modération"
+        PUBLISHED = "PUBLISHED", "Publiée"
+        REJECTED = "REJECTED", "Rejetée"
+        SUSPENDED = "SUSPENDED", "Suspendue"
+        REACTIVATED = "REACTIVATED", "Réactivée"
+        CLOSED = "CLOSED", "Clôturée"
+
+    campaign = models.ForeignKey(
+        Campaign, on_delete=models.PROTECT, related_name="audit_logs"
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="campaign_audit_actions",
+    )
+    action = models.CharField(max_length=20, choices=Action.choices)
+    previous_status = models.CharField(max_length=20)
+    new_status = models.CharField(max_length=20)
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "événement d’audit de campagne"
+        verbose_name_plural = "événements d’audit de campagne"
