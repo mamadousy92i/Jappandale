@@ -1,9 +1,22 @@
-import { Outlet } from "react-router-dom"
+import { useEffect } from "react"
+import { Outlet, useLocation } from "react-router-dom"
 
 import { Footer } from "./Footer"
 import { Header } from "./Header"
 
 export function Layout() {
+  const { pathname, hash } = useLocation()
+
+  useEffect(() => {
+    if (hash) {
+      window.requestAnimationFrame(() => {
+        document.getElementById(hash.slice(1))?.scrollIntoView()
+      })
+      return
+    }
+    window.scrollTo(0, 0)
+  }, [pathname, hash])
+
   return (
     <div className="flex min-h-screen flex-col bg-surface">
       <a href="#main-content" className="sr-only z-[200] rounded-lg bg-ink px-4 py-3 text-white focus:fixed focus:top-3 focus:left-3 focus:not-sr-only">Aller au contenu principal</a>

@@ -29,7 +29,8 @@ export function Footer() {
           <div className="grid grid-cols-2 gap-10 text-sm sm:grid-cols-3">
           <nav aria-label="Comprendre" className="flex flex-col gap-2">
             <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">Comprendre</span>
-            <Link to="/comment-ca-marche" className="w-fit text-ink-secondary hover:text-gold-dark">Comment ça marche</Link>
+            <Link to="/#comment-ca-marche" className="w-fit text-ink-secondary hover:text-gold-dark">Comment ça marche</Link>
+            <Link to="/a-propos" className="w-fit text-ink-secondary hover:text-gold-dark">À propos</Link>
             <Link to="/confiance" className="w-fit text-ink-secondary hover:text-gold-dark">Confiance et transparence</Link>
             <Link to="/contact" className="w-fit text-ink-secondary hover:text-gold-dark">Assistance</Link>
           </nav>

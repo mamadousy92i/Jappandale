@@ -8,7 +8,7 @@ class PaymentResult:
 
 
 class SimulatedPaymentProvider:
-    """Fournisseur déterministe utilisé pour démontrer succès et échec."""
+    """Fournisseur déterministe utilisé pour les parcours locaux."""
 
     SUCCESS = "SUCCESS"
     FAILURE = "FAILURE"
@@ -18,5 +18,5 @@ class SimulatedPaymentProvider:
             return PaymentResult(success=True)
         return PaymentResult(
             success=False,
-            failure_reason="Paiement refusé par le simulateur.",
+            failure_reason="La contribution n’a pas été confirmée.",
         )

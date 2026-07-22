@@ -50,11 +50,31 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     email_verified = serializers.BooleanField(source="is_email_verified", read_only=True)
+    avatar = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = User
-        fields = ["id", "email", "email_verified", "first_name", "last_name", "role", "phone", "organization_name", "city", "bio", "kyc_status"]
+        fields = ["id", "email", "email_verified", "first_name", "last_name", "role", "phone", "avatar", "organization_name", "city", "bio", "kyc_status"]
         read_only_fields = ["id", "email", "role", "kyc_status"]
+
+    def validate_avatar(self, avatar):
+        if avatar is None:
+            return avatar
+        if avatar.size > 3 * 1024 * 1024:
+            raise serializers.ValidationError("La photo ne doit pas dépasser 3 Mo.")
+        if avatar.image.format not in {"JPEG", "PNG", "WEBP"}:
+            raise serializers.ValidationError("Formats acceptés : JPG, PNG ou WebP.")
+        width, height = avatar.image.size
+        if width > 4000 or height > 4000:
+            raise serializers.ValidationError("La photo ne doit pas dépasser 4 000 × 4 000 pixels.")
+        return avatar
+
+    def update(self, instance, validated_data):
+        previous_avatar = instance.avatar if "avatar" in validated_data else None
+        instance = super().update(instance, validated_data)
+        if previous_avatar and previous_avatar.name != getattr(instance.avatar, "name", ""):
+            previous_avatar.storage.delete(previous_avatar.name)
+        return instance
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):

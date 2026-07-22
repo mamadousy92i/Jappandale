@@ -1,10 +1,11 @@
 import { useState } from "react"
-import type { FormEvent } from "react"
+import type { ChangeEvent, FormEvent } from "react"
+import { Camera, LoaderCircle, Trash2 } from "lucide-react"
 
 import { KycSection } from "@/components/account/KycSection"
-import { MyCampaigns } from "@/components/account/MyCampaigns"
 import { MyContributions } from "@/components/account/MyContributions"
 import { ReceivedContributions } from "@/components/account/ReceivedContributions"
+import { UserAvatar } from "@/components/account/UserAvatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,9 +32,55 @@ function AccountPage() {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [avatarBusy, setAvatarBusy] = useState(false)
+  const [avatarMessage, setAvatarMessage] = useState<string | null>(null)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
 
   // La route est protégée par RequireAuth : user est garanti non nul ici.
   if (!user) return null
+
+  const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+    if (!file) return
+    setAvatarMessage(null)
+    setAvatarError(null)
+    if (!file.type.match(/^image\/(jpeg|png|webp)$/) || file.size > 3 * 1024 * 1024) {
+      setAvatarError("Choisissez une image JPG, PNG ou WebP de 3 Mo maximum.")
+      return
+    }
+    setAvatarBusy(true)
+    const payload = new FormData()
+    payload.append("avatar", file)
+    try {
+      await authFetch("/auth/me/", { method: "PATCH", body: payload })
+      await refreshUser()
+      setAvatarMessage("Votre photo de profil a été mise à jour.")
+    } catch (err) {
+      const details = err instanceof ApiError ? err.details?.avatar : null
+      setAvatarError(details?.join(" ") || "Impossible d’enregistrer cette photo.")
+    } finally {
+      setAvatarBusy(false)
+    }
+  }
+
+  const removeAvatar = async () => {
+    setAvatarBusy(true)
+    setAvatarMessage(null)
+    setAvatarError(null)
+    try {
+      await authFetch("/auth/me/", {
+        method: "PATCH",
+        body: JSON.stringify({ avatar: null }),
+      })
+      await refreshUser()
+      setAvatarMessage("La photo a été supprimée.")
+    } catch {
+      setAvatarError("Impossible de supprimer cette photo.")
+    } finally {
+      setAvatarBusy(false)
+    }
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -67,13 +114,8 @@ function AccountPage() {
 
       <div className="relative mx-auto max-w-3xl px-6 pt-16 pb-24 sm:pt-20">
         {/* En-tête compte */}
-        <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-start gap-4 duration-700 motion-reduce:animate-none sm:flex-row sm:items-center sm:gap-5">
-          <span
-            aria-hidden="true"
-            className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gold/15 font-heading text-2xl font-bold text-gold-dark"
-          >
-            {(user.first_name || user.email).charAt(0).toUpperCase()}
-          </span>
+        <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-start gap-5 duration-700 motion-reduce:animate-none sm:flex-row sm:items-center">
+          <UserAvatar user={user} size="lg" className="shadow-md shadow-black/10" />
           <div>
             <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
               Mon compte
@@ -87,6 +129,23 @@ function AccountPage() {
               </span>
               <span>{user.email}</span>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-7 flex flex-col justify-between gap-4 rounded-[20px] border border-black/5 bg-surface p-5 shadow-sm sm:flex-row sm:items-center">
+          <div>
+            <p className="font-semibold text-ink">Photo de profil</p>
+            <p className="mt-1 text-sm text-ink-muted">JPG, PNG ou WebP · 3 Mo maximum.</p>
+            {avatarMessage && <p role="status" className="mt-2 text-sm text-emerald-700">{avatarMessage}</p>}
+            {avatarError && <p role="alert" className="mt-2 text-sm text-red-700">{avatarError}</p>}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <label className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-full bg-gold px-4 text-sm font-semibold text-ink transition hover:bg-gold-light ${avatarBusy ? "pointer-events-none opacity-60" : ""}`}>
+              {avatarBusy ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <Camera aria-hidden="true" className="size-4" />}
+              {user.avatar ? "Changer la photo" : "Ajouter une photo"}
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void handleAvatarChange(event)} disabled={avatarBusy} className="sr-only" />
+            </label>
+            {user.avatar && <Button type="button" variant="outline" disabled={avatarBusy} onClick={() => void removeAvatar()} className="h-10 rounded-full border-red-200 text-red-700 hover:bg-red-50"><Trash2 aria-hidden="true" className="size-4" />Supprimer</Button>}
           </div>
         </div>
 
@@ -176,13 +235,6 @@ function AccountPage() {
         <div className="animate-in fade-in fill-mode-backwards mt-6 delay-300 duration-700 motion-reduce:animate-none">
           <KycSection status={user.kyc_status} role={user.role} />
         </div>
-
-        {/* Mes campagnes (porteurs uniquement) */}
-        {user.role === "PORTEUR" && (
-          <div className="animate-in fade-in fill-mode-backwards mt-6 delay-500 duration-700 motion-reduce:animate-none">
-            <MyCampaigns />
-          </div>
-        )}
 
         <div className="animate-in fade-in fill-mode-backwards mt-6 delay-500 duration-700 motion-reduce:animate-none">
           <MyContributions />

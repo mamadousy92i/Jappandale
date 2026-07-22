@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
-import { RefreshCw, Search, Sparkles } from "lucide-react"
+import { Link, useSearchParams } from "react-router-dom"
+import { FolderKanban, Plus, RefreshCw, Search, Sparkles } from "lucide-react"
 
 import { Reveal } from "@/components/Reveal"
+import { MyCampaigns } from "@/components/account/MyCampaigns"
 import { CampaignCard } from "@/components/campaigns/CampaignCard"
 import { Button } from "@/components/ui/button"
 import { apiFetch } from "@/lib/api"
+import { useAuth } from "@/lib/auth"
 import type { CampaignCategory, CampaignListItem } from "@/lib/types"
 
 const categories: { code: CampaignCategory; label: string }[] = [
@@ -41,6 +43,11 @@ function CampaignSkeleton() {
 }
 
 function CampaignsPage() {
+  const { user } = useAuth()
+  const [searchParams] = useSearchParams()
+  const showMine =
+    user?.role === "PORTEUR" &&
+    searchParams.get("vue") === "mes-campagnes"
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -88,17 +95,47 @@ function CampaignsPage() {
     <section>
       <div className="mx-auto max-w-6xl px-6 pt-12 pb-20 sm:pt-16 sm:pb-24">
         {/* En-tête de section */}
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold text-gold-dark">Projets publiés</p>
-          <h1 className="mt-3 font-heading text-4xl font-bold text-balance text-ink sm:text-5xl">
-            Des besoins précis, présentés par leurs porteurs
-          </h1>
-          <p className="mt-5 max-w-2xl text-ink-secondary sm:text-lg">
-            Consultez les objectifs, l’utilisation prévue des fonds et le calendrier de
-            chaque campagne. Le paiement reste simulé et n’entraîne aucun débit réel.
-          </p>
+        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold text-gold-dark">
+              {showMine ? "Espace porteur" : "Projets publiés"}
+            </p>
+            <h1 className="mt-3 font-heading text-4xl font-bold text-balance text-ink sm:text-5xl">
+              {showMine
+                ? "Pilotez vos campagnes"
+                : "Des besoins précis, présentés par leurs porteurs"}
+            </h1>
+            <p className="mt-5 max-w-2xl text-ink-secondary sm:text-lg">
+              {showMine
+                ? "Retrouvez vos brouillons, suivez leur validation et publiez les actualités de vos collectes."
+                : "Consultez les objectifs, l’utilisation prévue des fonds et le calendrier de chaque campagne."}
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            {user?.role === "PORTEUR" && (
+              <Button asChild variant="outline" className="h-11 rounded-full border-black/10 px-5 text-ink hover:border-gold hover:bg-gold/10">
+                <Link to={showMine ? "/campagnes" : "/campagnes?vue=mes-campagnes"}>
+                  <FolderKanban aria-hidden="true" className="size-4" />
+                  {showMine ? "Découvrir les projets" : "Mes campagnes"}
+                </Link>
+              </Button>
+            )}
+            {((user?.role === "PORTEUR" && !showMine) || !user) && (
+              <Button asChild className="h-11 rounded-full bg-gold px-5 font-semibold text-ink shadow-md shadow-gold/25 hover:bg-gold-light">
+                <Link to={user ? "/campagnes/nouvelle" : "/inscription?role=PORTEUR"}>
+                  <Plus aria-hidden="true" className="size-4" />
+                  Créer une campagne
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
 
+        {showMine ? (
+          <div className="mt-10">
+            <MyCampaigns />
+          </div>
+        ) : <>
         {/* Recherche + filtres */}
         <div className="mt-10 border-y border-black/10 py-7">
           <div className="relative max-w-xl">
@@ -211,6 +248,7 @@ function CampaignsPage() {
             </div>
           )}
         </div>
+        </>}
       </div>
     </section>
   )

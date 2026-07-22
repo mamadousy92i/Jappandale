@@ -10,6 +10,7 @@ export interface User {
   last_name: string
   role: Role
   phone: string
+  avatar: string | null
   organization_name: string
   city: string
   bio: string

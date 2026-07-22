@@ -82,7 +82,9 @@ def test_admin_can_review_kyc_and_signed_document_link():
     dashboard = client.get("/api/backoffice/dashboard/")
     file_url = dashboard.data["kyc"][0]["documents"][0]["file_url"]
 
-    assert APIClient().get(file_url).status_code == 200
+    document_response = APIClient().get(file_url)
+    assert document_response.status_code == 200
+    assert document_response["X-Frame-Options"] == "SAMEORIGIN"
     decision = client.post(
         f"/api/backoffice/kyc/{user.id}/decision/", {"decision": "VALIDE", "note": "Dossier conforme."}, format="json"
     )

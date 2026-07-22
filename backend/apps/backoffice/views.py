@@ -238,12 +238,15 @@ class KycDocumentFileView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         document = get_object_or_404(KycDocument, pk=payload.get("document_id"))
         content_type = mimetypes.guess_type(document.file.name)[0] or "application/octet-stream"
-        return FileResponse(
+        response = FileResponse(
             document.file.open("rb"),
             content_type=content_type,
             as_attachment=False,
             filename=document.file.name.rsplit("/", 1)[-1],
         )
+        # La prévisualisation KYC est autorisée uniquement dans une iframe du même site.
+        response["X-Frame-Options"] = "SAMEORIGIN"
+        return response
 
 
 class KycDecisionView(APIView):

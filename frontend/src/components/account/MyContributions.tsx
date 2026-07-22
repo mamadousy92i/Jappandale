@@ -29,7 +29,7 @@ export function MyContributions() {
   return (
     <section className="rounded-[20px] border border-black/5 bg-surface p-8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.08)] sm:p-10">
       <h2 className="font-heading text-xl font-bold text-ink">Mes contributions</h2>
-      <p className="mt-1 text-sm text-ink-muted">Historique des paiements simulés réalisés sur Jappandale.</p>
+      <p className="mt-1 text-sm text-ink-muted">Historique de vos contributions réalisées sur Jappandale.</p>
       {loading ? (
         <div className="mt-6 h-24 animate-pulse rounded-2xl bg-black/[0.05]" />
       ) : error ? (

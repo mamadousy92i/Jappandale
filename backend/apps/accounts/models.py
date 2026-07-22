@@ -50,6 +50,12 @@ class User(AbstractUser):
         "rôle", max_length=20, choices=Role.choices, default=Role.CONTRIBUTEUR
     )
     phone = models.CharField("téléphone", max_length=20, blank=True)
+    avatar = models.ImageField(
+        "photo de profil",
+        upload_to="avatars/%Y/%m/",
+        null=True,
+        blank=True,
+    )
     organization_name = models.CharField("organisation", max_length=160, blank=True)
     city = models.CharField("ville", max_length=120, blank=True)
     bio = models.TextField("présentation publique", max_length=700, blank=True)

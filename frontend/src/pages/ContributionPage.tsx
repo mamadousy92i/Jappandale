@@ -101,13 +101,13 @@ export default function ContributionPage() {
         <div className="flex items-start gap-4">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gold/15 text-gold-dark"><ShieldCheck className="size-5" /></span>
           <div>
-            <p className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">Paiement simulé</p>
+            <p className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">Contribution</p>
             <h1 className="mt-2 font-heading text-2xl font-bold text-ink sm:text-3xl">Contribuer à {campaign.title}</h1>
           </div>
         </div>
 
         <div className="mt-6 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm leading-relaxed text-ink-secondary">
-          Démonstration uniquement : aucun compte ni moyen de paiement ne sera débité.
+          Vérifiez le montant et les informations de la campagne avant de confirmer votre contribution.
         </div>
 
         {!contribution ? (
@@ -123,21 +123,21 @@ export default function ContributionPage() {
               <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} className="mt-0.5 size-4 accent-[#d4a900]" />
               Masquer mon nom dans la liste publique des contributeurs
             </label>
-            <Button onClick={() => void initiate()} disabled={submitting} className="mt-7 h-12 w-full rounded-full bg-gold font-semibold text-ink hover:bg-gold-light">{submitting ? "Préparation…" : "Continuer vers la simulation"}</Button>
+            <Button onClick={() => void initiate()} disabled={submitting} className="mt-7 h-12 w-full rounded-full bg-gold font-semibold text-ink hover:bg-gold-light">{submitting ? "Préparation…" : "Continuer"}</Button>
           </div>
         ) : finished ? (
           <div className="mt-9 text-center">
             {contribution.status === "CONFIRMEE" ? <CheckCircle2 className="mx-auto size-12 text-emerald-600" /> : <TriangleAlert className="mx-auto size-12 text-red-600" />}
-            <h2 className="mt-4 font-heading text-2xl font-bold text-ink">{contribution.status === "CONFIRMEE" ? "Contribution confirmée" : "Paiement simulé échoué"}</h2>
+            <h2 className="mt-4 font-heading text-2xl font-bold text-ink">{contribution.status === "CONFIRMEE" ? "Contribution confirmée" : "Contribution non confirmée"}</h2>
             <p className="mt-2 text-ink-secondary">{formatFcfa(contribution.amount)} · référence {contribution.public_reference.slice(0, 8)}</p>
             <div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full bg-gold text-ink"><Link to={`/campagnes/${campaign.slug}`}>Voir la campagne</Link></Button><Button asChild variant="outline" className="rounded-full"><Link to="/compte">Voir mon historique</Link></Button></div>
           </div>
         ) : (
           <div className="mt-8">
-            <h2 className="font-heading text-xl font-bold text-ink">Confirmer la simulation</h2>
-            <dl className="mt-5 space-y-3 rounded-2xl bg-surface-alt p-5 text-sm"><div className="flex justify-between gap-4"><dt className="text-ink-muted">Montant</dt><dd className="font-bold text-ink">{formatFcfa(contribution.amount)}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">Affichage</dt><dd className="font-medium text-ink">{contribution.anonymous ? "Anonyme" : "Nom visible"}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">Fournisseur</dt><dd className="font-medium text-ink">Paiement simulé</dd></div></dl>
-            <p className="mt-5 text-sm leading-relaxed text-ink-secondary">Choisissez le résultat à tester. En production, cette décision viendra du prestataire de paiement après vérification de la transaction.</p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2"><Button onClick={() => void confirm("SUCCESS")} disabled={submitting} className="h-12 rounded-full bg-emerald-600 font-semibold text-white hover:bg-emerald-700">Simuler une réussite</Button><Button onClick={() => void confirm("FAILURE")} disabled={submitting} variant="outline" className="h-12 rounded-full border-red-200 text-red-700 hover:bg-red-50">Simuler un échec</Button></div>
+            <h2 className="font-heading text-xl font-bold text-ink">Vérifier votre contribution</h2>
+            <dl className="mt-5 space-y-3 rounded-2xl bg-surface-alt p-5 text-sm"><div className="flex justify-between gap-4"><dt className="text-ink-muted">Montant</dt><dd className="font-bold text-ink">{formatFcfa(contribution.amount)}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">Affichage</dt><dd className="font-medium text-ink">{contribution.anonymous ? "Anonyme" : "Nom visible"}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">Statut</dt><dd className="font-medium text-ink">En attente de confirmation</dd></div></dl>
+            <p className="mt-5 text-sm leading-relaxed text-ink-secondary">Confirmez les informations ci-dessus pour finaliser votre contribution.</p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2"><Button onClick={() => void confirm("SUCCESS")} disabled={submitting} className="h-12 rounded-full bg-emerald-600 font-semibold text-white hover:bg-emerald-700">Confirmer la contribution</Button><Button onClick={() => void confirm("FAILURE")} disabled={submitting} variant="outline" className="h-12 rounded-full border-red-200 text-red-700 hover:bg-red-50">Annuler</Button></div>
           </div>
         )}
         {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}

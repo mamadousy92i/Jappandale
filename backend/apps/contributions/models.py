@@ -56,7 +56,7 @@ class Transaction(models.Model):
     """Tentative de paiement associée à une contribution."""
 
     class Provider(models.TextChoices):
-        SIMULATED = "SIMULATED", "Paiement simulé"
+        SIMULATED = "SIMULATED", "Contribution Jappandale"
 
     class Status(models.TextChoices):
         INITIEE = "INITIEE", "Initiée"

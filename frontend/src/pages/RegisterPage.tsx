@@ -1,6 +1,6 @@
 import { useState } from "react"
 import type { FormEvent } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -45,13 +45,16 @@ function toMessage(value: unknown): string {
 function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [phone, setPhone] = useState("")
-  const [role, setRole] = useState<RegisterRole>("CONTRIBUTEUR")
+  const [role, setRole] = useState<RegisterRole>(
+    searchParams.get("role") === "PORTEUR" ? "PORTEUR" : "CONTRIBUTEUR"
+  )
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)

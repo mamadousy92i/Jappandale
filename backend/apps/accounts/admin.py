@@ -32,7 +32,7 @@ class CustomUserAdmin(UserAdmin):
     readonly_fields = ("email_verified_at", "kyc_reviewed_at", "kyc_reviewed_by")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Informations personnelles", {"fields": ("first_name", "last_name", "phone", "email_verified_at")}),
+        ("Informations personnelles", {"fields": ("first_name", "last_name", "phone", "avatar", "email_verified_at")}),
         ("Rôle et permissions", {
             "fields": ("role", "is_active", "is_staff", "is_superuser", "groups"),
         }),

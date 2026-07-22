@@ -113,7 +113,7 @@ function DonationCard({ campaign }: { campaign: CampaignDetail }) {
 
       {campaign.status === "PUBLIEE" ? (
         <Button asChild className="mt-6 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 hover:bg-gold-light">
-          <Link to={`/campagnes/${campaign.slug}/contribuer`}>Contribuer en mode démonstration</Link>
+          <Link to={`/campagnes/${campaign.slug}/contribuer`}>Contribuer maintenant</Link>
         </Button>
       ) : (
         <Button disabled className="mt-6 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink">
@@ -123,7 +123,7 @@ function DonationCard({ campaign }: { campaign: CampaignDetail }) {
         </Button>
       )}
       <p className="mt-3 text-center text-xs leading-relaxed text-ink-muted">
-        Le paiement est simulé : aucun débit réel ne sera effectué.
+        Votre contribution sera associée à votre compte et à cette campagne.
       </p>
       <Button variant="ghost" onClick={() => void shareCampaign()} className="mt-2 w-full rounded-full text-ink-secondary hover:bg-surface-alt hover:text-ink">
         <Share2 className="size-4" />
