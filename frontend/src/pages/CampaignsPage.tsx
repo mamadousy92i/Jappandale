@@ -85,34 +85,23 @@ function CampaignsPage() {
   const hasFilters = category !== null || search !== ""
 
   return (
-    <section className="relative overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[26rem] bg-[radial-gradient(ellipse_55%_45%_at_50%_-5%,rgba(250,197,2,0.12),transparent)]"
-      />
-
-      <div className="relative mx-auto max-w-6xl px-6 pt-14 pb-20 sm:pt-18 sm:pb-24">
+    <section>
+      <div className="mx-auto max-w-6xl px-6 pt-12 pb-20 sm:pt-16 sm:pb-24">
         {/* En-tête de section */}
-        <div className="flex flex-col items-center text-center">
-          <span className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards text-xs font-semibold tracking-[4px] text-gold-dark uppercase duration-700 motion-reduce:animate-none">
-            Les campagnes
-          </span>
-          <h1 className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-4 font-heading text-3xl font-bold text-balance text-ink delay-100 duration-700 motion-reduce:animate-none sm:text-5xl">
-            Découvrir les campagnes
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold text-gold-dark">Projets publiés</p>
+          <h1 className="mt-3 font-heading text-4xl font-bold text-balance text-ink sm:text-5xl">
+            Des besoins précis, présentés par leurs porteurs
           </h1>
-          <div
-            aria-hidden="true"
-            className="animate-in fade-in zoom-in-75 fill-mode-backwards mt-6 h-[3px] w-16 rounded-full bg-gradient-to-r from-gold to-gold-dark delay-200 duration-700 motion-reduce:animate-none"
-          />
-          <p className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-6 max-w-2xl text-ink-secondary delay-300 duration-700 motion-reduce:animate-none sm:text-lg">
-            Des projets sénégalais vérifiés, portés par des femmes et des hommes qui
-            construisent le pays. Trouvez celui qui vous ressemble.
+          <p className="mt-5 max-w-2xl text-ink-secondary sm:text-lg">
+            Consultez les objectifs, l’utilisation prévue des fonds et le calendrier de
+            chaque campagne. Le paiement reste simulé et n’entraîne aucun débit réel.
           </p>
         </div>
 
         {/* Recherche + filtres */}
-        <div className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-12 delay-400 duration-700 motion-reduce:animate-none">
-          <div className="relative mx-auto max-w-xl">
+        <div className="mt-10 border-y border-black/10 py-7">
+          <div className="relative max-w-xl">
             <Search
               aria-hidden="true"
               className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-ink-muted"
@@ -130,7 +119,7 @@ function CampaignsPage() {
           <div
             role="group"
             aria-label="Filtrer par catégorie"
-            className="mt-6 flex flex-wrap justify-center gap-2"
+            className="mt-6 flex flex-wrap gap-2"
           >
             <button
               type="button"

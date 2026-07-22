@@ -26,10 +26,15 @@ export function Footer() {
             </p>
           </div>
 
-          <nav aria-label="Liens du pied de page" className="flex flex-col gap-2 text-sm">
-            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">
-              Rejoindre
-            </span>
+          <div className="grid grid-cols-2 gap-10 text-sm sm:grid-cols-3">
+          <nav aria-label="Comprendre" className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">Comprendre</span>
+            <Link to="/comment-ca-marche" className="w-fit text-ink-secondary hover:text-gold-dark">Comment ça marche</Link>
+            <Link to="/confiance" className="w-fit text-ink-secondary hover:text-gold-dark">Confiance et transparence</Link>
+            <Link to="/contact" className="w-fit text-ink-secondary hover:text-gold-dark">Assistance</Link>
+          </nav>
+          <nav aria-label="Compte" className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">Compte</span>
             <Link
               to="/inscription"
               className="w-fit rounded-sm text-ink-secondary transition-colors outline-none hover:text-gold-dark focus-visible:ring-2 focus-visible:ring-gold-dark/50"
@@ -43,6 +48,13 @@ export function Footer() {
               Se connecter
             </Link>
           </nav>
+          <nav aria-label="Informations légales" className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">Légal</span>
+            <Link to="/mentions-legales" className="w-fit text-ink-secondary hover:text-gold-dark">Mentions légales</Link>
+            <Link to="/confidentialite" className="w-fit text-ink-secondary hover:text-gold-dark">Confidentialité</Link>
+            <Link to="/conditions" className="w-fit text-ink-secondary hover:text-gold-dark">Conditions d’utilisation</Link>
+          </nav>
+          </div>
         </div>
 
         <div className="mt-12 border-t border-black/5 pt-6">

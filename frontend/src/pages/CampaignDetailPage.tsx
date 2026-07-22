@@ -6,13 +6,20 @@ import {
   CalendarDays,
   Hammer,
   HeartPulse,
+  Flag,
   Landmark,
   Laptop,
+  ListChecks,
+  MapPin,
   Newspaper,
+  Share2,
+  ShieldCheck,
   Sprout,
   Store,
   Tag,
   UserRound,
+  UsersRound,
+  WalletCards,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -48,8 +55,32 @@ function ownerName(owner: CampaignDetail["owner"]): string {
   return `${owner.first_name}${initial}`
 }
 
+function contentLines(content: string): string[] {
+  return content
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+}
+
 /** Carte de collecte : montants, progression et appel à contribuer. */
 function DonationCard({ campaign }: { campaign: CampaignDetail }) {
+  const [shared, setShared] = useState(false)
+
+  const shareCampaign = async () => {
+    const shareData = { title: campaign.title, text: campaign.summary, url: window.location.href }
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        await navigator.clipboard.writeText(window.location.href)
+        setShared(true)
+        window.setTimeout(() => setShared(false), 2500)
+      }
+    } catch {
+      // Une annulation du menu de partage ne nécessite aucun message d'erreur.
+    }
+  }
+
   return (
     <div className="rounded-[20px] border border-black/5 bg-surface p-7 shadow-sm">
       <p className="font-heading text-3xl font-bold text-ink">
@@ -80,15 +111,23 @@ function DonationCard({ campaign }: { campaign: CampaignDetail }) {
         </div>
       </div>
 
-      <Button
-        disabled
-        className="mt-6 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 disabled:opacity-60"
-      >
-        Contribuer — bientôt
-      </Button>
+      {campaign.status === "PUBLIEE" ? (
+        <Button asChild className="mt-6 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 hover:bg-gold-light">
+          <Link to={`/campagnes/${campaign.slug}/contribuer`}>Contribuer en mode démonstration</Link>
+        </Button>
+      ) : (
+        <Button disabled className="mt-6 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink">
+          Campagne clôturée
+        </Button>
+      )}
       <p className="mt-3 text-center text-xs leading-relaxed text-ink-muted">
-        Les contributions en ligne arrivent très bientôt.
+        Le paiement est simulé : aucun débit réel ne sera effectué.
       </p>
+      <Button variant="ghost" onClick={() => void shareCampaign()} className="mt-2 w-full rounded-full text-ink-secondary hover:bg-surface-alt hover:text-ink">
+        <Share2 className="size-4" />
+        {shared ? "Lien copié" : "Partager cette campagne"}
+      </Button>
+      <Link to={`/campagnes/${campaign.slug}/signaler`} className="mt-2 flex items-center justify-center gap-2 rounded-full py-2 text-xs font-medium text-ink-muted transition-colors hover:bg-red-50 hover:text-red-700"><Flag className="size-3.5" />Signaler cette campagne</Link>
     </div>
   )
 }
@@ -187,8 +226,31 @@ function CampaignDetailPage() {
         Toutes les campagnes
       </Link>
 
+      {/* Le titre et la confiance restent visibles avant le grand média. */}
+      <header className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-7 duration-700 motion-reduce:animate-none">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <ShieldCheck aria-hidden="true" className="size-3.5" />
+            Porteur vérifié
+          </span>
+          <span className="rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold text-gold-dark">Collecte flexible</span>
+        </div>
+        <h1 className="mt-4 max-w-4xl font-heading text-3xl leading-tight font-bold text-balance text-ink sm:text-4xl lg:text-5xl">
+          {campaign.title}
+        </h1>
+        <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-secondary">{campaign.summary}</p>
+        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-secondary">
+          <span className="inline-flex items-center gap-2">
+            <span aria-hidden="true" className="flex size-7 items-center justify-center rounded-full bg-gold/15 text-gold-dark"><UserRound className="size-4" /></span>
+            Porté par <span className="font-semibold text-ink">{ownerName(campaign.owner)}</span>
+          </span>
+          {campaign.published_at && <span className="inline-flex items-center gap-1.5 text-ink-muted"><CalendarDays aria-hidden="true" className="size-4" />Publiée le {formatDate(campaign.published_at)}</span>}
+          {campaign.location && <span className="inline-flex items-center gap-1.5 text-ink-muted"><MapPin aria-hidden="true" className="size-4" />{campaign.location}</span>}
+        </div>
+      </header>
+
       {/* Couverture */}
-      <div className="animate-in fade-in fill-mode-backwards relative mt-6 overflow-hidden rounded-[28px] border border-black/5 shadow-md duration-700 motion-reduce:animate-none">
+      <div className="animate-in fade-in fill-mode-backwards relative mt-8 overflow-hidden rounded-[28px] border border-black/5 shadow-md duration-700 motion-reduce:animate-none">
         {campaign.cover_image ? (
           <img
             src={campaign.cover_image}
@@ -205,31 +267,6 @@ function CampaignDetailPage() {
           {campaign.category_display}
         </span>
       </div>
-
-      {/* Titre + porteur */}
-      <header className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-8 delay-100 duration-700 motion-reduce:animate-none">
-        <h1 className="font-heading text-3xl leading-tight font-bold text-balance text-ink sm:text-4xl lg:text-5xl">
-          {campaign.title}
-        </h1>
-        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-secondary">
-          <span className="inline-flex items-center gap-2">
-            <span
-              aria-hidden="true"
-              className="flex size-7 items-center justify-center rounded-full bg-gold/15 text-gold-dark"
-            >
-              <UserRound className="size-4" />
-            </span>
-            Porté par{" "}
-            <span className="font-semibold text-ink">{ownerName(campaign.owner)}</span>
-          </span>
-          {campaign.published_at && (
-            <span className="inline-flex items-center gap-1.5 text-ink-muted">
-              <CalendarDays aria-hidden="true" className="size-4" />
-              Publiée le {formatDate(campaign.published_at)}
-            </span>
-          )}
-        </div>
-      </header>
 
       {/* Contenu + carte de collecte */}
       <div className="mt-10 grid items-start gap-10 lg:grid-cols-[1fr_24rem] lg:gap-14">
@@ -250,6 +287,84 @@ function CampaignDetailPage() {
               {campaign.description}
             </p>
           </section>
+
+          {campaign.beneficiaries && (
+            <div className="mt-8 flex items-start gap-4 border-l-4 border-gold bg-[#fbfaf6] px-5 py-4">
+              <UsersRound aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-gold-dark" />
+              <div>
+                <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">
+                  Impact attendu
+                </p>
+                <p className="mt-1 font-medium text-ink">{campaign.beneficiaries}</p>
+              </div>
+            </div>
+          )}
+
+          {(campaign.funding_plan || campaign.project_timeline) && (
+            <div className="mt-12 grid gap-8 sm:grid-cols-2">
+              {campaign.funding_plan && (
+                <section aria-labelledby="fonds">
+                  <WalletCards aria-hidden="true" className="size-6 text-gold-dark" />
+                  <h2 id="fonds" className="mt-3 font-heading text-2xl font-bold text-ink">
+                    Utilisation des fonds
+                  </h2>
+                  <ul className="mt-5 space-y-3">
+                    {contentLines(campaign.funding_plan).map((line) => (
+                      <li key={line} className="flex gap-3 text-sm leading-relaxed text-ink-secondary">
+                        <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-gold-dark" />
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {campaign.project_timeline && (
+                <section aria-labelledby="calendrier">
+                  <ListChecks aria-hidden="true" className="size-6 text-gold-dark" />
+                  <h2 id="calendrier" className="mt-3 font-heading text-2xl font-bold text-ink">
+                    Calendrier du projet
+                  </h2>
+                  <ol className="mt-5 space-y-3">
+                    {contentLines(campaign.project_timeline).map((line, index) => (
+                      <li key={line} className="grid grid-cols-[1.75rem_1fr] gap-2 text-sm leading-relaxed text-ink-secondary">
+                        <span className="font-heading font-bold text-gold-dark">{index + 1}.</span>
+                        {line}
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              )}
+            </div>
+          )}
+
+          <section className="mt-12 border-y border-black/10 py-7" aria-labelledby="verification">
+            <h2 id="verification" className="font-heading text-xl font-bold text-ink">
+              Ce qui a été vérifié avant publication
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
+              L’identité du porteur et les informations déclarées dans cette campagne ont
+              été relues par l’équipe de modération. Cette vérification ne constitue pas
+              une garantie de résultat ni un conseil d’investissement.
+            </p>
+          </section>
+
+          {campaign.recent_contributors.length > 0 && (
+            <section className="mt-12" aria-labelledby="contributeurs">
+              <h2 id="contributeurs" className="font-heading text-2xl font-bold text-ink">Contributions récentes</h2>
+              <ul className="mt-5 divide-y divide-black/5 rounded-[20px] border border-black/5 bg-surface px-5 shadow-sm">
+                {campaign.recent_contributors.map((contribution, index) => (
+                  <li key={`${contribution.confirmed_at}-${index}`} className="flex items-center justify-between gap-4 py-4">
+                    <div>
+                      <p className="font-semibold text-ink">{contribution.display_name}</p>
+                      <p className="mt-0.5 text-xs text-ink-muted">{formatDate(contribution.confirmed_at)}</p>
+                    </div>
+                    <span className="font-heading font-bold text-gold-dark">{formatFcfa(contribution.amount)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           {campaign.updates.length > 0 && (
             <section aria-labelledby="actualites" className="mt-14">

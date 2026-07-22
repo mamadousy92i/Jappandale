@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from apps.campaigns.models import Campaign
+from apps.campaigns.models import Campaign, CampaignReport
 
 User = get_user_model()
 
@@ -25,6 +25,10 @@ DONNEES_CAMPAGNE = {
     "title": "Atelier de couture solidaire",
     "summary": "Équiper un atelier de couture pour former des jeunes.",
     "description": "Description détaillée du projet de couture solidaire à Dakar.",
+    "location": "Médina, Dakar",
+    "beneficiaries": "10 apprenties couturières",
+    "funding_plan": "Machines — 400 000 F CFA",
+    "project_timeline": "Installation — semaine 1",
     "category": "ARTISANAT",
     "goal_amount": 500000,
     "deadline": (timezone.localdate() + timedelta(days=30)).isoformat(),
@@ -142,3 +146,87 @@ def test_progress_percent_calcule():
     campagne.collected_amount = 250000
     campagne.save(update_fields=["collected_amount"])
     assert campagne.progress_percent == 50
+
+
+@pytest.mark.django_db
+def test_echeance_passee_refusee():
+    client = APIClient()
+    client.force_authenticate(_porteur_valide())
+    response = client.post(
+        "/api/campaigns/",
+        {
+            **DONNEES_CAMPAGNE,
+            "deadline": (timezone.localdate() - timedelta(days=1)).isoformat(),
+        },
+        format="multipart",
+    )
+    assert response.status_code == 400
+    assert "deadline" in response.data
+
+
+@pytest.mark.django_db
+def test_campagne_expiree_est_cloturee_a_la_consultation():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(porteur, status=Campaign.Status.PUBLIEE)
+    campagne.deadline = timezone.localdate() - timedelta(days=1)
+    campagne.save(update_fields=["deadline"])
+
+    response = APIClient().get("/api/campaigns/")
+
+    assert response.status_code == 200
+    campagne.refresh_from_db()
+    assert campagne.status == Campaign.Status.CLOTUREE
+
+
+@pytest.mark.django_db
+def test_campagne_publiee_ne_peut_pas_etre_supprimee():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(porteur, status=Campaign.Status.PUBLIEE)
+    client = APIClient()
+    client.force_authenticate(porteur)
+
+    response = client.delete(f"/api/campaigns/{campagne.slug}/")
+
+    assert response.status_code == 400
+    assert Campaign.objects.filter(pk=campagne.pk).exists()
+
+
+@pytest.mark.django_db
+def test_membre_peut_signaler_une_campagne_publiee():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(porteur, status=Campaign.Status.PUBLIEE)
+    reporter = User.objects.create_user(
+        email="signalement@test.sn", password="MotDePasse123!"
+    )
+    client = APIClient()
+    client.force_authenticate(reporter)
+
+    response = client.post(
+        f"/api/campaigns/{campagne.slug}/report/",
+        {"reason": "INFORMATION_TROMPEUSE", "details": "Le budget mérite une vérification."},
+        format="json",
+    )
+
+    assert response.status_code == 201
+    assert CampaignReport.objects.filter(campaign=campagne, reporter=reporter).exists()
+
+
+@pytest.mark.django_db
+def test_un_membre_ne_peut_pas_signaler_deux_fois_la_meme_campagne():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(porteur, status=Campaign.Status.PUBLIEE)
+    reporter = User.objects.create_user(email="doublon@test.sn", password="MotDePasse123!")
+    CampaignReport.objects.create(
+        campaign=campagne, reporter=reporter, reason=CampaignReport.Reason.AUTRE, details="Premier signalement"
+    )
+    client = APIClient()
+    client.force_authenticate(reporter)
+
+    response = client.post(
+        f"/api/campaigns/{campagne.slug}/report/",
+        {"reason": "FRAUDE", "details": "Deuxième signalement"},
+        format="json",
+    )
+
+    assert response.status_code == 400
+    assert CampaignReport.objects.filter(campaign=campagne, reporter=reporter).count() == 1

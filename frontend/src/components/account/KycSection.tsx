@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { FormEvent } from "react"
 import { CheckCircle2, Clock, ShieldCheck, Upload } from "lucide-react"
 
@@ -6,13 +6,24 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { ApiError } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
-import type { KycStatus } from "@/lib/types"
+import type { KycStatus, Role } from "@/lib/types"
 
 const documentTypes = [
   { value: "CNI", label: "Carte nationale d'identité" },
   { value: "PASSEPORT", label: "Passeport" },
   { value: "JUSTIFICATIF_ACTIVITE", label: "Justificatif d'activité" },
 ]
+
+interface KycDocumentItem {
+  id: number
+  document_type: string
+  document_type_display: string
+}
+
+interface KycStateResponse {
+  kyc_status: KycStatus
+  documents: KycDocumentItem[]
+}
 
 function StatutValide() {
   return (
@@ -54,7 +65,15 @@ function StatutEnAttente() {
   )
 }
 
-function FormulaireUpload({ rejete }: { rejete: boolean }) {
+function FormulaireUpload({
+  rejete,
+  pending,
+  onUploaded,
+}: {
+  rejete: boolean
+  pending?: boolean
+  onUploaded?: (state: KycStateResponse) => void
+}) {
   const { authFetch, refreshUser } = useAuth()
   const [documentType, setDocumentType] = useState(documentTypes[0].value)
   const [file, setFile] = useState<File | null>(null)
@@ -73,7 +92,11 @@ function FormulaireUpload({ rejete }: { rejete: boolean }) {
       const data = new FormData()
       data.append("document_type", documentType)
       data.append("file", file)
-      await authFetch("/kyc/submit/", { method: "POST", body: data })
+      const state = (await authFetch("/kyc/submit/", {
+        method: "POST",
+        body: data,
+      })) as KycStateResponse
+      onUploaded?.(state)
       await refreshUser()
     } catch (err) {
       if (err instanceof ApiError && err.status === 400) {
@@ -95,9 +118,13 @@ function FormulaireUpload({ rejete }: { rejete: boolean }) {
           <ShieldCheck className="size-5" />
         </span>
         <div>
-          <p className="font-heading text-lg font-bold text-ink">Vérifiez votre identité</p>
+          <p className="font-heading text-lg font-bold text-ink">
+            {pending ? "Ajouter une pièce au dossier" : "Vérifiez votre identité"}
+          </p>
           <p className="mt-1 text-sm leading-relaxed text-ink-secondary">
-            {rejete
+            {pending
+              ? "Vous pouvez compléter le dossier pendant sa vérification."
+              : rejete
               ? "Votre dossier précédent n'a pas pu être validé. Envoyez un nouveau document lisible."
               : "Envoyez une pièce d'identité pour pouvoir créer des campagnes et contribuer."}
           </p>
@@ -143,6 +170,7 @@ function FormulaireUpload({ rejete }: { rejete: boolean }) {
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             className="block w-full rounded-xl border border-black/10 bg-surface text-sm text-ink-secondary file:mr-4 file:cursor-pointer file:border-0 file:bg-gold/15 file:px-4 file:py-2.5 file:font-medium file:text-gold-dark hover:file:bg-gold/25"
           />
+          <p className="text-xs text-ink-muted">JPG, PNG, WebP ou PDF — 8 Mo maximum.</p>
         </div>
 
         <Button
@@ -158,8 +186,49 @@ function FormulaireUpload({ rejete }: { rejete: boolean }) {
   )
 }
 
-export function KycSection({ status }: { status: KycStatus }) {
+export function KycSection({ status, role }: { status: KycStatus; role: Role }) {
+  const { authFetch } = useAuth()
+  const [documents, setDocuments] = useState<KycDocumentItem[]>([])
+
+  useEffect(() => {
+    authFetch("/kyc/")
+      .then((data) => setDocuments((data as KycStateResponse).documents))
+      .catch(() => setDocuments([]))
+  }, [authFetch])
+
   if (status === "VALIDE") return <StatutValide />
-  if (status === "EN_ATTENTE") return <StatutEnAttente />
-  return <FormulaireUpload rejete={status === "REJETE"} />
+  if (status === "EN_ATTENTE") {
+    return (
+      <div className="space-y-4">
+        <StatutEnAttente />
+        {documents.length > 0 && (
+          <div className="rounded-xl border border-black/5 bg-white px-4 py-3 text-sm text-ink-secondary">
+            <p className="font-semibold text-ink">Pièces déjà reçues</p>
+            <ul className="mt-2 space-y-1">
+              {documents.map((document) => (
+                <li key={document.id}>✓ {document.document_type_display}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {role === "PORTEUR" && (
+          <p className="rounded-xl border border-gold/25 bg-gold/10 px-4 py-3 text-sm text-ink-secondary">
+            Pour être validé, un porteur doit fournir une pièce d’identité et un
+            justificatif d’activité.
+          </p>
+        )}
+        <FormulaireUpload
+          rejete={false}
+          pending
+          onUploaded={(state) => setDocuments(state.documents)}
+        />
+      </div>
+    )
+  }
+  return (
+    <FormulaireUpload
+      rejete={status === "REJETE"}
+      onUploaded={(state) => setDocuments(state.documents)}
+    />
+  )
 }

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import type { FormEvent } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth"
 function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -23,7 +24,8 @@ function LoginPage() {
     setSubmitting(true)
     try {
       await login(email, password)
-      navigate("/")
+      const destination = (location.state as { from?: string } | null)?.from ?? "/"
+      navigate(destination, { replace: true })
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError("E-mail ou mot de passe incorrect.")
@@ -88,9 +90,7 @@ function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-ink">
-                Mot de passe
-              </Label>
+              <div className="flex items-center justify-between gap-4"><Label htmlFor="password" className="text-ink">Mot de passe</Label><Link to="/mot-de-passe/oublie" className="text-xs font-semibold text-gold-dark hover:underline">Mot de passe oublié ?</Link></div>
               <Input
                 id="password"
                 type="password"

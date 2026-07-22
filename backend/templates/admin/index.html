@@ -1,0 +1,32 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .jappandale-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin:0 0 24px; }
+    .jappandale-metric { background:var(--body-bg); border:1px solid var(--hairline-color); border-radius:8px; padding:18px; }
+    .jappandale-metric strong { display:block; color:var(--body-fg); font-size:24px; line-height:1.1; }
+    .jappandale-metric span { display:block; color:var(--body-quiet-color); font-size:12px; margin-top:7px; text-transform:uppercase; letter-spacing:.04em; }
+  </style>
+{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <div class="jappandale-metrics" aria-label="Indicateurs de la plateforme">
+    <div class="jappandale-metric"><strong>{{ admin_metrics.pending_kyc }}</strong><span>KYC en attente</span></div>
+    <div class="jappandale-metric"><strong>{{ admin_metrics.pending_campaigns }}</strong><span>Campagnes à modérer</span></div>
+    <div class="jappandale-metric"><strong>{{ admin_metrics.new_reports }}</strong><span>Signalements à examiner</span></div>
+    <div class="jappandale-metric"><strong>{{ admin_metrics.new_support_requests }}</strong><span>Demandes d’assistance</span></div>
+    <div class="jappandale-metric"><strong>{{ admin_metrics.published_campaigns }}</strong><span>Campagnes publiées</span></div>
+    <div class="jappandale-metric"><strong>{{ admin_metrics.confirmed_count }}</strong><span>Contributions confirmées</span></div>
+    <div class="jappandale-metric"><strong>{{ admin_metrics.confirmed_amount }} FCFA</strong><span>Montant confirmé</span></div>
+  </div>
+  {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}

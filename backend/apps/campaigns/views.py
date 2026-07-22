@@ -2,17 +2,20 @@ from django.db.models import Q
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 
-from .models import Campaign
+from .models import Campaign, CampaignReport
 from .permissions import IsOwner, IsValidatedPorteur
 from .serializers import (
     CampaignDetailSerializer,
     CampaignListSerializer,
+    CampaignReportSerializer,
     CampaignUpdateSerializer,
     CampaignWriteSerializer,
 )
+from .services import close_finished_campaigns
 
 PUBLIC_STATUSES = (Campaign.Status.PUBLIEE, Campaign.Status.CLOTUREE)
 
@@ -22,9 +25,11 @@ class CampaignViewSet(viewsets.ModelViewSet):
 
     lookup_field = "slug"
     permission_classes = [IsValidatedPorteur, IsOwner]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    throttle_scope = None
 
     def get_queryset(self):
+        close_finished_campaigns()
         base = Campaign.objects.select_related("owner")
         if self.action == "mine":
             return base.filter(owner=self.request.user)
@@ -33,6 +38,8 @@ class CampaignViewSet(viewsets.ModelViewSet):
             visible = Q(status__in=PUBLIC_STATUSES)
             if self.request.user.is_authenticated:
                 visible |= Q(owner=self.request.user)
+                if self.request.user.is_staff or self.request.user.role == "ADMIN":
+                    visible |= Q(status=Campaign.Status.EN_MODERATION)
             return base.filter(visible)
         if self.action == "list":
             queryset = base.filter(status__in=PUBLIC_STATUSES)
@@ -63,6 +70,14 @@ class CampaignViewSet(viewsets.ModelViewSet):
             )
         return super().update(request, *args, **kwargs)
 
+    def destroy(self, request, *args, **kwargs):
+        campaign = self.get_object()
+        if campaign.status not in (Campaign.Status.BROUILLON, Campaign.Status.REJETEE):
+            raise ValidationError(
+                "Seule une campagne en brouillon ou rejetée peut être supprimée."
+            )
+        return super().destroy(request, *args, **kwargs)
+
     @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
     def mine(self, request):
         serializer = self.get_serializer(self.get_queryset(), many=True)
@@ -75,6 +90,19 @@ class CampaignViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Cette campagne ne vous appartient pas.")
         if campaign.status not in (Campaign.Status.BROUILLON, Campaign.Status.REJETEE):
             raise ValidationError("Cette campagne ne peut pas être soumise à modération.")
+        required_fields = {
+            "location": "Indiquez la localisation du projet.",
+            "beneficiaries": "Précisez les bénéficiaires attendus.",
+            "funding_plan": "Détaillez l'utilisation prévue des fonds.",
+            "project_timeline": "Décrivez les étapes prévues du projet.",
+        }
+        missing = {
+            field: message
+            for field, message in required_fields.items()
+            if not getattr(campaign, field).strip()
+        }
+        if missing:
+            raise ValidationError(missing)
         campaign.status = Campaign.Status.EN_MODERATION
         campaign.moderation_note = ""
         campaign.save(update_fields=["status", "moderation_note"])
@@ -90,4 +118,23 @@ class CampaignViewSet(viewsets.ModelViewSet):
         serializer = CampaignUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(campaign=campaign)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[permissions.IsAuthenticated],
+        throttle_classes=[ScopedRateThrottle],
+        throttle_scope="campaign_report",
+        url_path="report",
+    )
+    def report(self, request, slug=None):
+        campaign = self.get_object()
+        if campaign.owner_id == request.user.id:
+            raise ValidationError("Vous ne pouvez pas signaler votre propre campagne.")
+        if CampaignReport.objects.filter(campaign=campaign, reporter=request.user).exists():
+            raise ValidationError("Vous avez déjà signalé cette campagne.")
+        serializer = CampaignReportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(campaign=campaign, reporter=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

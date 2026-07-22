@@ -2,6 +2,8 @@ import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
+from apps.notifications.models import Notification
+
 User = get_user_model()
 
 DONNEES_VALIDES = {
@@ -23,6 +25,9 @@ def test_inscription_valide():
     assert "password" not in response.data
     user = User.objects.get(email="nouveau@test.sn")
     assert user.check_password("MotDePasse123!")
+    assert Notification.objects.filter(
+        recipient=user, kind=Notification.Kind.ACCOUNT_CREATED
+    ).exists()
 
 
 @pytest.mark.django_db

@@ -3,6 +3,8 @@ import type { FormEvent } from "react"
 
 import { KycSection } from "@/components/account/KycSection"
 import { MyCampaigns } from "@/components/account/MyCampaigns"
+import { MyContributions } from "@/components/account/MyContributions"
+import { ReceivedContributions } from "@/components/account/ReceivedContributions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -165,13 +167,23 @@ function AccountPage() {
 
         {/* Vérification d'identité (KYC) */}
         <div className="animate-in fade-in fill-mode-backwards mt-6 delay-300 duration-700 motion-reduce:animate-none">
-          <KycSection status={user.kyc_status} />
+          <KycSection status={user.kyc_status} role={user.role} />
         </div>
 
         {/* Mes campagnes (porteurs uniquement) */}
         {user.role === "PORTEUR" && (
           <div className="animate-in fade-in fill-mode-backwards mt-6 delay-500 duration-700 motion-reduce:animate-none">
             <MyCampaigns />
+          </div>
+        )}
+
+        <div className="animate-in fade-in fill-mode-backwards mt-6 delay-500 duration-700 motion-reduce:animate-none">
+          <MyContributions />
+        </div>
+
+        {user.role === "PORTEUR" && (
+          <div className="animate-in fade-in fill-mode-backwards mt-6 delay-500 duration-700 motion-reduce:animate-none">
+            <ReceivedContributions />
           </div>
         )}
       </div>

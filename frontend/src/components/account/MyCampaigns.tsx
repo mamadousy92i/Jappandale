@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { ArrowUpRight, FolderOpen, Plus, RefreshCw, Send } from "lucide-react"
+import { ArrowUpRight, FolderOpen, Newspaper, Plus, RefreshCw, Send } from "lucide-react"
 
 import { ProgressBar } from "@/components/campaigns/CampaignCard"
 import { Button } from "@/components/ui/button"
@@ -99,17 +99,10 @@ function CampaignRow({
 
           <div className="mt-3 flex flex-wrap gap-2">
             {campaign.status === "PUBLIEE" && (
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="rounded-full border-black/10 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"
-              >
-                <Link to={`/campagnes/${campaign.slug}`}>
-                  Voir la page
-                  <ArrowUpRight aria-hidden="true" className="size-3.5" />
-                </Link>
-              </Button>
+              <>
+                <Button asChild variant="outline" size="sm" className="rounded-full border-black/10 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"><Link to={`/campagnes/${campaign.slug}`}>Voir la page<ArrowUpRight aria-hidden="true" className="size-3.5" /></Link></Button>
+                <Button asChild variant="outline" size="sm" className="rounded-full border-black/10 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"><Link to={`/campagnes/${campaign.slug}/actualites/nouvelle`}><Newspaper aria-hidden="true" className="size-3.5" />Publier une actualité</Link></Button>
+              </>
             )}
             {canSubmit && (
               <Button

@@ -1,14 +1,26 @@
 import { Route, Routes } from "react-router-dom"
 
 import { RequireAuth } from "@/components/RequireAuth"
+import { RequireAdmin } from "@/components/RequireAdmin"
 import { Layout } from "@/components/layout/Layout"
 import AccountPage from "@/pages/AccountPage"
+import AdminDashboardPage from "@/pages/AdminDashboardPage"
 import CampaignDetailPage from "@/pages/CampaignDetailPage"
 import CampaignsPage from "@/pages/CampaignsPage"
 import CreateCampaignPage from "@/pages/CreateCampaignPage"
+import CreateCampaignUpdatePage from "@/pages/CreateCampaignUpdatePage"
+import HowItWorksPage from "@/pages/HowItWorksPage"
+import ContributionPage from "@/pages/ContributionPage"
+import ContactPage from "@/pages/ContactPage"
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage"
 import HomePage from "@/pages/HomePage"
+import { LegalNoticePage, PrivacyPage, TermsPage } from "@/pages/LegalPages"
 import LoginPage from "@/pages/LoginPage"
+import NotificationsPage from "@/pages/NotificationsPage"
 import RegisterPage from "@/pages/RegisterPage"
+import ReportCampaignPage from "@/pages/ReportCampaignPage"
+import ResetPasswordPage from "@/pages/ResetPasswordPage"
+import TrustPage from "@/pages/TrustPage"
 
 function App() {
   return (
@@ -25,8 +37,28 @@ function App() {
           }
         />
         <Route path="/campagnes/:slug" element={<CampaignDetailPage />} />
+        <Route path="/comment-ca-marche" element={<HowItWorksPage />} />
+        <Route path="/confiance" element={<TrustPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/mentions-legales" element={<LegalNoticePage />} />
+        <Route path="/confidentialite" element={<PrivacyPage />} />
+        <Route path="/conditions" element={<TermsPage />} />
+        <Route path="/campagnes/:slug/actualites/nouvelle" element={<RequireAuth><CreateCampaignUpdatePage /></RequireAuth>} />
+        <Route path="/campagnes/:slug/signaler" element={<RequireAuth><ReportCampaignPage /></RequireAuth>} />
+        <Route
+          path="/campagnes/:slug/contribuer"
+          element={
+            <RequireAuth>
+              <ContributionPage />
+            </RequireAuth>
+          }
+        />
         <Route path="/connexion" element={<LoginPage />} />
+        <Route path="/mot-de-passe/oublie" element={<ForgotPasswordPage />} />
+        <Route path="/mot-de-passe/reinitialiser/:uid/:token" element={<ResetPasswordPage />} />
         <Route path="/inscription" element={<RegisterPage />} />
+        <Route path="/notifications" element={<RequireAuth><NotificationsPage /></RequireAuth>} />
+        <Route path="/administration" element={<RequireAdmin><AdminDashboardPage /></RequireAdmin>} />
         <Route
           path="/compte"
           element={

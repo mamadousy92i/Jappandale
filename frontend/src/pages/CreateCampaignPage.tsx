@@ -25,6 +25,10 @@ const fieldNames = [
   "title",
   "summary",
   "description",
+  "location",
+  "beneficiaries",
+  "funding_plan",
+  "project_timeline",
   "category",
   "goal_amount",
   "deadline",
@@ -75,6 +79,10 @@ function CreateCampaignForm() {
   const [title, setTitle] = useState("")
   const [summary, setSummary] = useState("")
   const [description, setDescription] = useState("")
+  const [location, setLocation] = useState("")
+  const [beneficiaries, setBeneficiaries] = useState("")
+  const [fundingPlan, setFundingPlan] = useState("")
+  const [projectTimeline, setProjectTimeline] = useState("")
   const [category, setCategory] = useState<CampaignCategory>("ARTISANAT")
   const [goalAmount, setGoalAmount] = useState("")
   const [deadline, setDeadline] = useState("")
@@ -104,6 +112,10 @@ function CreateCampaignForm() {
     data.append("title", title)
     data.append("summary", summary)
     data.append("description", description)
+    data.append("location", location)
+    data.append("beneficiaries", beneficiaries)
+    data.append("funding_plan", fundingPlan)
+    data.append("project_timeline", projectTimeline)
     data.append("category", category)
     data.append("goal_amount", goalAmount)
     data.append("deadline", deadline)
@@ -215,6 +227,74 @@ function CreateCampaignForm() {
             {...invalidProps("description")}
           />
           {errorFor("description")}
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="location" className="text-ink">
+              Localisation du projet
+            </Label>
+            <Input
+              id="location"
+              required
+              placeholder="Médina, Dakar"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="h-11 rounded-xl px-3.5"
+              {...invalidProps("location")}
+            />
+            {errorFor("location")}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="beneficiaries" className="text-ink">
+              Bénéficiaires attendus
+            </Label>
+            <Input
+              id="beneficiaries"
+              required
+              placeholder="10 apprenties couturières"
+              value={beneficiaries}
+              onChange={(e) => setBeneficiaries(e.target.value)}
+              className="h-11 rounded-xl px-3.5"
+              {...invalidProps("beneficiaries")}
+            />
+            {errorFor("beneficiaries")}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="funding_plan" className="text-ink">
+            Utilisation prévue des fonds
+          </Label>
+          <textarea
+            id="funding_plan"
+            required
+            rows={4}
+            placeholder={"Une dépense par ligne, par exemple :\n3 machines à coudre — 450 000 F CFA\nAménagement — 200 000 F CFA"}
+            value={fundingPlan}
+            onChange={(e) => setFundingPlan(e.target.value)}
+            className="w-full rounded-xl border border-black/10 bg-surface px-3.5 py-3 text-sm leading-relaxed text-ink outline-none placeholder:text-ink-muted focus-visible:border-gold-dark focus-visible:ring-2 focus-visible:ring-gold-dark/30"
+            {...invalidProps("funding_plan")}
+          />
+          {errorFor("funding_plan")}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="project_timeline" className="text-ink">
+            Étapes prévues du projet
+          </Label>
+          <textarea
+            id="project_timeline"
+            required
+            rows={4}
+            placeholder={"Une étape par ligne, par exemple :\nAchat du matériel — semaine 1\nInstallation et démarrage — semaine 2"}
+            value={projectTimeline}
+            onChange={(e) => setProjectTimeline(e.target.value)}
+            className="w-full rounded-xl border border-black/10 bg-surface px-3.5 py-3 text-sm leading-relaxed text-ink outline-none placeholder:text-ink-muted focus-visible:border-gold-dark focus-visible:ring-2 focus-visible:ring-gold-dark/30"
+            {...invalidProps("project_timeline")}
+          />
+          {errorFor("project_timeline")}
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">

@@ -1,463 +1,183 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import {
-  ArrowRight,
-  Check,
-  FileText,
-  Globe,
-  Hammer,
-  Heart,
-  Lightbulb,
-  ShieldCheck,
-  Sprout,
-  Store,
-  TrendingUp,
-} from "lucide-react"
+import { ArrowRight, Check, FileSearch, MapPin, ShieldCheck } from "lucide-react"
 
-import { Reveal } from "@/components/Reveal"
+import { CampaignCard } from "@/components/campaigns/CampaignCard"
 import { Button } from "@/components/ui/button"
 import { apiFetch } from "@/lib/api"
+import type { CampaignListItem } from "@/lib/types"
 
-const audiences = [
+const reviewSteps = [
   {
-    icon: Lightbulb,
-    photo: "/photos/commerce.jpg",
-    photoAlt: "Commerçant sénégalais confiant devant sa boutique",
-    title: "Vous portez un projet",
-    description:
-      "Entrepreneur, artisan, coopérative ou association : présentez votre projet, faites-le vérifier et collectez les fonds pour le concrétiser.",
-    points: [
-      "Créez votre campagne en quelques minutes",
-      "Profil vérifié : votre communauté contribue en confiance",
-      "Recevez les fonds et partagez vos avancées",
-    ],
-    cta: "Lancer mon projet",
+    title: "Identité et activité",
+    text: "Le porteur transmet ses justificatifs. L’équipe vérifie le dossier avant toute publication.",
   },
   {
-    icon: Heart,
-    photo: "/photos/communaute.jpg",
-    photoAlt: "Rassemblement communautaire, un groupe de personnes réunies",
-    title: "Vous voulez contribuer",
-    description:
-      "Depuis Dakar, Paris ou New York : soutenez des projets sénégalais vérifiés et suivez concrètement l'impact de chaque franc investi.",
-    points: [
-      "Découvrez des projets vérifiés et notés",
-      "Contribuez au montant de votre choix",
-      "Suivez l'évolution des projets que vous soutenez",
-    ],
-    cta: "Devenir contributeur",
+    title: "Projet et besoin financier",
+    text: "Le montant, l’utilisation des fonds, les bénéficiaires et le calendrier sont relus.",
+  },
+  {
+    title: "Publication encadrée",
+    text: "La campagne n’est visible qu’après validation. Un rejet doit être motivé et corrigé.",
   },
 ]
 
-const steps = [
-  {
-    number: "1",
-    title: "Le projet est présenté",
-    description:
-      "Le porteur décrit son projet, son objectif de collecte et son plan d'action. Chaque profil passe une vérification d'identité.",
-  },
-  {
-    number: "2",
-    title: "La communauté contribue",
-    description:
-      "Donateurs, investisseurs et diaspora participent à la campagne et suivent la progression de la collecte en temps réel.",
-  },
-  {
-    number: "3",
-    title: "Le projet prend vie",
-    description:
-      "Les fonds sont reversés au porteur, qui tient sa communauté informée des avancées et construit son historique de confiance.",
-  },
-]
-
-const sectors = [
-  { icon: Hammer, label: "Artisanat", photo: "/photos/artisan.jpg", alt: "Artisan travaillant le bois dans son atelier" },
-  { icon: Store, label: "Commerce", photo: "/photos/marche.jpg", alt: "Commerçant devant son étal de fruits, pouce levé" },
-  { icon: Sprout, label: "Agriculture", photo: "/photos/agriculture.jpg", alt: "Agriculteurs récoltant des légumes verts dans un champ" },
-  { icon: Heart, label: "Mode & couture", photo: "/photos/porteur.jpg", alt: "Jeune tailleur souriant dans son atelier de couture" },
-]
-
-const pillars = [
-  {
-    icon: ShieldCheck,
-    title: "Profils vérifiés",
-    description:
-      "Chaque porteur de projet passe une vérification d'identité (KYC) avant de pouvoir collecter le moindre franc.",
-    soon: false,
-  },
-  {
-    icon: TrendingUp,
-    title: "Score Jappandale®",
-    description:
-      "Une notation indépendante de la fiabilité de chaque projet, pour contribuer en connaissance de cause.",
-    soon: true,
-  },
-  {
-    icon: FileText,
-    title: "Passeport Financier®",
-    description:
-      "Chaque campagne réussie enrichit l'historique financier du porteur — un capital de confiance réutilisable.",
-    soon: true,
-  },
-  {
-    icon: Globe,
-    title: "Pensé pour la diaspora",
-    description:
-      "Contribuez depuis l'étranger et suivez vos projets à distance, avec la même transparence qu'à Dakar.",
-    soon: false,
-  },
-]
-
-function ApiStatus() {
-  const [apiOk, setApiOk] = useState<boolean | null>(null)
+function HomePage() {
+  const [campaigns, setCampaigns] = useState<CampaignListItem[]>([])
 
   useEffect(() => {
-    apiFetch("/health/")
-      .then(() => setApiOk(true))
-      .catch(() => setApiOk(false))
+    apiFetch("/campaigns/")
+      .then((data) => setCampaigns((data as CampaignListItem[]).slice(0, 3)))
+      .catch(() => setCampaigns([]))
   }, [])
 
   return (
-    <p className="inline-flex items-center gap-2 rounded-full border border-black/5 bg-surface px-4 py-1.5 text-xs text-ink-muted">
-      <span
-        aria-hidden="true"
-        className={`size-1.5 rounded-full ${
-          apiOk === null ? "animate-pulse bg-ink-muted" : apiOk ? "bg-emerald-500" : "bg-red-400"
-        }`}
-      />
-      API backend :{" "}
-      {apiOk === null ? "vérification en cours…" : apiOk ? "connectée" : "injoignable"}
-    </p>
-  )
-}
-
-function HomePage() {
-  return (
     <>
-      {/* Héro */}
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-[40rem] bg-[radial-gradient(ellipse_55%_45%_at_70%_-5%,rgba(250,197,2,0.16),transparent)]"
-        />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 pt-14 pb-20 sm:pt-20 sm:pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-            <span className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs font-semibold tracking-[3px] text-gold-dark uppercase duration-700 motion-reduce:animate-none">
-              Financement participatif · Sénégal
-            </span>
-
-            <h1 className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-6 font-heading text-4xl leading-[1.05] font-bold text-balance text-ink delay-100 duration-700 motion-reduce:animate-none sm:text-5xl xl:text-6xl">
-              Connecter les projets aux{" "}
-              <span className="text-gold-dark">opportunités de financement</span>
+      <section className="border-b border-black/5 bg-[#fbfaf6]">
+        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-24">
+          <div>
+            <p className="text-sm font-semibold text-gold-dark">Plateforme de projets sénégalais</p>
+            <h1 className="mt-4 max-w-3xl font-heading text-4xl leading-[1.05] font-bold text-ink sm:text-5xl lg:text-6xl">
+              Financer les projets qui font avancer le Sénégal.
             </h1>
-
-            <div
-              aria-hidden="true"
-              className="animate-in fade-in zoom-in-75 fill-mode-backwards mt-7 h-[3px] w-20 rounded-full bg-gradient-to-r from-gold to-gold-dark delay-200 duration-700 motion-reduce:animate-none"
-            />
-
-            <p className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-7 max-w-xl text-base leading-relaxed text-ink-secondary delay-300 duration-700 motion-reduce:animate-none sm:text-lg">
-              Jappandale relie les porteurs de projets sénégalais à une communauté de
-              donateurs, d'investisseurs et de membres de la diaspora. Des campagnes
-              vérifiées, une collecte transparente, un suivi de bout en bout.
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-secondary sm:text-lg">
+              Découvrez des projets locaux documentés, portés par des personnes vérifiées,
+              et suivez concrètement l’utilisation prévue des fonds et leur avancement.
             </p>
-
-            <div className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-9 flex flex-col items-center gap-4 delay-400 duration-700 motion-reduce:animate-none sm:flex-row sm:gap-5">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
                 asChild
-                className="h-12 rounded-full bg-gold px-8 text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
+                className="h-12 rounded-full bg-gold px-7 font-semibold text-ink shadow-sm hover:bg-gold-light"
               >
-                <Link to="/inscription">Lancer mon projet</Link>
+                <Link to="/campagnes">
+                  Voir les projets publiés
+                  <ArrowRight aria-hidden="true" className="size-4" />
+                </Link>
               </Button>
-              <a
-                href="#comment-ca-marche"
-                className="group inline-flex items-center gap-1.5 rounded-sm text-sm font-medium text-ink-secondary transition-colors outline-none hover:text-ink focus-visible:ring-2 focus-visible:ring-gold-dark/50"
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 rounded-full border-black/15 bg-white px-7 font-semibold text-ink hover:border-gold"
               >
-                Comment ça marche
-                <span
-                  aria-hidden="true"
-                  className="transition-transform duration-300 group-hover:translate-y-0.5"
-                >
-                  ↓
-                </span>
-              </a>
+                <Link to="/inscription">Déposer un projet</Link>
+              </Button>
             </div>
-
-            <ul className="animate-in fade-in fill-mode-backwards mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-ink-muted delay-500 duration-700 motion-reduce:animate-none lg:justify-start">
-              {["Projets vérifiés", "Collecte transparente", "Ouvert à la diaspora"].map(
-                (item) => (
-                  <li key={item} className="flex items-center gap-1.5">
-                    <Check aria-hidden="true" className="size-4 text-gold-dark" />
-                    {item}
-                  </li>
-                )
-              )}
-            </ul>
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-ink-muted">
+              Le parcours de contribution fonctionne en mode démonstration. Aucun
+              compte ni moyen de paiement réel n’est débité.
+            </p>
           </div>
 
-          {/* Visuel héro */}
-          <div className="animate-in fade-in zoom-in-95 fill-mode-backwards relative mx-auto w-full max-w-md delay-200 duration-700 motion-reduce:animate-none lg:max-w-none">
-            <div
-              aria-hidden="true"
-              className="absolute -inset-4 -z-10 rounded-[36px] bg-gold/15 blur-3xl"
+          <figure className="relative">
+            <img
+              src="/photos/porteur.jpg"
+              alt="Tailleur dans son atelier à Dakar"
+              width={1200}
+              height={900}
+              fetchPriority="high"
+              className="aspect-[4/3] w-full rounded-[24px] object-cover shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)]"
             />
-            <div className="overflow-hidden rounded-[28px] border border-black/5 bg-white shadow-xl shadow-black/10">
-              <img
-                src="/photos/porteur.jpg"
-                alt="Jeune tailleur sénégalais souriant devant sa machine à coudre, son téléphone à la main"
-                className="aspect-[4/3] w-full object-cover"
-                width={1200}
-                height={900}
-                fetchPriority="high"
-              />
-            </div>
-            <div className="absolute -bottom-5 -left-3 flex items-center gap-3 rounded-2xl border border-black/5 bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:-left-6">
-              <span
-                aria-hidden="true"
-                className="flex size-10 items-center justify-center rounded-xl bg-gold/15 text-gold-dark"
-              >
-                <ShieldCheck className="size-5" />
-              </span>
-              <span className="text-sm leading-tight font-medium text-ink">
-                Chaque projet
-                <br />
-                <span className="text-ink-secondary">est vérifié</span>
-              </span>
-            </div>
-          </div>
+            <figcaption className="absolute right-4 bottom-4 left-4 flex items-center gap-2 rounded-xl bg-black/70 px-4 py-3 text-sm text-white backdrop-blur-sm">
+              <MapPin aria-hidden="true" className="size-4 text-gold" />
+              Atelier de couture — Médina, Dakar
+            </figcaption>
+          </figure>
         </div>
       </section>
 
-      {/* Pour qui */}
-      <section className="border-t border-black/5 bg-surface-alt">
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-          <Reveal className="flex flex-col items-center text-center">
-            <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-              Une plateforme, deux communautés
-            </span>
-            <h2 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-              Jappandale est fait pour vous
+      <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-gold-dark">En cours de préparation</p>
+            <h2 className="mt-2 font-heading text-3xl font-bold text-ink sm:text-4xl">
+              Les projets publiés
             </h2>
-          </Reveal>
+            <p className="mt-3 max-w-2xl text-ink-secondary">
+              Chaque fiche présente le besoin, le lieu, les bénéficiaires et l’usage prévu
+              du financement.
+            </p>
+          </div>
+          <Link
+            to="/campagnes"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-gold-dark"
+          >
+            Toutes les campagnes
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+        </div>
 
-          <div className="mt-14 grid gap-8 lg:grid-cols-2">
-            {audiences.map((audience, index) => (
-              <Reveal key={audience.title} delay={index * 120} className="h-full">
-                <article className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-transparent bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={audience.photo}
-                      alt={audience.photoAlt}
-                      loading="lazy"
-                      width={1200}
-                      height={800}
-                      className="aspect-[16/9] w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                    />
-                    <span
-                      aria-hidden="true"
-                      className="absolute top-4 left-4 flex size-11 items-center justify-center rounded-2xl bg-white/95 text-gold-dark shadow-sm backdrop-blur"
-                    >
-                      <audience.icon className="size-5" />
-                    </span>
-                  </div>
-                  <div className="flex flex-1 flex-col p-8">
-                    <h3 className="font-heading text-2xl font-bold text-ink">{audience.title}</h3>
-                    <p className="mt-3 leading-relaxed text-ink-secondary">{audience.description}</p>
-                    <ul className="mt-6 space-y-3">
-                      {audience.points.map((point) => (
-                        <li key={point} className="flex items-start gap-3 text-sm text-ink-secondary">
-                          <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-gold-dark" />
-                          {point}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-8 pt-2">
-                      <Button
-                        asChild
-                        variant="outline"
-                        className="rounded-full border-black/10 px-6 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"
-                      >
-                        <Link to="/inscription">
-                          {audience.cta}
-                          <ArrowRight aria-hidden="true" className="size-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </article>
-              </Reveal>
+        {campaigns.length > 0 ? (
+          <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {campaigns.map((campaign) => (
+              <CampaignCard key={campaign.id} campaign={campaign} />
             ))}
           </div>
-        </div>
+        ) : (
+          <div className="mt-9 rounded-2xl border border-dashed border-black/15 bg-surface-alt px-6 py-10 text-sm text-ink-secondary">
+            Les campagnes seront affichées ici dès que le service sera disponible.
+          </div>
+        )}
       </section>
 
-      {/* Comment ça marche */}
-      <section id="comment-ca-marche" className="scroll-mt-20">
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-          <Reveal className="flex flex-col items-center text-center">
-            <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-              Comment ça marche
-            </span>
-            <h2 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-              Trois étapes, une communauté
+      <section className="border-y border-black/5 bg-ink text-white">
+        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-16 sm:py-20 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <ShieldCheck aria-hidden="true" className="size-9 text-gold" />
+            <h2 className="mt-5 font-heading text-3xl font-bold sm:text-4xl">
+              Ce que signifie « projet vérifié »
             </h2>
-          </Reveal>
+            <p className="mt-5 leading-relaxed text-white/70">
+              Une validation ne garantit pas la réussite du projet. Elle confirme que le
+              porteur a transmis les pièces demandées et que les informations de la
+              campagne ont été relues avant publication.
+            </p>
+          </div>
 
-          <ol className="mt-14 grid gap-10 sm:grid-cols-3 sm:gap-8">
-            {steps.map((step, index) => (
-              <li key={step.number}>
-                <Reveal delay={index * 120} className="h-full">
-                  <div className="group h-full rounded-[20px] border border-black/5 bg-surface p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                    <span className="font-heading text-4xl font-bold text-gold" aria-hidden="true">
-                      {step.number}
-                    </span>
-                    <h3 className="mt-4 font-heading text-xl font-bold text-ink">{step.title}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
-                      {step.description}
-                    </p>
-                  </div>
-                </Reveal>
+          <ol className="divide-y divide-white/10 border-y border-white/10">
+            {reviewSteps.map((step, index) => (
+              <li key={step.title} className="grid grid-cols-[2.5rem_1fr] gap-4 py-6">
+                <span className="font-heading text-2xl font-bold text-gold">0{index + 1}</span>
+                <div>
+                  <h3 className="font-heading text-xl font-bold">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/65">{step.text}</p>
+                </div>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* Secteurs financés */}
-      <section className="border-t border-black/5 bg-surface-alt">
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-          <Reveal className="flex flex-col items-center text-center">
-            <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-              Des projets bien réels
-            </span>
-            <h2 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-              Tous les secteurs qui font le Sénégal
-            </h2>
-            <p className="mt-4 max-w-2xl text-ink-secondary">
-              De l'atelier de couture à la coopérative agricole, Jappandale accompagne la
-              diversité des porteurs de projets d'ici.
-            </p>
-          </Reveal>
-
-          <ul className="mt-14 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-            {sectors.map((sector, index) => (
-              <li key={sector.label}>
-                <Reveal delay={index * 100}>
-                  <figure className="group relative overflow-hidden rounded-[20px] shadow-sm">
-                    <img
-                      src={sector.photo}
-                      alt={sector.alt}
-                      loading="lazy"
-                      width={800}
-                      height={1000}
-                      className="aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                    />
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
-                    />
-                    <figcaption className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-4 text-white">
-                      <sector.icon aria-hidden="true" className="size-5 text-gold" />
-                      <span className="font-heading text-lg font-bold">{sector.label}</span>
-                    </figcaption>
-                  </figure>
-                </Reveal>
-              </li>
-            ))}
+      <section className="mx-auto grid max-w-6xl gap-8 px-6 py-16 sm:py-20 lg:grid-cols-2">
+        <article className="border-l-4 border-gold pl-6 sm:pl-8">
+          <Check aria-hidden="true" className="size-6 text-gold-dark" />
+          <h2 className="mt-4 font-heading text-2xl font-bold text-ink">
+            Disponible aujourd’hui
+          </h2>
+          <ul className="mt-5 space-y-3 text-sm text-ink-secondary">
+            <li>Création de compte et profil porteur</li>
+            <li>Dépôt et revue manuelle des pièces KYC</li>
+            <li>Création, modération et publication d’une campagne</li>
+            <li>Consultation publique des projets publiés</li>
           </ul>
-        </div>
+        </article>
+
+        <article className="border-l-4 border-black/15 pl-6 sm:pl-8">
+          <FileSearch aria-hidden="true" className="size-6 text-ink-muted" />
+          <h2 className="mt-4 font-heading text-2xl font-bold text-ink">Paiement en démonstration</h2>
+          <p className="mt-5 text-sm leading-relaxed text-ink-secondary">
+            Vous pouvez maintenant tester une contribution, son historique et son effet
+            sur la collecte. Le raccordement à un prestataire de paiement réel viendra
+            après validation des règles financières et des tests de sécurité.
+          </p>
+          <Button
+            asChild
+            variant="outline"
+            className="mt-6 rounded-full border-black/15 px-6 font-semibold"
+          >
+            <Link to="/inscription">Créer mon espace</Link>
+          </Button>
+        </article>
       </section>
-
-      {/* Les piliers de la confiance */}
-      <section>
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-          <Reveal className="flex flex-col items-center text-center">
-            <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-              Pourquoi Jappandale
-            </span>
-            <h2 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-              La confiance au cœur de la plateforme
-            </h2>
-            <p className="mt-4 max-w-2xl text-ink-secondary">
-              Financer un projet, c'est d'abord une question de confiance. Chaque brique de
-              Jappandale est pensée pour la construire et la mesurer.
-            </p>
-          </Reveal>
-
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {pillars.map((pillar, index) => (
-              <Reveal key={pillar.title} delay={index * 100} className="h-full">
-                <article className="group relative h-full rounded-[20px] border border-transparent bg-surface p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                  {pillar.soon && (
-                    <span className="absolute top-5 right-5 rounded-full bg-gold/15 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-gold-dark uppercase">
-                      Bientôt
-                    </span>
-                  )}
-                  <span
-                    aria-hidden="true"
-                    className="flex size-11 items-center justify-center rounded-xl bg-gold/15 text-gold-dark transition-colors group-hover:bg-gold/25"
-                  >
-                    <pillar.icon className="size-5" />
-                  </span>
-                  <h3 className="mt-5 font-heading text-lg font-bold text-ink">{pillar.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
-                    {pillar.description}
-                  </p>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Appel à l'action final */}
-      <section className="relative overflow-hidden bg-ink">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_50%_0%,rgba(250,197,2,0.14),transparent)]"
-        />
-        <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 py-20 text-center sm:py-24">
-          <Reveal className="flex flex-col items-center">
-            <span className="text-xs font-semibold tracking-[4px] text-gold uppercase">
-              Rejoignez le mouvement
-            </span>
-            <h2 className="mt-5 font-heading text-3xl font-bold text-balance text-white sm:text-5xl">
-              Votre projet mérite sa chance.
-              <br />
-              Votre soutien change tout.
-            </h2>
-            <p className="mt-6 max-w-xl leading-relaxed text-white/70">
-              Créez votre compte gratuitement — que ce soit pour lancer votre campagne ou
-              pour soutenir les idées qui font avancer le Sénégal.
-            </p>
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
-              <Button
-                asChild
-                className="h-12 rounded-full bg-gold px-8 text-base font-semibold text-ink shadow-lg shadow-gold/20 transition-all hover:bg-gold-light hover:shadow-xl hover:shadow-gold/25"
-              >
-                <Link to="/inscription">Créer mon compte</Link>
-              </Button>
-              <Link
-                to="/connexion"
-                className="group inline-flex items-center gap-1.5 rounded-sm text-sm font-medium text-white/70 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-gold/60"
-              >
-                J'ai déjà un compte
-                <ArrowRight
-                  aria-hidden="true"
-                  className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-                />
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Statut technique discret */}
-      <div className="border-t border-black/5 bg-surface-alt">
-        <div className="mx-auto flex max-w-6xl justify-center px-6 py-6">
-          <ApiStatus />
-        </div>
-      </div>
     </>
   )
 }

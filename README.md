@@ -31,6 +31,18 @@ npm run dev
 
 Application sur http://localhost:5173, API sur http://localhost:8001/api/.
 
+### Données de démonstration
+
+```bash
+cd backend
+python manage.py shell < scripts/seed_campaigns.py
+```
+
+L’espace client d’administration est disponible sur
+`http://localhost:5173/administration` avec le compte local
+`demo.admin@jappandale.sn` et le mot de passe `MotDePasse123!`.
+Ce compte est réservé au développement et ne doit pas être créé en production.
+
 ### Tests
 
 ```bash

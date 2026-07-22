@@ -5,6 +5,7 @@ import {
   HeartPulse,
   Landmark,
   Laptop,
+  MapPin,
   Sprout,
   Store,
   Tag,
@@ -76,6 +77,12 @@ export function CampaignCard({ campaign }: { campaign: CampaignListItem }) {
         <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-secondary">
           {campaign.summary}
         </p>
+        {campaign.location && (
+          <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-ink-muted">
+            <MapPin aria-hidden="true" className="size-3.5 text-gold-dark" />
+            {campaign.location}
+          </p>
+        )}
 
         <div className="mt-auto pt-5">
           <ProgressBar percent={campaign.progress_percent} />
