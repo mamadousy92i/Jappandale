@@ -1,129 +1,168 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useEffect, useState } from "react"
-import type { ReactNode } from "react"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import type { ReactNode } from "react";
 
-import { ApiError, apiFetch } from "@/lib/api"
-import type { RegisterData, User } from "@/lib/types"
-
-const ACCESS_KEY = "jappandale_access"
-const REFRESH_KEY = "jappandale_refresh"
+import { ApiError, apiFetch } from "@/lib/api";
+import type { RegisterData, User } from "@/lib/types";
 
 interface AuthContextValue {
-  user: User | null
-  loading: boolean
-  login: (email: string, password: string) => Promise<void>
-  register: (data: RegisterData) => Promise<void>
-  logout: () => void
-  authFetch: (path: string, options?: RequestInit) => Promise<unknown>
-  refreshUser: () => Promise<void>
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<LoginResult>;
+  verifyAdminMfa: (challengeId: string, code: string) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
+  logout: () => Promise<void>;
+  authFetch: (path: string, options?: RequestInit) => Promise<unknown>;
+  refreshUser: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null)
+interface LoginResult {
+  mfaRequired: boolean;
+  challengeId?: string;
+  message?: string;
+}
 
-async function refreshAccessToken(): Promise<string | null> {
-  const refresh = localStorage.getItem(REFRESH_KEY)
-  if (!refresh) return null
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+async function refreshSession(): Promise<boolean> {
   try {
-    const data = (await apiFetch("/auth/token/refresh/", {
+    await apiFetch("/auth/token/refresh/", {
       method: "POST",
-      body: JSON.stringify({ refresh }),
-    })) as { access: string }
-    localStorage.setItem(ACCESS_KEY, data.access)
-    return data.access
+      body: JSON.stringify({}),
+    });
+    return true;
   } catch {
-    localStorage.removeItem(ACCESS_KEY)
-    localStorage.removeItem(REFRESH_KEY)
-    return null
+    return false;
   }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const authFetch = useCallback(
     async (path: string, options?: RequestInit): Promise<unknown> => {
-      const access = localStorage.getItem(ACCESS_KEY)
-      const withToken = (token: string | null): RequestInit => ({
-        ...options,
-        headers: {
-          ...options?.headers,
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      })
       try {
-        return await apiFetch(path, withToken(access))
+        return await apiFetch(path, options);
       } catch (error) {
         if (error instanceof ApiError && error.status === 401) {
-          const newAccess = await refreshAccessToken()
-          if (newAccess) return apiFetch(path, withToken(newAccess))
-          setUser(null)
+          const refreshed = await refreshSession();
+          if (refreshed) return apiFetch(path, options);
+          setUser(null);
         }
-        throw error
+        throw error;
       }
     },
-    []
-  )
+    [],
+  );
 
   useEffect(() => {
     const bootstrap = async () => {
-      if (!localStorage.getItem(ACCESS_KEY) && !localStorage.getItem(REFRESH_KEY)) {
-        setLoading(false)
-        return
-      }
       try {
-        setUser((await authFetch("/auth/me/")) as User)
+        const session = (await apiFetch("/auth/session/")) as {
+          authenticated: boolean;
+          can_refresh: boolean;
+        };
+        if (session.authenticated) {
+          setUser((await apiFetch("/auth/me/")) as User);
+        } else if (session.can_refresh && (await refreshSession())) {
+          setUser((await apiFetch("/auth/me/")) as User);
+        } else {
+          setUser(null);
+        }
       } catch {
-        setUser(null)
+        setUser(null);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    void bootstrap()
-  }, [authFetch])
+    };
+    void bootstrap();
+  }, []);
 
   const login = useCallback(
     async (email: string, password: string) => {
-      const tokens = (await apiFetch("/auth/token/", {
+      const result = (await apiFetch("/auth/token/", {
         method: "POST",
         body: JSON.stringify({ email, password }),
-      })) as { access: string; refresh: string }
-      localStorage.setItem(ACCESS_KEY, tokens.access)
-      localStorage.setItem(REFRESH_KEY, tokens.refresh)
-      setUser((await authFetch("/auth/me/")) as User)
+      })) as { requires_mfa?: boolean; challenge_id?: string; detail?: string };
+      if (result.requires_mfa && result.challenge_id) {
+        return {
+          mfaRequired: true,
+          challengeId: result.challenge_id,
+          message: result.detail,
+        };
+      }
+      setUser((await authFetch("/auth/me/")) as User);
+      return { mfaRequired: false };
     },
-    [authFetch]
-  )
+    [authFetch],
+  );
+
+  const verifyAdminMfa = useCallback(
+    async (challengeId: string, code: string) => {
+      await apiFetch("/auth/token/mfa/", {
+        method: "POST",
+        body: JSON.stringify({ challenge_id: challengeId, code }),
+      });
+      setUser((await authFetch("/auth/me/")) as User);
+    },
+    [authFetch],
+  );
 
   const register = useCallback(
     async (data: RegisterData) => {
-      await apiFetch("/auth/register/", { method: "POST", body: JSON.stringify(data) })
-      await login(data.email, data.password)
+      await apiFetch("/auth/register/", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      await login(data.email, data.password);
     },
-    [login]
-  )
+    [login],
+  );
 
-  const logout = useCallback(() => {
-    localStorage.removeItem(ACCESS_KEY)
-    localStorage.removeItem(REFRESH_KEY)
-    setUser(null)
-  }, [])
+  const logout = useCallback(async () => {
+    try {
+      await apiFetch("/auth/logout/", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+    } catch {
+      // La session locale est fermée même si le serveur est momentanément indisponible.
+    } finally {
+      setUser(null);
+    }
+  }, []);
 
   const refreshUser = useCallback(async () => {
-    setUser((await authFetch("/auth/me/")) as User)
-  }, [authFetch])
+    setUser((await authFetch("/auth/me/")) as User);
+  }, [authFetch]);
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, authFetch, refreshUser }}
+      value={{
+        user,
+        loading,
+        login,
+        verifyAdminMfa,
+        register,
+        logout,
+        authFetch,
+        refreshUser,
+      }}
     >
       {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error("useAuth doit être utilisé sous <AuthProvider>")
-  return ctx
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth doit être utilisé sous <AuthProvider>");
+  return ctx;
 }

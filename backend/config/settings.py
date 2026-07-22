@@ -87,7 +87,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.User"
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS", default=CORS_ALLOWED_ORIGINS
+)
 
 # Les protections HTTPS restent désactivées en local et doivent être activées en staging.
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=False)
@@ -105,7 +108,7 @@ if env.bool("TRUST_PROXY_SSL_HEADER", default=False):
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "apps.accounts.authentication.CookieJWTAuthentication",
     ),
     "DEFAULT_THROTTLE_RATES": {
         "password_reset": "5/hour",
@@ -114,6 +117,8 @@ REST_FRAMEWORK = {
         "campaign_report": "5/hour",
         "email_otp_send": "5/hour",
         "email_otp_verify": "20/hour",
+        "admin_login": "10/hour",
+        "admin_mfa_verify": "20/hour",
     },
 }
 
@@ -130,6 +135,12 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
     "CHECK_REVOKE_TOKEN": True,
 }
+
+AUTH_COOKIE_ACCESS_NAME = "jappandale_access"
+AUTH_COOKIE_REFRESH_NAME = "jappandale_refresh"
+AUTH_COOKIE_SECURE = env.bool("AUTH_COOKIE_SECURE", default=not DEBUG)
+AUTH_COOKIE_SAMESITE = env("AUTH_COOKIE_SAMESITE", default="Lax")
+AUTH_COOKIE_DOMAIN = env("AUTH_COOKIE_DOMAIN", default=None) or None
 
 EMAIL_BACKEND = env(
     "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
@@ -150,6 +161,7 @@ EMAIL_LOGO_PATH = env(
     default=str(BASE_DIR.parent / "frontend" / "public" / "logo-mark.png"),
 )
 EMAIL_OTP_TTL = env.int("EMAIL_OTP_TTL", default=600)
+ADMIN_MFA_OTP_TTL = env.int("ADMIN_MFA_OTP_TTL", default=600)
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173")
 PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT", default=3600)
 

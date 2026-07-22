@@ -7,6 +7,7 @@
 - `ALLOWED_HOSTS` limité au domaine du staging
 - `CORS_ALLOWED_ORIGINS` et `CSRF_TRUSTED_ORIGINS` limités au frontend
 - `FRONTEND_URL` configuré avec l’URL HTTPS publique
+- `AUTH_COOKIE_SECURE=True` et `AUTH_COOKIE_SAMESITE=Lax`
 - une base PostgreSQL et un stockage média sauvegardés
 - un serveur SMTP réel pour la récupération de mot de passe et les notifications
 
@@ -21,6 +22,9 @@ Configuration e-mail retenue :
 Les OTP sont envoyés exclusivement par e-mail. Aucun OTP SMS ou WhatsApp n’est
 activé dans cette version.
 
+Les comptes administrateurs utilisent également un code e-mail obligatoire à
+chaque connexion. Le délai est piloté par `ADMIN_MFA_OTP_TTL`.
+
 ## Protections HTTPS
 
 Après validation du certificat et du proxy :
@@ -28,6 +32,7 @@ Après validation du certificat et du proxy :
 - `SECURE_SSL_REDIRECT=True`
 - `SESSION_COOKIE_SECURE=True`
 - `CSRF_COOKIE_SECURE=True`
+- `AUTH_COOKIE_SECURE=True`
 - `TRUST_PROXY_SSL_HEADER=True` uniquement derrière un proxy maîtrisé
 - commencer `SECURE_HSTS_SECONDS` avec une durée courte, puis augmenter progressivement
 - n’activer `SECURE_HSTS_PRELOAD` qu’après vérification de tous les sous-domaines
@@ -51,6 +56,6 @@ Après validation du certificat et du proxy :
 
 ## Point de sécurité restant
 
-Le MVP stocke encore les jetons JWT dans le navigateur. Avant une exposition
-publique importante, prévoir leur migration vers des cookies `HttpOnly`, ajouter
-une politique CSP stricte et faire réaliser un test d’intrusion ciblé.
+Les jetons JWT sont conservés dans des cookies `HttpOnly` et les opérations du
+navigateur sont protégées par CSRF. Avant une exposition publique importante,
+ajouter une politique CSP stricte et faire réaliser un test d’intrusion ciblé.

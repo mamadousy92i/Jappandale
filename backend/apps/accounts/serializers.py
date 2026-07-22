@@ -1,7 +1,8 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
-import logging
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from rest_framework import serializers
@@ -82,6 +83,14 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
 
 class EmailVerificationSerializer(serializers.Serializer):
+    code = serializers.RegexField(
+        r"^\d{6}$",
+        error_messages={"invalid": "Saisissez les six chiffres du code."},
+    )
+
+
+class AdminMfaVerifySerializer(serializers.Serializer):
+    challenge_id = serializers.UUIDField()
     code = serializers.RegexField(
         r"^\d{6}$",
         error_messages={"invalid": "Saisissez les six chiffres du code."},

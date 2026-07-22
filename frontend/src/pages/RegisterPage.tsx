@@ -114,7 +114,7 @@ function RegisterPage() {
         className="pointer-events-none absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(250,197,2,0.14),transparent)]"
       />
 
-      <div className="relative mx-auto flex max-w-lg flex-col items-center px-6 pt-16 pb-24 sm:pt-24 sm:pb-32">
+      <div className="relative mx-auto flex max-w-3xl flex-col items-center px-5 pt-16 pb-24 sm:px-8 sm:pt-24 sm:pb-32">
         <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-center text-center duration-700 motion-reduce:animate-none">
           <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
             Rejoindre Jappandale
@@ -136,7 +136,7 @@ function RegisterPage() {
           data-testid="register-form"
           onSubmit={handleSubmit}
           noValidate
-          className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-10 w-full rounded-[20px] border border-black/5 bg-surface p-8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.08)] delay-150 duration-700 motion-reduce:animate-none sm:p-10"
+          className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-10 w-full rounded-[28px] border border-black/5 bg-surface p-8 shadow-[0_18px_60px_-16px_rgba(0,0,0,0.12)] delay-150 duration-700 motion-reduce:animate-none sm:p-14"
         >
           {globalError && (
             <p
@@ -204,7 +204,7 @@ function RegisterPage() {
                   placeholder="Awa"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="h-11 rounded-xl px-3.5"
+                  className="h-14 rounded-xl px-5 text-base"
                   {...invalidProps("first_name")}
                 />
                 {errorFor("first_name")}
@@ -221,7 +221,7 @@ function RegisterPage() {
                   placeholder="Diop"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="h-11 rounded-xl px-3.5"
+                  className="h-14 rounded-xl px-5 text-base"
                   {...invalidProps("last_name")}
                 />
                 {errorFor("last_name")}
@@ -240,7 +240,7 @@ function RegisterPage() {
                 placeholder="vous@exemple.sn"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11 rounded-xl px-3.5"
+                className="h-14 rounded-xl px-5 text-base"
                 {...invalidProps("email")}
               />
               {errorFor("email")}
@@ -258,7 +258,7 @@ function RegisterPage() {
                 placeholder="8 caractères minimum"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-11 rounded-xl px-3.5"
+                  className="h-14 rounded-xl px-5 text-base"
                 {...invalidProps("password")}
               />
               {errorFor("password")}
@@ -276,7 +276,7 @@ function RegisterPage() {
                 placeholder="+221 77 000 00 00"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="h-11 rounded-xl px-3.5"
+                  className="h-14 rounded-xl px-5 text-base"
                 {...invalidProps("phone")}
               />
               {errorFor("phone")}
@@ -286,7 +286,7 @@ function RegisterPage() {
           <Button
             type="submit"
             disabled={submitting}
-            className="mt-8 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
+            className="mt-9 h-14 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
           >
             {submitting ? "Création du compte…" : "Créer mon compte"}
           </Button>

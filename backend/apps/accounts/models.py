@@ -1,5 +1,7 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+import uuid
+
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils import timezone
 
@@ -130,4 +132,40 @@ class EmailVerificationOtp(models.Model):
 
     @property
     def is_valid(self):
-        return self.used_at is None and self.expires_at > timezone.now() and self.attempts < 5
+        return (
+            self.used_at is None
+            and self.expires_at > timezone.now()
+            and self.attempts < 5
+        )
+
+
+class AdminLoginOtp(models.Model):
+    """Second facteur à usage unique pour les connexions administrateur."""
+
+    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="admin_login_otps"
+    )
+    code_hash = models.CharField(max_length=128)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "OTP de connexion administrateur"
+
+    def set_code(self, code):
+        self.code_hash = make_password(code)
+
+    def check_code(self, code):
+        return check_password(code, self.code_hash)
+
+    @property
+    def is_valid(self):
+        return (
+            self.used_at is None
+            and self.expires_at > timezone.now()
+            and self.attempts < 5
+        )
