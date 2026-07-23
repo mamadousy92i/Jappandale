@@ -1,6 +1,7 @@
 import { useState } from "react"
-import type { ChangeEvent, FormEvent } from "react"
-import { Camera, LoaderCircle, Trash2 } from "lucide-react"
+import type { ChangeEvent, FormEvent, ReactNode } from "react"
+import { Camera, IdCard, LoaderCircle, Trash2, UserRound, WalletCards } from "lucide-react"
+import { Link, useSearchParams } from "react-router-dom"
 
 import { KycSection } from "@/components/account/KycSection"
 import { MyContributions } from "@/components/account/MyContributions"
@@ -12,7 +13,6 @@ import { Label } from "@/components/ui/label"
 import { ApiError } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import type { Role } from "@/lib/types"
-import { Link } from "react-router-dom"
 
 const roleLabels: Record<Role, string> = {
   PORTEUR: "Porteur de projet",
@@ -20,8 +20,11 @@ const roleLabels: Record<Role, string> = {
   ADMIN: "Administrateur",
 }
 
+type TabKey = "profil" | "kyc" | "contributions"
+
 function AccountPage() {
   const { user, authFetch, refreshUser } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [firstName, setFirstName] = useState(user?.first_name ?? "")
   const [lastName, setLastName] = useState(user?.last_name ?? "")
@@ -38,6 +41,14 @@ function AccountPage() {
 
   // La route est protégée par RequireAuth : user est garanti non nul ici.
   if (!user) return null
+
+  const requestedTab = searchParams.get("onglet")
+  const activeTab: TabKey =
+    requestedTab === "kyc" || requestedTab === "contributions" ? requestedTab : "profil"
+
+  const goToTab = (tab: TabKey) => {
+    setSearchParams(tab === "profil" ? {} : { onglet: tab })
+  }
 
   const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -105,34 +116,26 @@ function AccountPage() {
     }
   }
 
-  return (
-    <section className="relative overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(250,197,2,0.12),transparent)]"
-      />
+  const tabs: { key: TabKey; label: string; icon: typeof UserRound; alert?: boolean }[] = [
+    { key: "profil", label: "Informations personnelles", icon: UserRound },
+    { key: "kyc", label: "Vérification d'identité", icon: IdCard, alert: user.kyc_status !== "VALIDE" },
+    { key: "contributions", label: "Contributions", icon: WalletCards },
+  ]
 
-      <div className="relative mx-auto max-w-3xl px-6 pt-16 pb-24 sm:pt-20">
-        {/* En-tête compte */}
-        <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-start gap-5 duration-700 motion-reduce:animate-none sm:flex-row sm:items-center">
-          <UserAvatar user={user} size="lg" className="shadow-md shadow-black/10" />
-          <div>
-            <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-              Mon compte
-            </span>
-            <h1 className="mt-1 font-heading text-3xl font-bold text-ink sm:text-4xl">
-              Bonjour {user.first_name || "à vous"}
-            </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink-secondary">
-              <span className="rounded-full bg-gold/15 px-3 py-0.5 text-xs font-semibold text-gold-dark">
-                {roleLabels[user.role]}
-              </span>
-              <span>{user.email}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-7 flex flex-col justify-between gap-4 rounded-[20px] border border-black/5 bg-surface p-5 shadow-sm sm:flex-row sm:items-center">
+  let tabContent: ReactNode
+  if (activeTab === "kyc") {
+    tabContent = <KycSection status={user.kyc_status} role={user.role} />
+  } else if (activeTab === "contributions") {
+    tabContent = (
+      <div className="space-y-6">
+        <MyContributions />
+        {user.role === "PORTEUR" && <ReceivedContributions />}
+      </div>
+    )
+  } else {
+    tabContent = (
+      <div className="space-y-6">
+        <div className="flex flex-col justify-between gap-4 rounded-[20px] border border-black/5 bg-surface p-5 shadow-sm sm:flex-row sm:items-center">
           <div>
             <p className="font-semibold text-ink">Photo de profil</p>
             <p className="mt-1 text-sm text-ink-muted">JPG, PNG ou WebP · 3 Mo maximum.</p>
@@ -149,14 +152,13 @@ function AccountPage() {
           </div>
         </div>
 
-        {/* Formulaire de profil */}
-        {!user.email_verified && <div className="mt-8 flex flex-col justify-between gap-4 rounded-[20px] border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center"><div><p className="font-semibold text-amber-900">Adresse e-mail non vérifiée</p><p className="mt-1 text-sm text-amber-800">Saisissez le code reçu par e-mail pour sécuriser votre compte.</p></div><Button asChild className="shrink-0 rounded-full bg-ink text-white"><Link to="/verifier-email">Vérifier maintenant</Link></Button></div>}
+        {!user.email_verified && <div className="flex flex-col justify-between gap-4 rounded-[20px] border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center"><div><p className="font-semibold text-amber-900">Adresse e-mail non vérifiée</p><p className="mt-1 text-sm text-amber-800">Saisissez le code reçu par e-mail pour sécuriser votre compte.</p></div><Button asChild className="shrink-0 rounded-full bg-ink text-white"><Link to="/verifier-email">Vérifier maintenant</Link></Button></div>}
 
         <form
           data-testid="account-form"
           onSubmit={handleSubmit}
           noValidate
-          className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-10 rounded-[20px] border border-black/5 bg-surface p-8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.08)] delay-150 duration-700 motion-reduce:animate-none sm:p-10"
+          className="rounded-[20px] border border-black/5 bg-surface p-8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.08)] sm:p-10"
         >
           <h2 className="font-heading text-xl font-bold text-ink">Informations personnelles</h2>
           <p className="mt-1 text-sm text-ink-muted">
@@ -230,21 +232,78 @@ function AccountPage() {
             {submitting ? "Enregistrement…" : "Enregistrer les modifications"}
           </Button>
         </form>
+      </div>
+    )
+  }
 
-        {/* Vérification d'identité (KYC) */}
-        <div className="animate-in fade-in fill-mode-backwards mt-6 delay-300 duration-700 motion-reduce:animate-none">
-          <KycSection status={user.kyc_status} role={user.role} />
-        </div>
+  return (
+    <section className="relative overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(250,197,2,0.12),transparent)]"
+      />
 
-        <div className="animate-in fade-in fill-mode-backwards mt-6 delay-500 duration-700 motion-reduce:animate-none">
-          <MyContributions />
-        </div>
-
-        {user.role === "PORTEUR" && (
-          <div className="animate-in fade-in fill-mode-backwards mt-6 delay-500 duration-700 motion-reduce:animate-none">
-            <ReceivedContributions />
+      <div className="relative mx-auto max-w-3xl px-6 pt-16 pb-24 sm:pt-20">
+        {/* En-tête compte */}
+        <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-start gap-5 duration-700 motion-reduce:animate-none sm:flex-row sm:items-center">
+          <UserAvatar user={user} size="lg" className="shadow-md shadow-black/10" />
+          <div>
+            <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
+              Mon compte
+            </span>
+            <h1 className="mt-1 font-heading text-3xl font-bold text-ink sm:text-4xl">
+              Bonjour {user.first_name || "à vous"}
+            </h1>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink-secondary">
+              <span className="rounded-full bg-gold/15 px-3 py-0.5 text-xs font-semibold text-gold-dark">
+                {roleLabels[user.role]}
+              </span>
+              <span>{user.email}</span>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Onglets */}
+        <div
+          role="tablist"
+          aria-label="Sections de mon compte"
+          className="mt-9 flex flex-wrap gap-2 border-b border-black/8 pb-px"
+        >
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              id={`tab-${tab.key}`}
+              aria-selected={activeTab === tab.key}
+              aria-controls={`panel-${tab.key}`}
+              onClick={() => goToTab(tab.key)}
+              className={`relative flex items-center gap-2 rounded-t-xl px-4 py-3 text-sm font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-gold-dark/50 ${
+                activeTab === tab.key
+                  ? "border-b-2 border-gold-dark text-ink"
+                  : "border-b-2 border-transparent text-ink-secondary hover:text-ink"
+              }`}
+            >
+              <tab.icon aria-hidden="true" className="size-4" />
+              {tab.label}
+              {tab.alert && (
+                <span
+                  aria-label="Action requise"
+                  className="size-1.5 rounded-full bg-gold-dark"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+          className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards mt-6 duration-500 motion-reduce:animate-none"
+        >
+          {tabContent}
+        </div>
       </div>
     </section>
   )

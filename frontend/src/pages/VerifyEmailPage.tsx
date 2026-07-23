@@ -45,7 +45,7 @@ export default function VerifyEmailPage() {
         body: JSON.stringify({ code }),
       });
       await refreshUser();
-      navigate("/compte", { replace: true });
+      navigate("/compte?onglet=kyc", { replace: true });
     } catch {
       setError("Code incorrect ou expiré. Vérifiez les six chiffres reçus.");
     } finally {

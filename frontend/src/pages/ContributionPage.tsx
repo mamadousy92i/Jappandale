@@ -110,7 +110,7 @@ export default function ContributionPage() {
         <TriangleAlert className="size-10 text-gold-dark" />
         <h1 className="mt-5 font-heading text-3xl font-bold text-ink">Vérification d’identité requise</h1>
         <p className="mt-3 leading-relaxed text-ink-secondary">Votre identité doit être validée avant de contribuer. Retrouvez les documents demandés et le statut de votre dossier dans votre compte.</p>
-        <Button asChild className="mt-7 rounded-full bg-gold font-semibold text-ink"><Link to="/compte">Accéder à mon compte</Link></Button>
+        <Button asChild className="mt-7 rounded-full bg-gold font-semibold text-ink"><Link to="/compte?onglet=kyc">Accéder à mon compte</Link></Button>
       </section>
     )
   }
@@ -214,7 +214,7 @@ export default function ContributionPage() {
             {contribution.status === "CONFIRMEE" ? <CheckCircle2 className="mx-auto size-12 text-emerald-600" /> : <TriangleAlert className="mx-auto size-12 text-red-600" />}
             <h2 className="mt-4 font-heading text-2xl font-bold text-ink">{contribution.status === "CONFIRMEE" ? "Contribution confirmée" : "Contribution non confirmée"}</h2>
             <p className="mt-2 text-ink-secondary">{formatFcfa(contribution.amount)}{contribution.reward && ` · ${contribution.reward.title}`} · référence {contribution.public_reference.slice(0, 8)}</p>
-            <div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full bg-gold text-ink"><Link to={`/campagnes/${campaign.slug}`}>Voir la campagne</Link></Button><Button asChild variant="outline" className="rounded-full"><Link to="/compte">Voir mon historique</Link></Button></div>
+            <div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full bg-gold text-ink"><Link to={`/campagnes/${campaign.slug}`}>Voir la campagne</Link></Button><Button asChild variant="outline" className="rounded-full"><Link to="/compte?onglet=contributions">Voir mon historique</Link></Button></div>
           </div>
         ) : (
           <div className="mt-8">

@@ -772,7 +772,7 @@ function CreateCampaignPage() {
           asChild
           className="mt-6 h-11 rounded-full bg-gold px-7 font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
         >
-          <Link to="/compte">Compléter ma vérification</Link>
+          <Link to="/compte?onglet=kyc">Compléter ma vérification</Link>
         </Button>
       </AccessNotice>
     );
