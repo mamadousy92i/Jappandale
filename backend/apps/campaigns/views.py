@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -6,7 +7,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 
-from .models import Campaign, CampaignAuditLog, CampaignReport
+from .models import Campaign, CampaignAuditLog, CampaignReport, Reward
 from apps.notifications.services import notify_admins
 from .permissions import IsOwner, IsValidatedPorteur
 from .serializers import (
@@ -15,10 +16,16 @@ from .serializers import (
     CampaignReportSerializer,
     CampaignUpdateSerializer,
     CampaignWriteSerializer,
+    RewardSerializer,
 )
 from .services import close_finished_campaigns
 
 PUBLIC_STATUSES = (Campaign.Status.PUBLIEE, Campaign.Status.CLOTUREE)
+EDITABLE_STATUSES = (
+    Campaign.Status.BROUILLON,
+    Campaign.Status.REJETEE,
+    Campaign.Status.SUSPENDUE,
+)
 
 
 class CampaignViewSet(viewsets.ModelViewSet):
@@ -70,11 +77,7 @@ class CampaignViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         campaign = self.get_object()
-        if campaign.status not in (
-            Campaign.Status.BROUILLON,
-            Campaign.Status.REJETEE,
-            Campaign.Status.SUSPENDUE,
-        ):
+        if campaign.status not in EDITABLE_STATUSES:
             raise ValidationError(
                 "Seule une campagne en brouillon, rejetée ou suspendue peut être modifiée."
             )
@@ -98,11 +101,7 @@ class CampaignViewSet(viewsets.ModelViewSet):
         campaign = self.get_object()
         if campaign.owner_id != request.user.id:
             raise PermissionDenied("Cette campagne ne vous appartient pas.")
-        if campaign.status not in (
-            Campaign.Status.BROUILLON,
-            Campaign.Status.REJETEE,
-            Campaign.Status.SUSPENDUE,
-        ):
+        if campaign.status not in EDITABLE_STATUSES:
             raise ValidationError("Cette campagne ne peut pas être soumise à modération.")
         required_fields = {
             "location": "Indiquez la localisation du projet.",
@@ -173,3 +172,49 @@ class CampaignViewSet(viewsets.ModelViewSet):
             message=f"La campagne « {campaign.title} » a été signalée : {report.get_reason_display()}.",
         )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def _get_owned_editable_campaign(self, request, slug):
+        campaign = self.get_object()
+        if campaign.owner_id != request.user.id:
+            raise PermissionDenied("Cette campagne ne vous appartient pas.")
+        if campaign.campaign_type != Campaign.CampaignType.DON_CONTREPARTIE:
+            raise ValidationError(
+                "Les contreparties ne sont disponibles que pour une campagne "
+                "« don avec contrepartie »."
+            )
+        if campaign.status not in EDITABLE_STATUSES:
+            raise ValidationError(
+                "Les contreparties ne peuvent être modifiées que sur une campagne "
+                "en brouillon, rejetée ou suspendue."
+            )
+        return campaign
+
+    @action(detail=True, methods=["post"], url_path="rewards")
+    def create_reward(self, request, slug=None):
+        campaign = self._get_owned_editable_campaign(request, slug)
+        serializer = RewardSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(campaign=campaign)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(
+        detail=True,
+        methods=["patch", "delete"],
+        url_path=r"rewards/(?P<reward_id>[0-9]+)",
+    )
+    def reward_detail(self, request, slug=None, reward_id=None):
+        campaign = self._get_owned_editable_campaign(request, slug)
+        reward = get_object_or_404(Reward, pk=reward_id, campaign=campaign)
+
+        if request.method == "DELETE":
+            if reward.quantity_claimed > 0:
+                raise ValidationError(
+                    "Cette contrepartie a déjà été réservée et ne peut plus être supprimée."
+                )
+            reward.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        serializer = RewardSerializer(reward, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

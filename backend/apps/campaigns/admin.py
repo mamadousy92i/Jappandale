@@ -5,12 +5,18 @@ from django.utils import timezone
 from apps.notifications.models import Notification
 from apps.notifications.services import notify_user
 
-from .models import Campaign, CampaignAuditLog, CampaignReport, CampaignUpdate
+from .models import Campaign, CampaignAuditLog, CampaignReport, CampaignUpdate, Reward
 
 
 class CampaignUpdateInline(admin.TabularInline):
     model = CampaignUpdate
     extra = 0
+
+
+class RewardInline(admin.TabularInline):
+    model = Reward
+    extra = 0
+    readonly_fields = ("quantity_claimed",)
 
 
 @admin.register(Campaign)
@@ -27,7 +33,7 @@ class CampaignAdmin(admin.ModelAdmin):
     list_filter = ("status", "category")
     search_fields = ("title", "owner__email")
     readonly_fields = ("slug", "collected_amount", "created_at", "updated_at", "published_at")
-    inlines = (CampaignUpdateInline,)
+    inlines = (RewardInline, CampaignUpdateInline)
     actions = ("publier", "rejeter")
 
     @admin.action(description="Publier les campagnes sélectionnées")

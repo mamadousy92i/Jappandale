@@ -77,6 +77,11 @@ def test_admin_can_review_kyc_and_signed_document_link():
         document_type=KycDocument.DocumentType.CNI,
         file=SimpleUploadedFile("identite.txt", b"document de test", content_type="text/plain"),
     )
+    KycDocument.objects.create(
+        user=user,
+        document_type=KycDocument.DocumentType.SELFIE,
+        file=SimpleUploadedFile("selfie.txt", b"document de test", content_type="text/plain"),
+    )
     client = APIClient()
     client.force_authenticate(admin)
     dashboard = client.get("/api/backoffice/dashboard/")

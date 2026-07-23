@@ -7,6 +7,10 @@ from django.utils.text import slugify
 class Campaign(models.Model):
     """Campagne de collecte de dons portée par un utilisateur validé."""
 
+    class CampaignType(models.TextChoices):
+        DON_LIBRE = "DON_LIBRE", "Don libre"
+        DON_CONTREPARTIE = "DON_CONTREPARTIE", "Don avec contrepartie"
+
     class Category(models.TextChoices):
         ARTISANAT = "ARTISANAT", "Artisanat"
         COMMERCE = "COMMERCE", "Commerce"
@@ -35,6 +39,12 @@ class Campaign(models.Model):
     slug = models.SlugField("identifiant", max_length=140, unique=True, blank=True)
     summary = models.CharField("accroche", max_length=200)
     description = models.TextField("description")
+    campaign_type = models.CharField(
+        "type de campagne",
+        max_length=20,
+        choices=CampaignType.choices,
+        default=CampaignType.DON_LIBRE,
+    )
     location = models.CharField("localisation", max_length=120, blank=True)
     beneficiaries = models.CharField("bénéficiaires attendus", max_length=180, blank=True)
     funding_plan = models.TextField("utilisation prévue des fonds", blank=True)
@@ -97,6 +107,43 @@ class Campaign(models.Model):
     @property
     def days_left(self):
         return max((self.deadline - timezone.localdate()).days, 0)
+
+
+class Reward(models.Model):
+    """Contrepartie proposée par le porteur pour une campagne « don avec contrepartie »."""
+
+    campaign = models.ForeignKey(
+        Campaign,
+        verbose_name="campagne",
+        on_delete=models.CASCADE,
+        related_name="rewards",
+    )
+    title = models.CharField("titre", max_length=120)
+    description = models.TextField("description", blank=True)
+    minimum_amount = models.PositiveIntegerField("montant minimum (FCFA)")
+    quantity_limit = models.PositiveIntegerField(
+        "quantité disponible", null=True, blank=True
+    )
+    quantity_claimed = models.PositiveIntegerField("quantité réservée", default=0)
+    created_at = models.DateTimeField("créée le", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "contrepartie"
+        verbose_name_plural = "contreparties"
+        ordering = ["minimum_amount"]
+
+    def __str__(self):
+        return f"{self.title} — {self.campaign.title}"
+
+    @property
+    def remaining(self):
+        if self.quantity_limit is None:
+            return None
+        return max(self.quantity_limit - self.quantity_claimed, 0)
+
+    @property
+    def sold_out(self):
+        return self.quantity_limit is not None and self.quantity_claimed >= self.quantity_limit
 
 
 class CampaignUpdate(models.Model):

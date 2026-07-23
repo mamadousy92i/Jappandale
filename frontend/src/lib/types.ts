@@ -2,6 +2,19 @@ export type Role = "PORTEUR" | "CONTRIBUTEUR" | "ADMIN";
 
 export type KycStatus = "NON_SOUMIS" | "EN_ATTENTE" | "VALIDE" | "REJETE";
 
+export type KycDocumentType =
+  | "CNI"
+  | "PASSEPORT"
+  | "SELFIE"
+  | "JUSTIFICATIF_ACTIVITE";
+
+export interface KycChecklistItem {
+  key: string;
+  label: string;
+  document_types: KycDocumentType[];
+  satisfied: boolean;
+}
+
 export interface User {
   id: number;
   email: string;
@@ -44,12 +57,27 @@ export type CampaignStatus =
   | "SUSPENDUE"
   | "CLOTUREE";
 
+export type CampaignType = "DON_LIBRE" | "DON_CONTREPARTIE";
+
+export interface Reward {
+  id: number;
+  title: string;
+  description: string;
+  minimum_amount: number;
+  quantity_limit: number | null;
+  quantity_claimed: number;
+  remaining: number | null;
+  sold_out: boolean;
+}
+
 export interface CampaignListItem {
   id: number;
   slug: string;
   title: string;
   summary: string;
   location: string;
+  campaign_type: CampaignType;
+  campaign_type_display: string;
   category: CampaignCategory;
   category_display: string;
   goal_amount: number;
@@ -90,6 +118,7 @@ export interface CampaignDetail extends CampaignListItem {
     bio: string;
   };
   updates: CampaignUpdate[];
+  rewards: Reward[];
   recent_contributors: RecentContributor[];
   created_at: string;
   published_at: string | null;
@@ -102,6 +131,7 @@ export type TransactionStatus = ContributionStatus;
 export interface Contribution {
   public_reference: string;
   campaign: Pick<CampaignListItem, "slug" | "title" | "cover_image" | "status">;
+  reward: Pick<Reward, "id" | "title" | "minimum_amount"> | null;
   amount: number;
   anonymous: boolean;
   status: ContributionStatus;

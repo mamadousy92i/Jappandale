@@ -11,6 +11,8 @@ const campaign: CampaignListItem = {
   title: "Atelier de couture",
   summary: "Former dix jeunes femmes à la couture.",
   location: "Dakar",
+  campaign_type: "DON_LIBRE",
+  campaign_type_display: "Don libre",
   category: "ARTISANAT",
   category_display: "Artisanat",
   goal_amount: 800000,

@@ -2,10 +2,10 @@ from django.db import transaction as db_transaction
 from django.db.models import Sum
 from django.utils import timezone
 
-from apps.campaigns.models import Campaign
+from apps.campaigns.models import Campaign, Reward
 
 from .models import Contribution, Transaction
-from .providers import SimulatedPaymentProvider
+from .providers import PaymentResult, SimulatedPaymentProvider
 
 
 def recalculate_campaign_total(campaign):
@@ -25,10 +25,11 @@ def recalculate_campaign_total(campaign):
 
 
 @db_transaction.atomic
-def create_pending_contribution(*, contributor, campaign, amount, anonymous):
+def create_pending_contribution(*, contributor, campaign, amount, anonymous, reward=None):
     contribution = Contribution.objects.create(
         contributor=contributor,
         campaign=campaign,
+        reward=reward,
         amount=amount,
         anonymous=anonymous,
     )
@@ -45,7 +46,14 @@ def process_simulated_payment(*, contribution, outcome):
     if locked.status != Contribution.Status.INITIEE:
         return locked
 
+    reward = None
+    if locked.reward_id:
+        reward = Reward.objects.select_for_update().get(pk=locked.reward_id)
+
     result = SimulatedPaymentProvider().process(outcome)
+    if result.success and reward is not None and reward.sold_out:
+        result = PaymentResult(success=False, failure_reason="Contrepartie épuisée.")
+
     now = timezone.now()
     payment_transaction = Transaction.objects.select_for_update().get(
         contribution=locked
@@ -58,6 +66,9 @@ def process_simulated_payment(*, contribution, outcome):
         payment_transaction.status = Transaction.Status.CONFIRMEE
         payment_transaction.failure_reason = ""
         locked.save(update_fields=["status", "confirmed_at"])
+        if reward is not None:
+            reward.quantity_claimed += 1
+            reward.save(update_fields=["quantity_claimed"])
         from apps.notifications.models import Notification
         from apps.notifications.services import notify_user
 
@@ -118,5 +129,9 @@ def refund_contribution(contribution):
     payment_transaction.status = Transaction.Status.REMBOURSEE
     payment_transaction.processed_at = now
     payment_transaction.save(update_fields=["status", "processed_at"])
+    if locked.reward_id:
+        reward = Reward.objects.select_for_update().get(pk=locked.reward_id)
+        reward.quantity_claimed = max(reward.quantity_claimed - 1, 0)
+        reward.save(update_fields=["quantity_claimed"])
     recalculate_campaign_total(campaign)
     return True

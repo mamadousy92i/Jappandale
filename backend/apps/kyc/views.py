@@ -8,14 +8,21 @@ from apps.notifications.services import notify_admins
 
 from .models import KycAuditLog, KycDocument
 from .serializers import KycDocumentSerializer
+from .services import build_checklist
 
 
 def _kyc_state(user):
-    """Représentation du KYC d'un utilisateur : statut + documents."""
+    """Représentation du KYC d'un utilisateur : statut, documents et exigences."""
     documents = KycDocumentSerializer(
         user.kyc_documents.all(), many=True, context={"request": None}
     ).data
-    return {"kyc_status": user.kyc_status, "documents": documents}
+    checklist = build_checklist(user)
+    return {
+        "kyc_status": user.kyc_status,
+        "documents": documents,
+        "checklist": checklist,
+        "is_complete": all(item["satisfied"] for item in checklist),
+    }
 
 
 class KycView(APIView):

@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import Campaign, CampaignReport, CampaignUpdate
+from .models import Campaign, CampaignReport, CampaignUpdate, Reward
 
 
 class CampaignUpdateSerializer(serializers.ModelSerializer):
@@ -9,6 +9,35 @@ class CampaignUpdateSerializer(serializers.ModelSerializer):
         model = CampaignUpdate
         fields = ["id", "title", "content", "created_at"]
         read_only_fields = ["id", "created_at"]
+
+
+class RewardSerializer(serializers.ModelSerializer):
+    remaining = serializers.SerializerMethodField()
+    sold_out = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Reward
+        fields = [
+            "id",
+            "title",
+            "description",
+            "minimum_amount",
+            "quantity_limit",
+            "quantity_claimed",
+            "remaining",
+            "sold_out",
+        ]
+        read_only_fields = ["id", "quantity_claimed", "remaining", "sold_out"]
+
+    def get_remaining(self, obj):
+        return obj.remaining
+
+    def validate_minimum_amount(self, value):
+        if value < 500:
+            raise serializers.ValidationError(
+                "Le montant minimum d'une contrepartie doit être d'au moins 500 FCFA."
+            )
+        return value
 
 
 class CampaignReportSerializer(serializers.ModelSerializer):
@@ -31,6 +60,9 @@ class OwnerSerializer(serializers.Serializer):
 class CampaignListSerializer(serializers.ModelSerializer):
     category_display = serializers.CharField(source="get_category_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+    campaign_type_display = serializers.CharField(
+        source="get_campaign_type_display", read_only=True
+    )
     progress_percent = serializers.IntegerField(read_only=True)
     days_left = serializers.IntegerField(read_only=True)
 
@@ -42,6 +74,8 @@ class CampaignListSerializer(serializers.ModelSerializer):
             "title",
             "summary",
             "location",
+            "campaign_type",
+            "campaign_type_display",
             "category",
             "category_display",
             "goal_amount",
@@ -60,10 +94,14 @@ class CampaignListSerializer(serializers.ModelSerializer):
 class CampaignDetailSerializer(serializers.ModelSerializer):
     category_display = serializers.CharField(source="get_category_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+    campaign_type_display = serializers.CharField(
+        source="get_campaign_type_display", read_only=True
+    )
     progress_percent = serializers.IntegerField(read_only=True)
     days_left = serializers.IntegerField(read_only=True)
     owner = OwnerSerializer(read_only=True)
     updates = CampaignUpdateSerializer(many=True, read_only=True)
+    rewards = RewardSerializer(many=True, read_only=True)
     recent_contributors = serializers.SerializerMethodField()
 
     def get_recent_contributors(self, obj):
@@ -103,6 +141,8 @@ class CampaignDetailSerializer(serializers.ModelSerializer):
             "beneficiaries",
             "funding_plan",
             "project_timeline",
+            "campaign_type",
+            "campaign_type_display",
             "category",
             "category_display",
             "goal_amount",
@@ -117,6 +157,7 @@ class CampaignDetailSerializer(serializers.ModelSerializer):
             "days_left",
             "owner",
             "updates",
+            "rewards",
             "recent_contributors",
             "created_at",
             "published_at",
@@ -137,6 +178,7 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
             "beneficiaries",
             "funding_plan",
             "project_timeline",
+            "campaign_type",
             "category",
             "goal_amount",
             "cover_image",
@@ -148,6 +190,17 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
     def validate_goal_amount(self, value):
         if value < 1000:
             raise serializers.ValidationError("L'objectif doit être d'au moins 1 000 FCFA.")
+        return value
+
+    def validate_campaign_type(self, value):
+        if (
+            self.instance
+            and value == Campaign.CampaignType.DON_LIBRE
+            and self.instance.rewards.exists()
+        ):
+            raise serializers.ValidationError(
+                "Supprimez d'abord les contreparties avant de repasser en don libre."
+            )
         return value
 
     def validate_deadline(self, value):

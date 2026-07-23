@@ -8,6 +8,7 @@ class KycDocument(models.Model):
     class DocumentType(models.TextChoices):
         CNI = "CNI", "Carte nationale d'identité"
         PASSEPORT = "PASSEPORT", "Passeport"
+        SELFIE = "SELFIE", "Selfie de vérification"
         JUSTIFICATIF_ACTIVITE = "JUSTIFICATIF_ACTIVITE", "Justificatif d'activité"
 
     user = models.ForeignKey(

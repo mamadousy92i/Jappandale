@@ -30,6 +30,14 @@ class Contribution(models.Model):
         on_delete=models.PROTECT,
         related_name="contributions",
     )
+    reward = models.ForeignKey(
+        "campaigns.Reward",
+        verbose_name="contrepartie",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="contributions",
+    )
     amount = models.PositiveBigIntegerField("montant (FCFA)")
     anonymous = models.BooleanField("contribution anonyme", default=False)
     status = models.CharField(

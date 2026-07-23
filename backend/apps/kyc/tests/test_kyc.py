@@ -127,11 +127,12 @@ def test_me_expose_le_statut_kyc(client_authentifie):
 
 
 @pytest.mark.django_db
-def test_porteur_doit_fournir_identite_et_justificatif_activite(client_authentifie):
+def test_porteur_doit_fournir_identite_selfie_et_justificatif_activite(client_authentifie):
     _, user = client_authentifie
-    assert len(missing_required_documents(user)) == 2
+    assert len(missing_required_documents(user)) == 3
 
     user.kyc_documents.create(document_type=KycDocument.DocumentType.CNI, file=_fichier())
+    user.kyc_documents.create(document_type=KycDocument.DocumentType.SELFIE, file=_fichier())
     assert missing_required_documents(user) == ["un justificatif d'activité"]
 
     user.kyc_documents.create(
@@ -139,3 +140,64 @@ def test_porteur_doit_fournir_identite_et_justificatif_activite(client_authentif
         file=_fichier(),
     )
     assert missing_required_documents(user) == []
+
+
+@pytest.mark.django_db
+def test_contributeur_ne_doit_pas_fournir_de_justificatif_activite():
+    user = User.objects.create_user(
+        email="contrib@test.sn", password="MotDePasse123!", role=User.Role.CONTRIBUTEUR
+    )
+    assert len(missing_required_documents(user)) == 2
+
+    user.kyc_documents.create(document_type=KycDocument.DocumentType.PASSEPORT, file=_fichier())
+    user.kyc_documents.create(document_type=KycDocument.DocumentType.SELFIE, file=_fichier())
+    assert missing_required_documents(user) == []
+
+
+@pytest.mark.django_db
+def test_soumission_selfie_acceptee(client_authentifie):
+    client, user = client_authentifie
+    response = client.post(
+        "/api/kyc/submit/",
+        {"document_type": "SELFIE", "file": _fichier()},
+        format="multipart",
+    )
+    assert response.status_code == 201
+    assert user.kyc_documents.filter(document_type="SELFIE").exists()
+
+
+@pytest.mark.django_db
+def test_checklist_reflete_les_documents_deposes(client_authentifie):
+    client, user = client_authentifie
+    response = client.get("/api/kyc/")
+    assert response.status_code == 200
+    assert response.data["is_complete"] is False
+    keys = {item["key"] for item in response.data["checklist"]}
+    assert keys == {"identite", "selfie", "activite"}
+    assert all(item["satisfied"] is False for item in response.data["checklist"])
+
+    client.post("/api/kyc/submit/", {"document_type": "CNI", "file": _fichier()}, format="multipart")
+    client.post("/api/kyc/submit/", {"document_type": "SELFIE", "file": _fichier()}, format="multipart")
+    client.post(
+        "/api/kyc/submit/",
+        {"document_type": "JUSTIFICATIF_ACTIVITE", "file": _fichier()},
+        format="multipart",
+    )
+
+    response = client.get("/api/kyc/")
+    assert response.data["is_complete"] is True
+    assert all(item["satisfied"] is True for item in response.data["checklist"])
+
+
+@pytest.mark.django_db
+def test_checklist_contributeur_sans_exigence_activite():
+    user = User.objects.create_user(
+        email="contrib2@test.sn", password="MotDePasse123!", role=User.Role.CONTRIBUTEUR
+    )
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    response = client.get("/api/kyc/")
+
+    keys = {item["key"] for item in response.data["checklist"]}
+    assert keys == {"identite", "selfie"}
