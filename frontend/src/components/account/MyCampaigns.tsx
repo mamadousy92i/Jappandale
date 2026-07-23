@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   ArrowUpRight,
   FolderOpen,
+  Gift,
   Newspaper,
   Pencil,
   Plus,
@@ -157,6 +158,19 @@ function CampaignRow({
                 <Link to={`/campagnes/${campaign.slug}/modifier`}>
                   <Pencil aria-hidden="true" className="size-3.5" />
                   Modifier
+                </Link>
+              </Button>
+            )}
+            {canEdit && campaign.campaign_type === "DON_CONTREPARTIE" && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="rounded-full border-black/10 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"
+              >
+                <Link to={`/campagnes/${campaign.slug}/contreparties`}>
+                  <Gift aria-hidden="true" className="size-3.5" />
+                  Contreparties
                 </Link>
               </Button>
             )}

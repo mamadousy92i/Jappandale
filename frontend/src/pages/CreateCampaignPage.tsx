@@ -15,7 +15,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import type { CampaignCategory, CampaignDetail } from "@/lib/types";
+import type { CampaignCategory, CampaignDetail, CampaignType } from "@/lib/types";
+
+const campaignTypeOptions: {
+  value: CampaignType;
+  title: string;
+  description: string;
+}[] = [
+  {
+    value: "DON_LIBRE",
+    title: "Don libre",
+    description: "Les contributeurs donnent sans contrepartie matérielle.",
+  },
+  {
+    value: "DON_CONTREPARTIE",
+    title: "Don avec contrepartie",
+    description:
+      "Proposez des paliers de récompense pour remercier vos contributeurs.",
+  },
+];
 
 const categories: { code: CampaignCategory; label: string }[] = [
   { code: "ARTISANAT", label: "Artisanat" },
@@ -32,6 +50,7 @@ const fieldNames = [
   "title",
   "summary",
   "description",
+  "campaign_type",
   "location",
   "beneficiaries",
   "funding_plan",
@@ -118,6 +137,9 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
   const [title, setTitle] = useState(campaign?.title ?? "");
   const [summary, setSummary] = useState(campaign?.summary ?? "");
   const [description, setDescription] = useState(campaign?.description ?? "");
+  const [campaignType, setCampaignType] = useState<CampaignType>(
+    campaign?.campaign_type ?? "DON_LIBRE",
+  );
   const [location, setLocation] = useState(campaign?.location ?? "");
   const [beneficiaries, setBeneficiaries] = useState(
     campaign?.beneficiaries ?? "",
@@ -191,6 +213,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
     data.append("title", title);
     data.append("summary", summary);
     data.append("description", description);
+    data.append("campaign_type", campaignType);
     data.append("location", location);
     data.append("beneficiaries", beneficiaries);
     data.append(
@@ -324,6 +347,61 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
           />
           {errorFor("description")}
         </div>
+
+        <fieldset>
+          <legend className="text-sm font-medium text-ink">
+            Type de campagne
+          </legend>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {campaignTypeOptions.map((option) => (
+              <label
+                key={option.value}
+                className="cursor-pointer rounded-2xl border border-black/10 bg-surface p-4 transition-all duration-200 hover:border-gold/50 has-checked:border-gold has-checked:bg-gold/8 has-focus-visible:ring-2 has-focus-visible:ring-gold-dark/50 motion-reduce:transition-none"
+              >
+                <input
+                  type="radio"
+                  name="campaign_type"
+                  value={option.value}
+                  checked={campaignType === option.value}
+                  onChange={() => setCampaignType(option.value)}
+                  className="sr-only"
+                />
+                <span className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-semibold text-ink">
+                    {option.title}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className={`flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                      campaignType === option.value
+                        ? "border-gold-dark bg-gold-dark"
+                        : "border-black/20 bg-surface"
+                    }`}
+                  >
+                    {campaignType === option.value && (
+                      <span className="size-1.5 rounded-full bg-surface" />
+                    )}
+                  </span>
+                </span>
+                <span className="mt-1.5 block text-xs leading-relaxed text-ink-secondary">
+                  {option.description}
+                </span>
+              </label>
+            ))}
+          </div>
+          {errorFor("campaign_type")}
+          {campaign && campaign.campaign_type === "DON_CONTREPARTIE" && (
+            <p className="mt-3 text-sm text-ink-secondary">
+              <Link
+                to={`/campagnes/${campaign.slug}/contreparties`}
+                className="font-semibold text-gold-dark underline-offset-4 hover:underline"
+              >
+                Gérer les contreparties
+              </Link>{" "}
+              de cette campagne.
+            </p>
+          )}
+        </fieldset>
 
         <div className="grid gap-7 sm:grid-cols-2">
           <div className="space-y-2">

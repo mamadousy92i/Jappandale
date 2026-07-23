@@ -11,6 +11,7 @@ import CampaignDetailPage from "@/pages/CampaignDetailPage";
 import CampaignsPage from "@/pages/CampaignsPage";
 import CreateCampaignPage from "@/pages/CreateCampaignPage";
 import CreateCampaignUpdatePage from "@/pages/CreateCampaignUpdatePage";
+import ManageRewardsPage from "@/pages/ManageRewardsPage";
 import ContributionPage from "@/pages/ContributionPage";
 import ContactPage from "@/pages/ContactPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
@@ -66,6 +67,16 @@ function App() {
           element={
             <RequireAuth>
               <CreateCampaignUpdatePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/campagnes/:slug/contreparties"
+          element={
+            <RequireAuth>
+              <RequireVerifiedEmail>
+                <ManageRewardsPage />
+              </RequireVerifiedEmail>
             </RequireAuth>
           }
         />

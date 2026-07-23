@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   BookOpen,
   CalendarDays,
+  Gift,
   Hammer,
   HeartPulse,
   Flag,
@@ -300,6 +301,55 @@ function CampaignDetailPage() {
                 <p className="mt-1 font-medium text-ink">{campaign.beneficiaries}</p>
               </div>
             </div>
+          )}
+
+          {campaign.campaign_type === "DON_CONTREPARTIE" && campaign.rewards.length > 0 && (
+            <section className="mt-12" aria-labelledby="contreparties">
+              <h2
+                id="contreparties"
+                className="flex items-center gap-2 text-xs font-semibold tracking-[4px] text-gold-dark uppercase"
+              >
+                <Gift aria-hidden="true" className="size-4" />
+                Contreparties
+              </h2>
+              <ul className="mt-5 grid gap-4 sm:grid-cols-2">
+                {campaign.rewards.map((reward) => (
+                  <li
+                    key={reward.id}
+                    className={`rounded-[20px] border p-5 shadow-sm ${
+                      reward.sold_out
+                        ? "border-black/5 bg-surface-alt opacity-70"
+                        : "border-black/5 bg-surface"
+                    }`}
+                  >
+                    <p className="flex items-center gap-2 font-heading text-lg font-bold text-ink">
+                      {reward.title}
+                      {reward.sold_out && (
+                        <span className="rounded-full bg-black/[0.06] px-2.5 py-0.5 text-xs font-semibold text-ink-secondary">
+                          Épuisée
+                        </span>
+                      )}
+                    </p>
+                    {reward.description && (
+                      <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+                        {reward.description}
+                      </p>
+                    )}
+                    <p className="mt-3 text-sm">
+                      <span className="font-semibold text-gold-dark">
+                        {formatFcfa(reward.minimum_amount)}
+                      </span>
+                      <span className="text-ink-muted"> minimum</span>
+                    </p>
+                    <p className="mt-1 text-xs text-ink-muted">
+                      {reward.quantity_limit === null
+                        ? "Quantité illimitée"
+                        : `${reward.remaining} restante(s) sur ${reward.quantity_limit}`}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
 
           {(campaign.funding_plan || campaign.project_timeline) && (

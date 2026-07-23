@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { ArrowLeft, CheckCircle2, ShieldCheck, TriangleAlert } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Gift, ShieldCheck, TriangleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,6 +25,7 @@ export default function ContributionPage() {
   const { user, authFetch } = useAuth()
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null)
   const [amount, setAmount] = useState(10_000)
+  const [selectedRewardId, setSelectedRewardId] = useState<number | null>(null)
   const [anonymous, setAnonymous] = useState(false)
   const [contribution, setContribution] = useState<Contribution | null>(null)
   const [loading, setLoading] = useState(true)
@@ -38,17 +39,39 @@ export default function ContributionPage() {
       .finally(() => setLoading(false))
   }, [slug])
 
+  const selectedReward =
+    campaign?.rewards.find((reward) => reward.id === selectedRewardId) ?? null
+
+  const selectReward = (rewardId: number | null) => {
+    setSelectedRewardId(rewardId)
+    const reward = campaign?.rewards.find((item) => item.id === rewardId)
+    if (reward && amount < reward.minimum_amount) {
+      setAmount(reward.minimum_amount)
+    }
+  }
+
   const initiate = async () => {
     setError(null)
     if (amount < 1_000 || amount > 5_000_000) {
       setError("Le montant doit être compris entre 1 000 et 5 000 000 FCFA.")
       return
     }
+    if (selectedReward && amount < selectedReward.minimum_amount) {
+      setError(
+        `Le montant minimum pour cette contrepartie est de ${formatFcfa(selectedReward.minimum_amount)}.`,
+      )
+      return
+    }
     setSubmitting(true)
     try {
       const data = await authFetch("/contributions/", {
         method: "POST",
-        body: JSON.stringify({ campaign_slug: slug, amount, anonymous }),
+        body: JSON.stringify({
+          campaign_slug: slug,
+          amount,
+          anonymous,
+          reward_id: selectedRewardId,
+        }),
       })
       setContribution(data as Contribution)
     } catch (err) {
@@ -112,6 +135,67 @@ export default function ContributionPage() {
 
         {!contribution ? (
           <div className="mt-8">
+            {campaign.campaign_type === "DON_CONTREPARTIE" && campaign.rewards.length > 0 && (
+              <div className="mb-7">
+                <Label>Contrepartie</Label>
+                <div className="mt-3 grid gap-3">
+                  <label
+                    className={`cursor-pointer rounded-2xl border p-4 transition-all duration-200 ${
+                      selectedRewardId === null
+                        ? "border-gold bg-gold/8"
+                        : "border-black/10 hover:border-gold/50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="reward"
+                      checked={selectedRewardId === null}
+                      onChange={() => selectReward(null)}
+                      className="sr-only"
+                    />
+                    <span className="text-sm font-semibold text-ink">
+                      Aucune contrepartie — don libre
+                    </span>
+                  </label>
+                  {campaign.rewards.map((reward) => (
+                    <label
+                      key={reward.id}
+                      className={`rounded-2xl border p-4 transition-all duration-200 ${
+                        reward.sold_out
+                          ? "cursor-not-allowed border-black/5 bg-surface-alt opacity-60"
+                          : selectedRewardId === reward.id
+                            ? "cursor-pointer border-gold bg-gold/8"
+                            : "cursor-pointer border-black/10 hover:border-gold/50"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="reward"
+                        disabled={reward.sold_out}
+                        checked={selectedRewardId === reward.id}
+                        onChange={() => selectReward(reward.id)}
+                        className="sr-only"
+                      />
+                      <span className="flex items-center gap-2 text-sm font-semibold text-ink">
+                        <Gift aria-hidden="true" className="size-4 text-gold-dark" />
+                        {reward.title}
+                        {reward.sold_out && (
+                          <span className="rounded-full bg-black/[0.06] px-2 py-0.5 text-xs font-semibold text-ink-secondary">
+                            Épuisée
+                          </span>
+                        )}
+                      </span>
+                      <span className="mt-1 block text-xs text-ink-secondary">
+                        À partir de {formatFcfa(reward.minimum_amount)}
+                        {reward.quantity_limit !== null &&
+                          ` · ${reward.remaining} restante(s)`}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Label htmlFor="amount">Montant en FCFA</Label>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {suggestedAmounts.map((value) => (
@@ -129,13 +213,13 @@ export default function ContributionPage() {
           <div className="mt-9 text-center">
             {contribution.status === "CONFIRMEE" ? <CheckCircle2 className="mx-auto size-12 text-emerald-600" /> : <TriangleAlert className="mx-auto size-12 text-red-600" />}
             <h2 className="mt-4 font-heading text-2xl font-bold text-ink">{contribution.status === "CONFIRMEE" ? "Contribution confirmée" : "Contribution non confirmée"}</h2>
-            <p className="mt-2 text-ink-secondary">{formatFcfa(contribution.amount)} · référence {contribution.public_reference.slice(0, 8)}</p>
+            <p className="mt-2 text-ink-secondary">{formatFcfa(contribution.amount)}{contribution.reward && ` · ${contribution.reward.title}`} · référence {contribution.public_reference.slice(0, 8)}</p>
             <div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full bg-gold text-ink"><Link to={`/campagnes/${campaign.slug}`}>Voir la campagne</Link></Button><Button asChild variant="outline" className="rounded-full"><Link to="/compte">Voir mon historique</Link></Button></div>
           </div>
         ) : (
           <div className="mt-8">
             <h2 className="font-heading text-xl font-bold text-ink">Vérifier votre contribution</h2>
-            <dl className="mt-5 space-y-3 rounded-2xl bg-surface-alt p-5 text-sm"><div className="flex justify-between gap-4"><dt className="text-ink-muted">Montant</dt><dd className="font-bold text-ink">{formatFcfa(contribution.amount)}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">Affichage</dt><dd className="font-medium text-ink">{contribution.anonymous ? "Anonyme" : "Nom visible"}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">Statut</dt><dd className="font-medium text-ink">En attente de confirmation</dd></div></dl>
+            <dl className="mt-5 space-y-3 rounded-2xl bg-surface-alt p-5 text-sm"><div className="flex justify-between gap-4"><dt className="text-ink-muted">Montant</dt><dd className="font-bold text-ink">{formatFcfa(contribution.amount)}</dd></div>{contribution.reward && <div className="flex justify-between gap-4"><dt className="text-ink-muted">Contrepartie</dt><dd className="font-medium text-ink">{contribution.reward.title}</dd></div>}<div className="flex justify-between gap-4"><dt className="text-ink-muted">Affichage</dt><dd className="font-medium text-ink">{contribution.anonymous ? "Anonyme" : "Nom visible"}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">Statut</dt><dd className="font-medium text-ink">En attente de confirmation</dd></div></dl>
             <p className="mt-5 text-sm leading-relaxed text-ink-secondary">Confirmez les informations ci-dessus pour finaliser votre contribution.</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2"><Button onClick={() => void confirm("SUCCESS")} disabled={submitting} className="h-12 rounded-full bg-emerald-600 font-semibold text-white hover:bg-emerald-700">Confirmer la contribution</Button><Button onClick={() => void confirm("FAILURE")} disabled={submitting} variant="outline" className="h-12 rounded-full border-red-200 text-red-700 hover:bg-red-50">Annuler</Button></div>
           </div>
