@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react"
 import type { FormEvent } from "react"
-import { CheckCircle2, Clock, ShieldCheck, Upload } from "lucide-react"
+import { Camera, CheckCircle2, Circle, Clock, ShieldCheck, Upload } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { ApiError } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
-import type { KycStatus, Role } from "@/lib/types"
+import type { KycChecklistItem, KycStatus, Role } from "@/lib/types"
 
 const documentTypes = [
   { value: "CNI", label: "Carte nationale d'identité" },
   { value: "PASSEPORT", label: "Passeport" },
+  { value: "SELFIE", label: "Selfie de vérification" },
   { value: "JUSTIFICATIF_ACTIVITE", label: "Justificatif d'activité" },
 ]
 
@@ -23,6 +24,39 @@ interface KycDocumentItem {
 interface KycStateResponse {
   kyc_status: KycStatus
   documents: KycDocumentItem[]
+  checklist: KycChecklistItem[]
+  is_complete: boolean
+}
+
+function Checklist({ items }: { items: KycChecklistItem[] }) {
+  if (items.length === 0) return null
+  return (
+    <div className="rounded-xl border border-black/5 bg-white px-4 py-3">
+      <p className="text-sm font-semibold text-ink">Pièces à fournir</p>
+      <ul className="mt-2 space-y-2">
+        {items.map((item) => (
+          <li
+            key={item.key}
+            className={`flex items-start gap-2.5 text-sm ${
+              item.satisfied ? "text-ink-secondary" : "text-ink"
+            }`}
+          >
+            {item.satisfied ? (
+              <CheckCircle2
+                aria-hidden="true"
+                className="mt-0.5 size-4 shrink-0 text-emerald-600"
+              />
+            ) : (
+              <Circle aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-ink-muted" />
+            )}
+            <span className={item.satisfied ? "line-through decoration-ink-muted/40" : ""}>
+              {item.label}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 function StatutValide() {
@@ -171,6 +205,13 @@ function FormulaireUpload({
             className="block w-full rounded-xl border border-black/10 bg-surface text-sm text-ink-secondary file:mr-4 file:cursor-pointer file:border-0 file:bg-gold/15 file:px-4 file:py-2.5 file:font-medium file:text-gold-dark hover:file:bg-gold/25"
           />
           <p className="text-xs text-ink-muted">JPG, PNG, WebP ou PDF — 8 Mo maximum.</p>
+          {documentType === "SELFIE" && (
+            <p className="flex items-start gap-2 rounded-xl border border-gold/25 bg-gold/10 px-3.5 py-2.5 text-xs leading-relaxed text-ink-secondary">
+              <Camera aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-gold-dark" />
+              Prenez une photo de vous-même en pleine lumière, visage dégagé, sans lunettes
+              de soleil ni couvre-chef.
+            </p>
+          )}
         </div>
 
         <Button
@@ -188,47 +229,82 @@ function FormulaireUpload({
 
 export function KycSection({ status, role }: { status: KycStatus; role: Role }) {
   const { authFetch } = useAuth()
-  const [documents, setDocuments] = useState<KycDocumentItem[]>([])
+  const [checklist, setChecklist] = useState<KycChecklistItem[]>([])
+  const [isComplete, setIsComplete] = useState(false)
 
   useEffect(() => {
     authFetch("/kyc/")
-      .then((data) => setDocuments((data as KycStateResponse).documents))
-      .catch(() => setDocuments([]))
+      .then((data) => {
+        const state = data as KycStateResponse
+        setChecklist(state.checklist)
+        setIsComplete(state.is_complete)
+      })
+      .catch(() => {
+        setChecklist([])
+        setIsComplete(false)
+      })
   }, [authFetch])
 
+  const handleUploaded = (state: KycStateResponse) => {
+    setChecklist(state.checklist)
+    setIsComplete(state.is_complete)
+  }
+
   if (status === "VALIDE") return <StatutValide />
+
   if (status === "EN_ATTENTE") {
     return (
       <div className="space-y-4">
         <StatutEnAttente />
-        {documents.length > 0 && (
-          <div className="rounded-xl border border-black/5 bg-white px-4 py-3 text-sm text-ink-secondary">
-            <p className="font-semibold text-ink">Pièces déjà reçues</p>
-            <ul className="mt-2 space-y-1">
-              {documents.map((document) => (
-                <li key={document.id}>✓ {document.document_type_display}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {role === "PORTEUR" && (
-          <p className="rounded-xl border border-gold/25 bg-gold/10 px-4 py-3 text-sm text-ink-secondary">
-            Pour être validé, un porteur doit fournir une pièce d’identité et un
-            justificatif d’activité.
+        {isComplete ? (
+          <p className="rounded-xl border border-black/5 bg-white px-4 py-3 text-sm text-ink-secondary">
+            Toutes les pièces demandées ont été reçues. Votre dossier complet est en
+            cours d'examen.
           </p>
+        ) : (
+          <>
+            <Checklist items={checklist} />
+            <FormulaireUpload
+              rejete={false}
+              pending
+              onUploaded={handleUploaded}
+            />
+          </>
         )}
-        <FormulaireUpload
-          rejete={false}
-          pending
-          onUploaded={(state) => setDocuments(state.documents)}
-        />
       </div>
     )
   }
+
   return (
-    <FormulaireUpload
-      rejete={status === "REJETE"}
-      onUploaded={(state) => setDocuments(state.documents)}
-    />
+    <div className="space-y-4">
+      <Checklist items={checklist.length > 0 ? checklist : placeholderChecklist(role)} />
+      <FormulaireUpload rejete={status === "REJETE"} onUploaded={handleUploaded} />
+    </div>
   )
+}
+
+function placeholderChecklist(role: Role): KycChecklistItem[] {
+  const base: KycChecklistItem[] = [
+    {
+      key: "identite",
+      label: "une carte nationale d'identité ou un passeport",
+      document_types: ["CNI", "PASSEPORT"],
+      satisfied: false,
+    },
+    {
+      key: "selfie",
+      label: "un selfie de vérification",
+      document_types: ["SELFIE"],
+      satisfied: false,
+    },
+  ]
+  if (role === "PORTEUR") {
+    base.push({
+      key: "activite",
+      label: "un justificatif d'activité",
+      document_types: ["JUSTIFICATIF_ACTIVITE"],
+      satisfied: false,
+    })
+  }
+  return base
 }
