@@ -165,16 +165,20 @@ function RequirementUpload({
           <input
             id={`kycFile-${item.key}`}
             type="file"
-            accept="image/*,application/pdf"
+            accept={documentType === "SELFIE" ? "image/*" : "image/*,application/pdf"}
+            capture={documentType === "SELFIE" ? "user" : undefined}
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             className="block w-full rounded-xl border border-black/10 bg-surface text-sm text-ink-secondary file:mr-4 file:cursor-pointer file:border-0 file:bg-gold/15 file:px-4 file:py-2.5 file:font-medium file:text-gold-dark hover:file:bg-gold/25"
           />
-          <p className="text-xs text-ink-muted">JPG, PNG, WebP ou PDF — 8 Mo maximum.</p>
+          <p className="text-xs text-ink-muted">
+            {documentType === "SELFIE" ? "JPG, PNG ou WebP" : "JPG, PNG, WebP ou PDF"} — 8 Mo maximum.
+          </p>
           {documentType === "SELFIE" && (
             <p className="flex items-start gap-2 rounded-xl border border-gold/25 bg-gold/10 px-3.5 py-2.5 text-xs leading-relaxed text-ink-secondary">
               <Camera aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-gold-dark" />
-              Prenez une photo de vous-même en pleine lumière, visage dégagé, sans lunettes
-              de soleil ni couvre-chef.
+              Sur mobile, cela ouvre directement votre caméra frontale. Prenez une photo
+              de vous-même en pleine lumière, visage dégagé, sans lunettes de soleil ni
+              couvre-chef.
             </p>
           )}
         </div>
