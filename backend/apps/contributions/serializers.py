@@ -65,6 +65,19 @@ class ContributionSerializer(serializers.ModelSerializer):
         return f"{obj.contributor.first_name or 'Contributeur'}{initial}"
 
 
+class ReceivedContributionSerializer(ContributionSerializer):
+    payout_status_display = serializers.CharField(
+        source="get_payout_status_display", read_only=True
+    )
+
+    class Meta(ContributionSerializer.Meta):
+        fields = ContributionSerializer.Meta.fields + [
+            "payout_status",
+            "payout_status_display",
+            "net_amount",
+        ]
+
+
 class ContributionCreateSerializer(serializers.Serializer):
     campaign_slug = serializers.SlugField()
     amount = serializers.IntegerField(min_value=1000, max_value=5_000_000)

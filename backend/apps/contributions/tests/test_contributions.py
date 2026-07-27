@@ -217,3 +217,52 @@ def test_detail_public_masque_le_nom_d_une_contribution_anonyme():
             "confirmed_at": response.data["recent_contributors"][0]["confirmed_at"],
         }
     ]
+
+
+@pytest.mark.django_db
+def test_contributions_recues_exposent_le_statut_de_reversement():
+    owner = make_user("owner-recu@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-recu@test.sn")
+    campaign = make_campaign(owner)
+    client = authenticated_client(contributor)
+    created = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000},
+        format="json",
+    )
+    client.post(
+        f"/api/contributions/{created.data['public_reference']}/confirm/",
+        {"outcome": "SUCCESS"},
+        format="json",
+    )
+
+    response = authenticated_client(owner).get("/api/contributions/received/")
+
+    assert response.status_code == 200
+    item = response.data[0]
+    assert item["payout_status"] == "EN_SEQUESTRE"
+    assert item["payout_status_display"] == "En séquestre"
+    assert item["net_amount"] == 19_000
+
+
+@pytest.mark.django_db
+def test_mes_contributions_n_expose_pas_le_reversement():
+    owner = make_user("owner-mine@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-mine@test.sn")
+    campaign = make_campaign(owner)
+    client = authenticated_client(contributor)
+    created = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000},
+        format="json",
+    )
+    client.post(
+        f"/api/contributions/{created.data['public_reference']}/confirm/",
+        {"outcome": "SUCCESS"},
+        format="json",
+    )
+
+    response = client.get("/api/contributions/mine/")
+
+    assert response.status_code == 200
+    assert "payout_status" not in response.data[0]

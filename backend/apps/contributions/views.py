@@ -8,6 +8,7 @@ from .serializers import (
     ContributionCreateSerializer,
     ContributionSerializer,
     PaymentConfirmationSerializer,
+    ReceivedContributionSerializer,
 )
 from .services import process_simulated_payment
 
@@ -39,7 +40,7 @@ class MyContributionsView(generics.ListAPIView):
 
 
 class ReceivedContributionsView(generics.ListAPIView):
-    serializer_class = ContributionSerializer
+    serializer_class = ReceivedContributionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
