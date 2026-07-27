@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Contribution, Transaction
+from .models import Contribution, PlatformSettings, Transaction
 from .services import refund_contribution
 
 
@@ -34,6 +34,17 @@ class ContributionAdmin(admin.ModelAdmin):
     def rembourser(self, request, queryset):
         refunded = sum(refund_contribution(item) for item in queryset)
         self.message_user(request, f"{refunded} contribution(s) remboursée(s).")
+
+
+@admin.register(PlatformSettings)
+class PlatformSettingsAdmin(admin.ModelAdmin):
+    list_display = ("commission_rate",)
+
+    def has_add_permission(self, request):
+        return not PlatformSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(Transaction)

@@ -1,9 +1,37 @@
 import uuid
+from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
 
 from apps.campaigns.models import Campaign
+
+
+class PlatformSettings(models.Model):
+    """Réglages globaux de la plateforme (un seul enregistrement, pk=1)."""
+
+    commission_rate = models.DecimalField(
+        "taux de commission",
+        max_digits=4,
+        decimal_places=2,
+        default=Decimal("0.05"),
+    )
+
+    class Meta:
+        verbose_name = "réglages de la plateforme"
+        verbose_name_plural = "réglages de la plateforme"
+
+    def __str__(self):
+        return f"Commission : {self.commission_rate * 100:.0f} %"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_solo(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
 
 
 class Contribution(models.Model):
