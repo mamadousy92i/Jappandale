@@ -43,6 +43,10 @@ class Contribution(models.Model):
         ECHOUEE = "ECHOUEE", "Échouée"
         REMBOURSEE = "REMBOURSEE", "Remboursée"
 
+    class PayoutStatus(models.TextChoices):
+        EN_SEQUESTRE = "EN_SEQUESTRE", "En séquestre"
+        REVERSEE = "REVERSEE", "Reversée"
+
     public_reference = models.UUIDField(
         "référence publique", default=uuid.uuid4, unique=True, editable=False
     )
@@ -71,6 +75,30 @@ class Contribution(models.Model):
     status = models.CharField(
         "statut", max_length=20, choices=Status.choices, default=Status.INITIEE
     )
+    payout_status = models.CharField(
+        "statut de reversement",
+        max_length=20,
+        choices=PayoutStatus.choices,
+        default=PayoutStatus.EN_SEQUESTRE,
+    )
+    commission_rate_applied = models.DecimalField(
+        "taux de commission appliqué", max_digits=4, decimal_places=2, null=True, blank=True
+    )
+    commission_amount = models.PositiveIntegerField(
+        "montant de la commission (FCFA)", null=True, blank=True
+    )
+    net_amount = models.PositiveIntegerField(
+        "montant net pour le porteur (FCFA)", null=True, blank=True
+    )
+    payout_released_at = models.DateTimeField("reversée le", null=True, blank=True)
+    payout_released_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="reversée par",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="released_payouts",
+    )
     created_at = models.DateTimeField("créée le", auto_now_add=True)
     confirmed_at = models.DateTimeField("confirmée le", null=True, blank=True)
     refunded_at = models.DateTimeField("remboursée le", null=True, blank=True)
@@ -82,6 +110,7 @@ class Contribution(models.Model):
         indexes = [
             models.Index(fields=["campaign", "status"]),
             models.Index(fields=["contributor", "status"]),
+            models.Index(fields=["campaign", "payout_status"]),
         ]
 
     def __str__(self):

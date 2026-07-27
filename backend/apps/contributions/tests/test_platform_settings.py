@@ -29,3 +29,42 @@ def test_un_seul_enregistrement_possible():
     assert PlatformSettings.objects.count() == 1
     PlatformSettings.get_solo()
     assert PlatformSettings.objects.count() == 1
+
+
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+from apps.campaigns.models import Campaign
+from apps.contributions.models import Contribution
+
+User = get_user_model()
+
+
+@pytest.mark.django_db
+def test_contribution_a_les_champs_de_reversement_par_defaut():
+    owner = User.objects.create_user(
+        email="owner-payout@test.sn", password="MotDePasse123!", role=User.Role.PORTEUR
+    )
+    contributor = User.objects.create_user(
+        email="contrib-payout@test.sn", password="MotDePasse123!"
+    )
+    campaign = Campaign.objects.create(
+        owner=owner,
+        title="Test reversement",
+        summary="Résumé.",
+        description="Description.",
+        category="ARTISANAT",
+        goal_amount=100_000,
+        deadline=timezone.localdate(),
+        status=Campaign.Status.PUBLIEE,
+    )
+    contribution = Contribution.objects.create(
+        contributor=contributor, campaign=campaign, amount=10_000
+    )
+
+    assert contribution.payout_status == Contribution.PayoutStatus.EN_SEQUESTRE
+    assert contribution.commission_rate_applied is None
+    assert contribution.commission_amount is None
+    assert contribution.net_amount is None
+    assert contribution.payout_released_at is None
+    assert contribution.payout_released_by is None
