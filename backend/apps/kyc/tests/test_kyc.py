@@ -201,3 +201,72 @@ def test_checklist_contributeur_sans_exigence_activite():
 
     keys = {item["key"] for item in response.data["checklist"]}
     assert keys == {"identite", "selfie"}
+
+
+@pytest.mark.django_db
+def test_contributeur_diaspora_doit_fournir_residence_et_origine_fonds():
+    user = User.objects.create_user(
+        email="diaspora@test.sn",
+        password="MotDePasse123!",
+        role=User.Role.CONTRIBUTEUR,
+        is_diaspora=True,
+    )
+    assert len(missing_required_documents(user)) == 4
+
+    user.kyc_documents.create(document_type=KycDocument.DocumentType.CNI, file=_fichier())
+    user.kyc_documents.create(document_type=KycDocument.DocumentType.SELFIE, file=_fichier())
+    assert missing_required_documents(user) == [
+        "un justificatif de résidence à l'étranger",
+        "un justificatif de l'origine des fonds",
+    ]
+
+    user.kyc_documents.create(
+        document_type=KycDocument.DocumentType.JUSTIFICATIF_RESIDENCE, file=_fichier()
+    )
+    user.kyc_documents.create(
+        document_type=KycDocument.DocumentType.JUSTIFICATIF_ORIGINE_FONDS, file=_fichier()
+    )
+    assert missing_required_documents(user) == []
+
+
+@pytest.mark.django_db
+def test_porteur_diaspora_cumule_les_exigences_renforcees():
+    user = User.objects.create_user(
+        email="porteur-diaspora@test.sn",
+        password="MotDePasse123!",
+        role=User.Role.PORTEUR,
+        is_diaspora=True,
+    )
+    assert len(missing_required_documents(user)) == 5
+
+
+@pytest.mark.django_db
+def test_checklist_expose_les_exigences_diaspora():
+    user = User.objects.create_user(
+        email="diaspora2@test.sn",
+        password="MotDePasse123!",
+        role=User.Role.CONTRIBUTEUR,
+        is_diaspora=True,
+    )
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    response = client.get("/api/kyc/")
+
+    keys = {item["key"] for item in response.data["checklist"]}
+    assert keys == {"identite", "selfie", "residence", "origine_fonds"}
+
+
+@pytest.mark.django_db
+def test_soumission_justificatif_residence_acceptee(client_authentifie):
+    client, user = client_authentifie
+    user.is_diaspora = True
+    user.save(update_fields=["is_diaspora"])
+
+    response = client.post(
+        "/api/kyc/submit/",
+        {"document_type": "JUSTIFICATIF_RESIDENCE", "file": _fichier()},
+        format="multipart",
+    )
+    assert response.status_code == 201
+    assert user.kyc_documents.filter(document_type="JUSTIFICATIF_RESIDENCE").exists()

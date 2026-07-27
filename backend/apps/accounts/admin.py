@@ -24,15 +24,15 @@ class KycDocumentInline(admin.TabularInline):
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     ordering = ("email",)
-    list_display = ("email", "first_name", "last_name", "role", "is_email_verified", "kyc_status", "is_active")
-    list_filter = ("role", "kyc_status", "is_active", "is_staff")
+    list_display = ("email", "first_name", "last_name", "role", "is_diaspora", "is_email_verified", "kyc_status", "is_active")
+    list_filter = ("role", "is_diaspora", "kyc_status", "is_active", "is_staff")
     search_fields = ("email", "first_name", "last_name")
     inlines = (KycDocumentInline,)
     actions = ("valider_kyc", "rejeter_kyc")
     readonly_fields = ("email_verified_at", "kyc_reviewed_at", "kyc_reviewed_by")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Informations personnelles", {"fields": ("first_name", "last_name", "phone", "avatar", "email_verified_at")}),
+        ("Informations personnelles", {"fields": ("first_name", "last_name", "phone", "avatar", "email_verified_at", "is_diaspora")}),
         ("Rôle et permissions", {
             "fields": ("role", "is_active", "is_staff", "is_superuser", "groups"),
         }),

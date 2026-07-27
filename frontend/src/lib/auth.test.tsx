@@ -23,6 +23,7 @@ const member: User = {
   organization_name: "",
   city: "Dakar",
   bio: "",
+  is_diaspora: false,
   kyc_status: "VALIDE",
 };
 

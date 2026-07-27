@@ -32,6 +32,7 @@ function AccountPage() {
   const [organizationName, setOrganizationName] = useState(user?.organization_name ?? "")
   const [city, setCity] = useState(user?.city ?? "")
   const [bio, setBio] = useState(user?.bio ?? "")
+  const [isDiaspora, setIsDiaspora] = useState(user?.is_diaspora ?? false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -101,7 +102,7 @@ function AccountPage() {
     try {
       await authFetch("/auth/me/", {
         method: "PATCH",
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone, organization_name: organizationName, city, bio }),
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone, organization_name: organizationName, city, bio, is_diaspora: isDiaspora }),
       })
       await refreshUser()
       setSaved(true)
@@ -220,6 +221,24 @@ function AccountPage() {
                 onChange={(e) => setPhone(e.target.value)}
                 className="h-11 rounded-xl px-3.5"
               />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-ink-secondary">
+                <input
+                  type="checkbox"
+                  checked={isDiaspora}
+                  onChange={(event) => setIsDiaspora(event.target.checked)}
+                  className="mt-0.5 size-4 accent-[#d4a900]"
+                />
+                <span>
+                  <span className="font-medium text-ink">Je réside à l'étranger (diaspora)</span>
+                  <br />
+                  <span className="text-xs text-ink-muted">
+                    Une vérification renforcée (justificatif de résidence et origine des
+                    fonds) sera demandée dans l'onglet Vérification d'identité.
+                  </span>
+                </span>
+              </label>
             </div>
             {user.role === "PORTEUR" && <><div className="space-y-2"><Label htmlFor="organization">Organisation <span className="font-normal text-ink-muted">(facultatif)</span></Label><Input id="organization" value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} placeholder="Nom de l’association ou de l’activité" className="h-11 rounded-xl" /></div><div className="space-y-2"><Label htmlFor="city">Ville</Label><Input id="city" value={city} onChange={(event) => setCity(event.target.value)} placeholder="Dakar" className="h-11 rounded-xl" /></div><div className="space-y-2 sm:col-span-2"><Label htmlFor="bio">Présentation publique</Label><textarea id="bio" rows={4} maxLength={700} value={bio} onChange={(event) => setBio(event.target.value)} placeholder="Présentez votre expérience et ce qui vous motive…" className="w-full rounded-xl border border-input bg-transparent px-3 py-3 text-sm text-ink outline-none focus:ring-2 focus:ring-gold-dark/30" /><p className="text-right text-xs text-ink-muted">{bio.length}/700</p></div></>}
           </div>

@@ -12,6 +12,8 @@ const documentTypeLabels: Record<KycDocumentType, string> = {
   PASSEPORT: "Passeport",
   SELFIE: "Selfie de vérification",
   JUSTIFICATIF_ACTIVITE: "Justificatif d'activité",
+  JUSTIFICATIF_RESIDENCE: "Justificatif de résidence à l'étranger",
+  JUSTIFICATIF_ORIGINE_FONDS: "Justificatif de l'origine des fonds",
 }
 
 function capitalize(text: string): string {

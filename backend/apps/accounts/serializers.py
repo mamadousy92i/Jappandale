@@ -55,7 +55,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "email_verified", "first_name", "last_name", "role", "phone", "avatar", "organization_name", "city", "bio", "kyc_status"]
+        fields = ["id", "email", "email_verified", "first_name", "last_name", "role", "phone", "avatar", "organization_name", "city", "bio", "is_diaspora", "kyc_status"]
         read_only_fields = ["id", "email", "role", "kyc_status"]
 
     def validate_avatar(self, avatar):

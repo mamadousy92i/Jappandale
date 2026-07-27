@@ -6,7 +6,9 @@ export type KycDocumentType =
   | "CNI"
   | "PASSEPORT"
   | "SELFIE"
-  | "JUSTIFICATIF_ACTIVITE";
+  | "JUSTIFICATIF_ACTIVITE"
+  | "JUSTIFICATIF_RESIDENCE"
+  | "JUSTIFICATIF_ORIGINE_FONDS";
 
 export interface KycChecklistItem {
   key: string;
@@ -27,6 +29,7 @@ export interface User {
   organization_name: string;
   city: string;
   bio: string;
+  is_diaspora: boolean;
   kyc_status: KycStatus;
 }
 

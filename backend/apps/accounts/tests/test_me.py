@@ -75,3 +75,16 @@ def test_me_ajoute_et_supprime_avatar(client_authentifie, tmp_path):
         user.refresh_from_db()
         assert not user.avatar
         assert not stored_path.exists()
+
+
+@pytest.mark.django_db
+def test_me_modification_is_diaspora(client_authentifie):
+    client, user = client_authentifie
+    assert user.is_diaspora is False
+
+    response = client.patch("/api/auth/me/", {"is_diaspora": True}, format="json")
+
+    assert response.status_code == 200
+    assert response.data["is_diaspora"] is True
+    user.refresh_from_db()
+    assert user.is_diaspora is True

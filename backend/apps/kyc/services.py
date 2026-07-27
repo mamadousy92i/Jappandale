@@ -19,20 +19,37 @@ _BASE_REQUIREMENTS = [
     },
 ]
 
-_PORTEUR_REQUIREMENTS = _BASE_REQUIREMENTS + [
+_ACTIVITE_REQUIREMENT = {
+    "key": "activite",
+    "label": "un justificatif d'activité",
+    "any_of": (DocumentType.JUSTIFICATIF_ACTIVITE,),
+}
+
+# Vérification renforcée pour la diaspora (§5.1) : justificatif de résidence
+# à l'étranger et justificatif de l'origine des fonds.
+_DIASPORA_REQUIREMENTS = [
     {
-        "key": "activite",
-        "label": "un justificatif d'activité",
-        "any_of": (DocumentType.JUSTIFICATIF_ACTIVITE,),
+        "key": "residence",
+        "label": "un justificatif de résidence à l'étranger",
+        "any_of": (DocumentType.JUSTIFICATIF_RESIDENCE,),
+    },
+    {
+        "key": "origine_fonds",
+        "label": "un justificatif de l'origine des fonds",
+        "any_of": (DocumentType.JUSTIFICATIF_ORIGINE_FONDS,),
     },
 ]
 
 
-def get_required_documents(role):
-    """Exigences KYC pour un rôle donné (le porteur a un parcours renforcé)."""
-    if role == User.Role.PORTEUR:
-        return _PORTEUR_REQUIREMENTS
-    return _BASE_REQUIREMENTS
+def get_required_documents(user):
+    """Exigences KYC pour un utilisateur : le porteur et la diaspora ont un
+    parcours renforcé, cumulable."""
+    requirements = list(_BASE_REQUIREMENTS)
+    if user.role == User.Role.PORTEUR:
+        requirements.append(_ACTIVITE_REQUIREMENT)
+    if user.is_diaspora:
+        requirements.extend(_DIASPORA_REQUIREMENTS)
+    return requirements
 
 
 def missing_required_documents(user):
@@ -40,7 +57,7 @@ def missing_required_documents(user):
     uploaded_types = set(user.kyc_documents.values_list("document_type", flat=True))
     return [
         requirement["label"]
-        for requirement in get_required_documents(user.role)
+        for requirement in get_required_documents(user)
         if not uploaded_types.intersection(requirement["any_of"])
     ]
 
@@ -55,5 +72,5 @@ def build_checklist(user):
             "document_types": list(requirement["any_of"]),
             "satisfied": bool(uploaded_types.intersection(requirement["any_of"])),
         }
-        for requirement in get_required_documents(user.role)
+        for requirement in get_required_documents(user)
     ]

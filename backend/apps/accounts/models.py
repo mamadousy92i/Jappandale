@@ -61,6 +61,9 @@ class User(AbstractUser):
     organization_name = models.CharField("organisation", max_length=160, blank=True)
     city = models.CharField("ville", max_length=120, blank=True)
     bio = models.TextField("présentation publique", max_length=700, blank=True)
+    is_diaspora = models.BooleanField(
+        "réside à l'étranger (diaspora)", default=False
+    )
     email_verified_at = models.DateTimeField(
         "adresse e-mail vérifiée le", null=True, blank=True
     )

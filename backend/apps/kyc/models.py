@@ -10,6 +10,14 @@ class KycDocument(models.Model):
         PASSEPORT = "PASSEPORT", "Passeport"
         SELFIE = "SELFIE", "Selfie de vérification"
         JUSTIFICATIF_ACTIVITE = "JUSTIFICATIF_ACTIVITE", "Justificatif d'activité"
+        JUSTIFICATIF_RESIDENCE = (
+            "JUSTIFICATIF_RESIDENCE",
+            "Justificatif de résidence à l'étranger",
+        )
+        JUSTIFICATIF_ORIGINE_FONDS = (
+            "JUSTIFICATIF_ORIGINE_FONDS",
+            "Justificatif de l'origine des fonds",
+        )
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
