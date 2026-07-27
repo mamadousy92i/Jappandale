@@ -16,6 +16,7 @@ from rest_framework.views import APIView
 
 from apps.campaigns.models import Campaign, CampaignAuditLog, CampaignReport
 from apps.contributions.models import Contribution
+from apps.contributions.services import release_campaign_payout
 from apps.core.models import SupportReply, SupportRequest
 from apps.core.email import send_branded_email
 from apps.kyc.models import KycAuditLog, KycDocument
@@ -460,6 +461,24 @@ class CampaignWorkflowView(APIView):
             action_url="/compte",
         )
         return Response({"detail": "Statut de la campagne mis à jour."})
+
+
+class CampaignPayoutView(APIView):
+    permission_classes = [IsJappandaleAdmin]
+
+    def post(self, request, campaign_id):
+        campaign = get_object_or_404(Campaign, pk=campaign_id)
+        try:
+            log = release_campaign_payout(campaign=campaign, actor=request.user)
+        except ValueError as error:
+            return Response({"detail": str(error)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {
+                "detail": "Reversement effectué.",
+                "contributions_count": log.contributions_count,
+                "net_amount": log.net_amount,
+            }
+        )
 
 
 class SupportReplyView(APIView):

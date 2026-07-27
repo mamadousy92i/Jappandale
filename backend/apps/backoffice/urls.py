@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     CampaignDecisionView,
+    CampaignPayoutView,
     CampaignWorkflowView,
     DashboardView,
     KycDocumentFileView,
@@ -22,6 +23,7 @@ urlpatterns = [
     path("kyc-documents/<str:token>/file/", KycDocumentFileView.as_view(), name="kyc-document-file"),
     path("campaigns/<int:campaign_id>/decision/", CampaignDecisionView.as_view(), name="campaign-decision"),
     path("campaigns/<int:campaign_id>/workflow/", CampaignWorkflowView.as_view(), name="campaign-workflow"),
+    path("campaigns/<int:campaign_id>/reverser/", CampaignPayoutView.as_view(), name="campaign-payout"),
     path("reports/<int:report_id>/", ReportReviewView.as_view(), name="report-review"),
     path("support/<int:request_id>/", SupportReviewView.as_view(), name="support-review"),
     path("support/<int:request_id>/reply/", SupportReplyView.as_view(), name="support-reply"),
