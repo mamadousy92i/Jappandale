@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from apps.campaigns.models import Campaign, Reward
 
-from .models import Contribution, Transaction
+from .models import Contribution, PlatformSettings, Transaction
 from .providers import PaymentResult, SimulatedPaymentProvider
 
 
@@ -65,7 +65,19 @@ def process_simulated_payment(*, contribution, outcome):
         locked.confirmed_at = now
         payment_transaction.status = Transaction.Status.CONFIRMEE
         payment_transaction.failure_reason = ""
-        locked.save(update_fields=["status", "confirmed_at"])
+        commission_rate = PlatformSettings.get_solo().commission_rate
+        locked.commission_rate_applied = commission_rate
+        locked.commission_amount = round(locked.amount * commission_rate)
+        locked.net_amount = locked.amount - locked.commission_amount
+        locked.save(
+            update_fields=[
+                "status",
+                "confirmed_at",
+                "commission_rate_applied",
+                "commission_amount",
+                "net_amount",
+            ]
+        )
         if reward is not None:
             reward.quantity_claimed += 1
             reward.save(update_fields=["quantity_claimed"])

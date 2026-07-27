@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Contribution, PlatformSettings, Transaction
+from .models import Contribution, PayoutAuditLog, PlatformSettings, Transaction
 from .services import refund_contribution
 
 
@@ -42,6 +42,21 @@ class PlatformSettingsAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not PlatformSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(PayoutAuditLog)
+class PayoutAuditLogAdmin(admin.ModelAdmin):
+    list_display = ("campaign", "actor", "contributions_count", "net_amount", "created_at")
+    readonly_fields = (
+        "campaign", "actor", "contributions_count", "gross_amount",
+        "commission_amount", "net_amount", "created_at",
+    )
+
+    def has_add_permission(self, request):
+        return False
 
     def has_delete_permission(self, request, obj=None):
         return False

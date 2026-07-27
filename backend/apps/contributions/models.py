@@ -158,3 +158,35 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.get_provider_display()} — {self.external_reference}"
+
+
+class PayoutAuditLog(models.Model):
+    """Historique append-only des reversements déclenchés par campagne."""
+
+    campaign = models.ForeignKey(
+        Campaign,
+        verbose_name="campagne",
+        on_delete=models.PROTECT,
+        related_name="payout_audit_logs",
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="administrateur",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="performed_payout_releases",
+    )
+    contributions_count = models.PositiveIntegerField("nombre de contributions reversées")
+    gross_amount = models.PositiveIntegerField("montant brut reversé (FCFA)")
+    commission_amount = models.PositiveIntegerField("commission totale (FCFA)")
+    net_amount = models.PositiveIntegerField("montant net reversé (FCFA)")
+    created_at = models.DateTimeField("effectué le", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "événement de reversement"
+        verbose_name_plural = "événements de reversement"
+
+    def __str__(self):
+        return f"Reversement — {self.campaign.title} — {self.created_at:%d/%m/%Y}"

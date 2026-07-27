@@ -17,6 +17,7 @@ class Notification(models.Model):
         CONTRIBUTION_CONFIRMED = "CONTRIBUTION_CONFIRMED", "Contribution confirmée"
         CONTRIBUTION_RECEIVED = "CONTRIBUTION_RECEIVED", "Contribution reçue"
         GOAL_REACHED = "GOAL_REACHED", "Objectif atteint"
+        PAYOUT_RELEASED = "PAYOUT_RELEASED", "Fonds reversés"
         ADMIN_ACTION_REQUIRED = "ADMIN_ACTION_REQUIRED", "Action administrateur requise"
 
     class DeliveryStatus(models.TextChoices):
