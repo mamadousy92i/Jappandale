@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
 
-type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users"
+type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts"
 type Person = {
   id: number
   name: string
@@ -26,6 +26,8 @@ interface DashboardData {
     users: number
     confirmed_contributions: number
     confirmed_amount: number
+    total_en_sequestre: number
+    total_reverse: number
   }
   admins: Person[]
   kyc: Array<{
@@ -92,6 +94,12 @@ interface DashboardData {
     amount: number
     confirmed_at: string | null
   }>
+  payouts: Array<{
+    campaign: { id: number; slug: string; title: string; owner: Person }
+    contributions_count: number
+    gross_amount: number
+    net_amount: number
+  }>
 }
 
 interface ManagedUser extends Person {
@@ -146,6 +154,7 @@ const tabItems: Array<{
     count: "open_support",
   },
   { id: "users", label: "Utilisateurs", icon: UserCog },
+  { id: "payouts", label: "Reversements", icon: Banknote },
 ]
 
 const PAGE_SIZE = 8
@@ -378,7 +387,7 @@ export default function AdminDashboardPage() {
   const currentItems = useMemo(() => {
     if (!data) return [] as unknown[]
     const term = search.trim().toLocaleLowerCase("fr")
-    let items: unknown[] = tab === "kyc" ? data.kyc : tab === "campaigns" ? data.campaigns : tab === "reports" ? data.reports : tab === "support" ? data.support : []
+    let items: unknown[] = tab === "kyc" ? data.kyc : tab === "campaigns" ? data.campaigns : tab === "reports" ? data.reports : tab === "support" ? data.support : tab === "payouts" ? data.payouts : []
     if (term) items = items.filter((item) => JSON.stringify(item).toLocaleLowerCase("fr").includes(term))
     if (statusFilter !== "TOUS") items = items.filter((item) => (item as { status?: string }).status === statusFilter)
     return items
@@ -441,6 +450,17 @@ export default function AdminDashboardPage() {
       icon: Banknote,
     },
     {
+      label: "Fonds en séquestre",
+      value: formatFcfa(data.metrics.total_en_sequestre),
+      icon: Banknote,
+      target: "payouts",
+    },
+    {
+      label: "Fonds déjà reversés",
+      value: formatFcfa(data.metrics.total_reverse),
+      icon: CheckCircle2,
+    },
+    {
       label: "Utilisateurs actifs",
       value: data.metrics.users,
       icon: Users,
@@ -449,7 +469,7 @@ export default function AdminDashboardPage() {
   ]
 
   const queueToolbar =
-    tab !== "overview" && tab !== "users" ? (
+    tab !== "overview" && tab !== "users" && tab !== "payouts" ? (
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted" />
@@ -759,6 +779,52 @@ export default function AdminDashboardPage() {
                   </article>
                 )
               })
+            )}
+            <Pager page={localPage} pages={pages} onChange={setLocalPage} />
+          </section>
+        )}
+
+        {tab === "payouts" && (
+          <section className="mt-6 space-y-4" aria-labelledby="payout-title">
+            <div>
+              <h2 id="payout-title" className="font-heading text-2xl font-bold text-ink">
+                Reversements en attente
+              </h2>
+              <p className="mt-1 text-sm text-ink-secondary">
+                Campagnes clôturées dont les fonds sont encore en séquestre.
+              </p>
+            </div>
+            {visibleItems.length === 0 ? (
+              <EmptyQueue label="reversement" />
+            ) : (
+              (visibleItems as DashboardData["payouts"]).map((item) => (
+                <article key={item.campaign.id} className="rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="space-y-1">
+                      <h3 className="font-heading text-xl font-bold text-ink">{item.campaign.title}</h3>
+                      <p className="text-xs text-ink-muted">
+                        {item.campaign.owner.name} · {item.contributions_count} contribution(s)
+                      </p>
+                      <p className="text-sm text-ink-secondary">
+                        Brut {formatFcfa(item.gross_amount)} · Net à reverser {formatFcfa(item.net_amount)}
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() =>
+                        ask(
+                          "Reverser les fonds de cette campagne ?",
+                          `${item.contributions_count} contribution(s) seront marquées reversées pour un montant net de ${formatFcfa(item.net_amount)}.`,
+                          "Reverser",
+                          () => perform(`/backoffice/campaigns/${item.campaign.id}/reverser/`, "POST", {}, "Fonds reversés."),
+                        )
+                      }
+                      className="rounded-full bg-emerald-600 text-white"
+                    >
+                      Reverser les fonds
+                    </Button>
+                  </div>
+                </article>
+              ))
             )}
             <Pager page={localPage} pages={pages} onChange={setLocalPage} />
           </section>
