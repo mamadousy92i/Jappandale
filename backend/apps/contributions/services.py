@@ -3,8 +3,10 @@ from django.db.models import Sum
 from django.utils import timezone
 
 from apps.campaigns.models import Campaign, Reward
+from apps.notifications.models import Notification
+from apps.notifications.services import notify_user
 
-from .models import Contribution, PlatformSettings, Transaction
+from .models import Contribution, PayoutAuditLog, PlatformSettings, Transaction
 from .providers import PaymentResult, SimulatedPaymentProvider
 
 
@@ -81,9 +83,6 @@ def process_simulated_payment(*, contribution, outcome):
         if reward is not None:
             reward.quantity_claimed += 1
             reward.save(update_fields=["quantity_claimed"])
-        from apps.notifications.models import Notification
-        from apps.notifications.services import notify_user
-
         notify_user(
             recipient=locked.contributor,
             kind=Notification.Kind.CONTRIBUTION_CONFIRMED,
@@ -130,6 +129,8 @@ def refund_contribution(contribution):
     campaign = Campaign.objects.select_for_update().get(pk=locked.campaign_id)
     if locked.status != Contribution.Status.CONFIRMEE:
         return False
+    if locked.payout_status != Contribution.PayoutStatus.EN_SEQUESTRE:
+        return False
 
     now = timezone.now()
     locked.status = Contribution.Status.REMBOURSEE
@@ -147,3 +148,53 @@ def refund_contribution(contribution):
         reward.save(update_fields=["quantity_claimed"])
     recalculate_campaign_total(campaign)
     return True
+
+
+@db_transaction.atomic
+def release_campaign_payout(*, campaign, actor):
+    """Marque en lot les contributions confirmées d'une campagne comme reversées."""
+    if campaign.status != Campaign.Status.CLOTUREE:
+        raise ValueError("Seule une campagne clôturée peut faire l'objet d'un reversement.")
+
+    contributions = list(
+        Contribution.objects.select_for_update().filter(
+            campaign=campaign,
+            status=Contribution.Status.CONFIRMEE,
+            payout_status=Contribution.PayoutStatus.EN_SEQUESTRE,
+        )
+    )
+    if not contributions:
+        raise ValueError("Aucune contribution en séquestre à reverser pour cette campagne.")
+
+    now = timezone.now()
+    gross_amount = sum(c.amount for c in contributions)
+    commission_amount = sum(c.commission_amount for c in contributions)
+    net_amount = sum(c.net_amount for c in contributions)
+
+    for contribution in contributions:
+        contribution.payout_status = Contribution.PayoutStatus.REVERSEE
+        contribution.payout_released_at = now
+        contribution.payout_released_by = actor
+        contribution.save(
+            update_fields=["payout_status", "payout_released_at", "payout_released_by"]
+        )
+
+    log = PayoutAuditLog.objects.create(
+        campaign=campaign,
+        actor=actor,
+        contributions_count=len(contributions),
+        gross_amount=gross_amount,
+        commission_amount=commission_amount,
+        net_amount=net_amount,
+    )
+    notify_user(
+        recipient=campaign.owner,
+        kind=Notification.Kind.PAYOUT_RELEASED,
+        subject="Les fonds de votre campagne ont été reversés",
+        message=(
+            f"Les fonds de la campagne « {campaign.title} » ont été reversés : "
+            f"{net_amount} FCFA net, pour {len(contributions)} contribution(s)."
+        ),
+        action_url="/compte?onglet=contributions",
+    )
+    return log

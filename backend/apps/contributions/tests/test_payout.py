@@ -115,3 +115,116 @@ def test_montant_public_collecte_reste_brut():
 
     campaign.refresh_from_db()
     assert campaign.collected_amount == 20_000
+
+
+from apps.contributions.services import (
+    process_simulated_payment,
+    refund_contribution,
+    release_campaign_payout,
+)
+from apps.notifications.models import Notification
+
+
+def _confirmer_contribution(client, campaign, amount=20_000):
+    created = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": amount},
+        format="json",
+    )
+    client.post(
+        f"/api/contributions/{created.data['public_reference']}/confirm/",
+        {"outcome": "SUCCESS"},
+        format="json",
+    )
+    return Contribution.objects.get(public_reference=created.data["public_reference"])
+
+
+@pytest.mark.django_db
+def test_reversement_refuse_si_campagne_pas_cloturee():
+    owner = make_user("owner-p4@test.sn", User.Role.PORTEUR)
+    admin = make_user("admin-p4@test.sn", User.Role.ADMIN)
+    campaign = make_campaign(owner, status=Campaign.Status.PUBLIEE)
+
+    with pytest.raises(ValueError):
+        release_campaign_payout(campaign=campaign, actor=admin)
+
+
+@pytest.mark.django_db
+def test_reversement_marque_toutes_les_contributions_de_la_campagne():
+    owner = make_user("owner-p5@test.sn", User.Role.PORTEUR)
+    admin = make_user("admin-p5@test.sn", User.Role.ADMIN)
+    campaign = make_campaign(owner, status=Campaign.Status.PUBLIEE)
+    contributor1 = make_user("c1-p5@test.sn")
+    contributor2 = make_user("c2-p5@test.sn")
+    contribution1 = _confirmer_contribution(authenticated_client(contributor1), campaign, 10_000)
+    contribution2 = _confirmer_contribution(authenticated_client(contributor2), campaign, 30_000)
+    campaign.status = Campaign.Status.CLOTUREE
+    campaign.save(update_fields=["status"])
+
+    log = release_campaign_payout(campaign=campaign, actor=admin)
+
+    contribution1.refresh_from_db()
+    contribution2.refresh_from_db()
+    assert contribution1.payout_status == Contribution.PayoutStatus.REVERSEE
+    assert contribution2.payout_status == Contribution.PayoutStatus.REVERSEE
+    assert contribution1.payout_released_by_id == admin.id
+    assert contribution1.payout_released_at is not None
+    assert log.contributions_count == 2
+    assert log.gross_amount == 40_000
+    assert log.net_amount == contribution1.net_amount + contribution2.net_amount
+    assert Notification.objects.filter(
+        recipient=owner, kind=Notification.Kind.PAYOUT_RELEASED
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_reversement_ne_touche_pas_une_autre_campagne():
+    owner1 = make_user("owner-p6a@test.sn", User.Role.PORTEUR)
+    owner2 = make_user("owner-p6b@test.sn", User.Role.PORTEUR)
+    admin = make_user("admin-p6@test.sn", User.Role.ADMIN)
+    campaign1 = make_campaign(owner1, title="Campagne 1", status=Campaign.Status.PUBLIEE)
+    campaign2 = make_campaign(owner2, title="Campagne 2", status=Campaign.Status.PUBLIEE)
+    contribution1 = _confirmer_contribution(authenticated_client(make_user("c1-p6@test.sn")), campaign1)
+    contribution2 = _confirmer_contribution(authenticated_client(make_user("c2-p6@test.sn")), campaign2)
+    campaign1.status = Campaign.Status.CLOTUREE
+    campaign1.save(update_fields=["status"])
+    campaign2.status = Campaign.Status.CLOTUREE
+    campaign2.save(update_fields=["status"])
+
+    release_campaign_payout(campaign=campaign1, actor=admin)
+
+    contribution1.refresh_from_db()
+    contribution2.refresh_from_db()
+    assert contribution1.payout_status == Contribution.PayoutStatus.REVERSEE
+    assert contribution2.payout_status == Contribution.PayoutStatus.EN_SEQUESTRE
+
+
+@pytest.mark.django_db
+def test_reversement_idempotent_sur_contributions_deja_reversees():
+    owner = make_user("owner-p7@test.sn", User.Role.PORTEUR)
+    admin = make_user("admin-p7@test.sn", User.Role.ADMIN)
+    campaign = make_campaign(owner, status=Campaign.Status.PUBLIEE)
+    _confirmer_contribution(authenticated_client(make_user("c1-p7@test.sn")), campaign)
+    campaign.status = Campaign.Status.CLOTUREE
+    campaign.save(update_fields=["status"])
+    release_campaign_payout(campaign=campaign, actor=admin)
+
+    with pytest.raises(ValueError):
+        release_campaign_payout(campaign=campaign, actor=admin)
+
+
+@pytest.mark.django_db
+def test_remboursement_refuse_si_deja_reversee():
+    owner = make_user("owner-p8@test.sn", User.Role.PORTEUR)
+    admin = make_user("admin-p8@test.sn", User.Role.ADMIN)
+    campaign = make_campaign(owner, status=Campaign.Status.PUBLIEE)
+    contribution = _confirmer_contribution(authenticated_client(make_user("c1-p8@test.sn")), campaign)
+    campaign.status = Campaign.Status.CLOTUREE
+    campaign.save(update_fields=["status"])
+    release_campaign_payout(campaign=campaign, actor=admin)
+    contribution.refresh_from_db()
+
+    assert refund_contribution(contribution) is False
+
+    contribution.refresh_from_db()
+    assert contribution.status == Contribution.Status.CONFIRMEE
