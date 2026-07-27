@@ -98,3 +98,22 @@ def test_reversement_refuse_si_campagne_pas_cloturee():
     response = client.post(f"/api/backoffice/campaigns/{campaign.id}/reverser/")
 
     assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_dashboard_expose_les_agregats_de_reversement():
+    campaign = _campagne_cloturee_avec_contribution(montant=20_000)
+    admin = _admin()
+    client = APIClient()
+    client.force_authenticate(admin)
+
+    response = client.get("/api/backoffice/dashboard/")
+
+    assert response.status_code == 200
+    assert response.data["metrics"]["total_en_sequestre"] == 19_000
+    assert response.data["metrics"]["total_reverse"] == 0
+    payout_entry = next(
+        item for item in response.data["payouts"] if item["campaign"]["slug"] == campaign.slug
+    )
+    assert payout_entry["net_amount"] == 19_000
+    assert payout_entry["contributions_count"] == 1

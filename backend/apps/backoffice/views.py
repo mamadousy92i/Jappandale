@@ -91,6 +91,17 @@ class DashboardView(APIView):
             .order_by("created_at")[:30]
         )
         recent_contributions = confirmed.select_related("campaign", "contributor")[:10]
+        en_sequestre = confirmed.filter(payout_status=Contribution.PayoutStatus.EN_SEQUESTRE)
+        reversees = confirmed.filter(payout_status=Contribution.PayoutStatus.REVERSEE)
+        payout_campaigns = (
+            Campaign.objects.filter(
+                status=Campaign.Status.CLOTUREE,
+                contributions__status=Contribution.Status.CONFIRMEE,
+                contributions__payout_status=Contribution.PayoutStatus.EN_SEQUESTRE,
+            )
+            .distinct()
+            .select_related("owner")
+        )
 
         return Response(
             {
@@ -116,6 +127,8 @@ class DashboardView(APIView):
                     "users": User.objects.filter(is_active=True).count(),
                     "confirmed_contributions": confirmed.count(),
                     "confirmed_amount": confirmed.aggregate(total=Sum("amount"))["total"] or 0,
+                    "total_en_sequestre": en_sequestre.aggregate(total=Sum("net_amount"))["total"] or 0,
+                    "total_reverse": reversees.aggregate(total=Sum("net_amount"))["total"] or 0,
                 },
                 "kyc": [
                     {
@@ -224,6 +237,29 @@ class DashboardView(APIView):
                     for admin in User.objects.filter(
                         role=User.Role.ADMIN, is_active=True
                     ).order_by("first_name", "email")
+                ],
+                "payouts": [
+                    {
+                        "campaign": {
+                            "id": campaign.id,
+                            "slug": campaign.slug,
+                            "title": campaign.title,
+                            "owner": _person(campaign.owner),
+                        },
+                        "contributions_count": campaign.contributions.filter(
+                            status=Contribution.Status.CONFIRMEE,
+                            payout_status=Contribution.PayoutStatus.EN_SEQUESTRE,
+                        ).count(),
+                        "gross_amount": campaign.contributions.filter(
+                            status=Contribution.Status.CONFIRMEE,
+                            payout_status=Contribution.PayoutStatus.EN_SEQUESTRE,
+                        ).aggregate(total=Sum("amount"))["total"] or 0,
+                        "net_amount": campaign.contributions.filter(
+                            status=Contribution.Status.CONFIRMEE,
+                            payout_status=Contribution.PayoutStatus.EN_SEQUESTRE,
+                        ).aggregate(total=Sum("net_amount"))["total"] or 0,
+                    }
+                    for campaign in payout_campaigns
                 ],
             }
         )
