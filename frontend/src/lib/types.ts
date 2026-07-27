@@ -130,6 +130,7 @@ export interface CampaignDetail extends CampaignListItem {
 export type ContributionStatus =
   "INITIEE" | "CONFIRMEE" | "ECHOUEE" | "REMBOURSEE";
 export type TransactionStatus = ContributionStatus;
+export type PayoutStatus = "EN_SEQUESTRE" | "REVERSEE";
 
 export interface Contribution {
   public_reference: string;
@@ -150,6 +151,12 @@ export interface Contribution {
     failure_reason: string;
     processed_at: string | null;
   };
+}
+
+export interface ReceivedContribution extends Contribution {
+  payout_status: PayoutStatus;
+  payout_status_display: string;
+  net_amount: number;
 }
 
 export interface Notification {

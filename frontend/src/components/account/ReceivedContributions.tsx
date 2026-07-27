@@ -3,17 +3,17 @@ import { Inbox } from "lucide-react"
 
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
-import type { Contribution } from "@/lib/types"
+import type { ReceivedContribution } from "@/lib/types"
 
 export function ReceivedContributions() {
   const { authFetch } = useAuth()
-  const [items, setItems] = useState<Contribution[]>([])
+  const [items, setItems] = useState<ReceivedContribution[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   useEffect(() => {
     authFetch("/contributions/received/")
-      .then((data) => setItems(data as Contribution[]))
+      .then((data) => setItems(data as ReceivedContribution[]))
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [authFetch])
@@ -40,7 +40,14 @@ export function ReceivedContributions() {
                   <p className="font-semibold text-ink">{item.contributor_display}</p>
                   <p className="mt-1 text-xs text-ink-muted">{item.campaign.title} · {item.status.toLowerCase()}</p>
                 </div>
-                <span className="font-heading font-bold text-ink">{formatFcfa(item.amount)}</span>
+                <div className="text-right">
+                  <span className="font-heading font-bold text-ink">{formatFcfa(item.amount)}</span>
+                  {item.status === "CONFIRMEE" && (
+                    <p className={`mt-1 text-xs font-semibold ${item.payout_status === "REVERSEE" ? "text-emerald-700" : "text-gold-dark"}`}>
+                      {item.payout_status_display} · net {formatFcfa(item.net_amount)}
+                    </p>
+                  )}
+                </div>
               </div>
             </li>
           ))}
