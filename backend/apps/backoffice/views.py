@@ -27,6 +27,9 @@ from apps.kyc.services import missing_required_documents
 from apps.messaging.models import MessageReport
 from apps.notifications.models import Notification
 from apps.notifications.services import notify_user
+from apps.scoring.models import Score
+from apps.scoring.serializers import ScoreSerializer
+from apps.scoring.services import compute_score
 
 from .permissions import IsJappandaleAdmin
 from .serializers import (
@@ -36,6 +39,7 @@ from .serializers import (
     KycDecisionSerializer,
     MessageReportReviewSerializer,
     ReportReviewSerializer,
+    ScoreOverrideSerializer,
     SupportReplySerializer,
     SupportReviewSerializer,
     UserManagementSerializer,
@@ -53,6 +57,21 @@ def _person(user):
         "phone": user.phone,
         "role": user.role,
     }
+
+
+def _porteurs_scores_payload(porteurs):
+    payload = []
+    for porteur in porteurs:
+        score = Score.objects.filter(porteur=porteur).first()
+        payload.append(
+            {
+                "porteur": _person(porteur),
+                "effective_value": score.effective_value if score else None,
+                "is_manual_override": score.is_manual_override if score else False,
+                "computed_at": score.computed_at if score else None,
+            }
+        )
+    return payload
 
 
 def _admin_or_none(admin_id):
@@ -111,6 +130,9 @@ class DashboardView(APIView):
             .order_by("created_at")[:30]
         )
         recent_contributions = confirmed.select_related("campaign", "contributor")[:10]
+        porteurs = User.objects.filter(
+            role=User.Role.PORTEUR, kyc_status=User.KycStatus.VALIDE
+        ).order_by("first_name", "email")[:30]
         en_sequestre = confirmed.filter(payout_status=Contribution.PayoutStatus.EN_SEQUESTRE)
         reversees = confirmed.filter(payout_status=Contribution.PayoutStatus.REVERSEE)
         payout_campaigns = (
@@ -260,6 +282,7 @@ class DashboardView(APIView):
                     }
                     for dispute in open_disputes
                 ],
+                "porteurs_scores": _porteurs_scores_payload(porteurs),
                 "support": [
                     {
                         "id": support.id,
@@ -500,6 +523,26 @@ class DisputeReviewView(APIView):
                 dispute.resolved_at = timezone.now()
             dispute.save(update_fields=["status", "admin_note", "assigned_to", "resolved_at"])
         return Response({"detail": "Litige mis à jour."})
+
+
+class ScoreOverrideView(APIView):
+    permission_classes = [IsJappandaleAdmin]
+
+    def post(self, request, user_id):
+        serializer = ScoreOverrideSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        porteur = get_object_or_404(User, pk=user_id, role=User.Role.PORTEUR)
+        value, breakdown = compute_score(porteur)
+        score = Score.objects.create(
+            porteur=porteur,
+            value=value,
+            breakdown=breakdown,
+            is_manual_override=True,
+            override_value=serializer.validated_data["override_value"],
+            override_note=serializer.validated_data["note"],
+            override_by=request.user,
+        )
+        return Response(ScoreSerializer(score).data, status=status.HTTP_201_CREATED)
 
 
 class SupportReviewView(APIView):

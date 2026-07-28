@@ -45,6 +45,11 @@ class MessageReportReviewSerializer(serializers.Serializer):
     assigned_to = serializers.IntegerField(required=False, allow_null=True)
 
 
+class ScoreOverrideSerializer(serializers.Serializer):
+    override_value = serializers.IntegerField(min_value=0, max_value=100)
+    note = serializers.CharField(max_length=1500)
+
+
 class DisputeReviewSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=Dispute.Status.choices)
     admin_note = serializers.CharField(required=False, allow_blank=True, max_length=2000)
