@@ -3,6 +3,7 @@ from rest_framework import serializers
 from apps.campaigns.models import CampaignReport
 from apps.core.models import SupportRequest
 from apps.accounts.models import User
+from apps.disputes.models import Dispute
 from apps.messaging.models import MessageReport
 
 
@@ -44,8 +45,16 @@ class MessageReportReviewSerializer(serializers.Serializer):
     assigned_to = serializers.IntegerField(required=False, allow_null=True)
 
 
+class DisputeReviewSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=Dispute.Status.choices)
+    admin_note = serializers.CharField(required=False, allow_blank=True, max_length=2000)
+    assigned_to = serializers.IntegerField(required=False, allow_null=True)
+
+
 class WorkAssignmentSerializer(serializers.Serializer):
-    kind = serializers.ChoiceField(choices=["kyc", "campaign", "report", "support", "message_report"])
+    kind = serializers.ChoiceField(
+        choices=["kyc", "campaign", "report", "support", "message_report", "dispute"]
+    )
     object_id = serializers.IntegerField()
     admin_id = serializers.IntegerField(required=False, allow_null=True)
 

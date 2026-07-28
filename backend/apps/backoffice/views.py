@@ -19,6 +19,8 @@ from apps.contributions.models import Contribution
 from apps.contributions.services import release_campaign_payout
 from apps.core.models import SupportReply, SupportRequest
 from apps.core.email import send_branded_email
+from apps.disputes.models import Dispute
+from apps.disputes.services import resolve_dispute_accepted
 from apps.kyc.models import KycAuditLog, KycDocument
 from apps.kyc.services import missing_required_documents
 from apps.messaging.models import MessageReport
@@ -29,6 +31,7 @@ from .permissions import IsJappandaleAdmin
 from .serializers import (
     CampaignDecisionSerializer,
     CampaignWorkflowSerializer,
+    DisputeReviewSerializer,
     KycDecisionSerializer,
     MessageReportReviewSerializer,
     ReportReviewSerializer,
@@ -99,6 +102,13 @@ class DashboardView(APIView):
             .select_related("message__thread__campaign", "reporter", "assigned_to")
             .order_by("created_at")[:30]
         )
+        open_disputes = (
+            Dispute.objects.filter(
+                status__in=[Dispute.Status.OUVERT, Dispute.Status.EN_EXAMEN]
+            )
+            .select_related("contribution__campaign", "reporter", "assigned_to")
+            .order_by("created_at")[:30]
+        )
         recent_contributions = confirmed.select_related("campaign", "contributor")[:10]
         en_sequestre = confirmed.filter(payout_status=Contribution.PayoutStatus.EN_SEQUESTRE)
         reversees = confirmed.filter(payout_status=Contribution.PayoutStatus.REVERSEE)
@@ -129,6 +139,9 @@ class DashboardView(APIView):
                     ).count(),
                     "open_message_reports": MessageReport.objects.exclude(
                         status__in=[MessageReport.Status.RESOLU, MessageReport.Status.CLASSE]
+                    ).count(),
+                    "open_disputes": Dispute.objects.filter(
+                        status__in=[Dispute.Status.OUVERT, Dispute.Status.EN_EXAMEN]
                     ).count(),
                     "published_campaigns": Campaign.objects.filter(
                         status=Campaign.Status.PUBLIEE
@@ -226,6 +239,25 @@ class DashboardView(APIView):
                         "assigned_to": _person(report.assigned_to) if report.assigned_to else None,
                     }
                     for report in open_message_reports
+                ],
+                "disputes": [
+                    {
+                        "id": dispute.id,
+                        "contribution_reference": str(dispute.contribution.public_reference),
+                        "campaign": {
+                            "slug": dispute.contribution.campaign.slug,
+                            "title": dispute.contribution.campaign.title,
+                        },
+                        "amount": dispute.contribution.amount,
+                        "reporter": _person(dispute.reporter),
+                        "reason": dispute.get_reason_display(),
+                        "details": dispute.details,
+                        "status": dispute.status,
+                        "admin_note": dispute.admin_note,
+                        "created_at": dispute.created_at,
+                        "assigned_to": _person(dispute.assigned_to) if dispute.assigned_to else None,
+                    }
+                    for dispute in open_disputes
                 ],
                 "support": [
                     {
@@ -446,6 +478,29 @@ class MessageReportReviewView(APIView):
         return Response({"detail": "Signalement mis à jour."})
 
 
+class DisputeReviewView(APIView):
+    permission_classes = [IsJappandaleAdmin]
+
+    def patch(self, request, dispute_id):
+        serializer = DisputeReviewSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        dispute = get_object_or_404(Dispute, pk=dispute_id)
+        dispute.admin_note = serializer.validated_data.get("admin_note", "").strip()
+        if "assigned_to" in serializer.validated_data:
+            dispute.assigned_to = _admin_or_none(serializer.validated_data["assigned_to"])
+        new_status = serializer.validated_data["status"]
+
+        if new_status == Dispute.Status.ACCEPTE:
+            dispute.save(update_fields=["admin_note", "assigned_to"])
+            resolve_dispute_accepted(dispute=dispute, actor=request.user)
+        else:
+            dispute.status = new_status
+            if new_status == Dispute.Status.REJETE:
+                dispute.resolved_at = timezone.now()
+            dispute.save(update_fields=["status", "admin_note", "assigned_to", "resolved_at"])
+        return Response({"detail": "Litige mis à jour."})
+
+
 class SupportReviewView(APIView):
     permission_classes = [IsJappandaleAdmin]
 
@@ -476,6 +531,7 @@ class WorkAssignmentView(APIView):
             "report": (CampaignReport, "assigned_to"),
             "support": (SupportRequest, "assigned_to"),
             "message_report": (MessageReport, "assigned_to"),
+            "dispute": (Dispute, "assigned_to"),
         }
         model, field = mapping[kind]
         obj = get_object_or_404(model, pk=object_id)
