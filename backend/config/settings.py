@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "apps.contributions",
     "apps.notifications",
     "apps.backoffice",
+    "apps.messaging",
 ]
 
 MIDDLEWARE = [
