@@ -275,7 +275,11 @@ class EmailVerificationVerifyView(APIView):
         otp.used_at = now
         otp.save(update_fields=["used_at"])
         request.user.email_verified_at = now
-        request.user.save(update_fields=["email_verified_at"])
+        update_fields = ["email_verified_at"]
+        if request.user.account_status == User.AccountStatus.EN_ATTENTE:
+            request.user.account_status = User.AccountStatus.VALIDE
+            update_fields.append("account_status")
+        request.user.save(update_fields=update_fields)
         return Response({"detail": "Votre adresse e-mail est vérifiée."})
 
 

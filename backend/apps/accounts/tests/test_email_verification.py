@@ -38,6 +38,24 @@ def test_email_otp_is_sent_and_verifies_user(mock_randbelow):
 
 @pytest.mark.django_db
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+@patch("apps.accounts.services.secrets.randbelow", return_value=111111)
+def test_verification_email_passe_le_compte_a_valide(mock_randbelow):
+    User = get_user_model()
+    user = User.objects.create_user(email="valide@test.sn", password="MotDePasse123!")
+    assert user.account_status == User.AccountStatus.EN_ATTENTE
+    send_email_verification_otp(user)
+    client = APIClient()
+    client.force_authenticate(user)
+
+    client.post("/api/auth/email-verification/verify/", {"code": "111111"}, format="json")
+
+    user.refresh_from_db()
+    assert user.account_status == User.AccountStatus.VALIDE
+    assert user.account_status_changed_by is None
+
+
+@pytest.mark.django_db
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 @patch("apps.accounts.services.secrets.randbelow", return_value=654321)
 def test_wrong_email_otp_is_rejected(mock_randbelow):
     user = get_user_model().objects.create_user(
