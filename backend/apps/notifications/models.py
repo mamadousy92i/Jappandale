@@ -19,6 +19,7 @@ class Notification(models.Model):
         GOAL_REACHED = "GOAL_REACHED", "Objectif atteint"
         PAYOUT_RELEASED = "PAYOUT_RELEASED", "Fonds reversés"
         MESSAGE_RECEIVED = "MESSAGE_RECEIVED", "Nouveau message reçu"
+        DISPUTE_RESOLVED = "DISPUTE_RESOLVED", "Litige résolu"
         ADMIN_ACTION_REQUIRED = "ADMIN_ACTION_REQUIRED", "Action administrateur requise"
 
     class DeliveryStatus(models.TextChoices):

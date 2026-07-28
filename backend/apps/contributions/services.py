@@ -3,6 +3,7 @@ from django.db.models import Sum
 from django.utils import timezone
 
 from apps.campaigns.models import Campaign, Reward
+from apps.disputes.models import Dispute
 from apps.notifications.models import Notification
 from apps.notifications.services import notify_user
 
@@ -155,6 +156,12 @@ def release_campaign_payout(*, campaign, actor):
     """Marque en lot les contributions confirmées d'une campagne comme reversées."""
     if campaign.status != Campaign.Status.CLOTUREE:
         raise ValueError("Seule une campagne clôturée peut faire l'objet d'un reversement.")
+
+    if Dispute.objects.filter(
+        contribution__campaign=campaign,
+        status__in=[Dispute.Status.OUVERT, Dispute.Status.EN_EXAMEN],
+    ).exists():
+        raise ValueError("Un litige est en cours sur une contribution de cette campagne.")
 
     contributions = list(
         Contribution.objects.select_for_update().filter(

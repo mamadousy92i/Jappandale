@@ -228,3 +228,45 @@ def test_remboursement_refuse_si_deja_reversee():
 
     contribution.refresh_from_db()
     assert contribution.status == Contribution.Status.CONFIRMEE
+
+
+from apps.disputes.models import Dispute
+
+
+@pytest.mark.django_db
+def test_reversement_refuse_si_litige_ouvert_sur_une_contribution():
+    owner = make_user("owner-p9@test.sn", User.Role.PORTEUR)
+    admin = make_user("admin-p9@test.sn", User.Role.ADMIN)
+    campaign = make_campaign(owner, status=Campaign.Status.PUBLIEE)
+    contributor = make_user("c1-p9@test.sn")
+    contribution = _confirmer_contribution(authenticated_client(contributor), campaign)
+    campaign.status = Campaign.Status.CLOTUREE
+    campaign.save(update_fields=["status"])
+    Dispute.objects.create(
+        contribution=contribution, reporter=contributor, reason=Dispute.Reason.AUTRE, details="Détails."
+    )
+
+    with pytest.raises(ValueError):
+        release_campaign_payout(campaign=campaign, actor=admin)
+
+
+@pytest.mark.django_db
+def test_reversement_autorise_si_litige_rejete():
+    owner = make_user("owner-p10@test.sn", User.Role.PORTEUR)
+    admin = make_user("admin-p10@test.sn", User.Role.ADMIN)
+    campaign = make_campaign(owner, status=Campaign.Status.PUBLIEE)
+    contributor = make_user("c1-p10@test.sn")
+    contribution = _confirmer_contribution(authenticated_client(contributor), campaign)
+    campaign.status = Campaign.Status.CLOTUREE
+    campaign.save(update_fields=["status"])
+    Dispute.objects.create(
+        contribution=contribution,
+        reporter=contributor,
+        reason=Dispute.Reason.AUTRE,
+        details="Détails.",
+        status=Dispute.Status.REJETE,
+    )
+
+    log = release_campaign_payout(campaign=campaign, actor=admin)
+
+    assert log.contributions_count == 1
