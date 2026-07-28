@@ -159,6 +159,31 @@ export interface ReceivedContribution extends Contribution {
   net_amount: number;
 }
 
+export interface MessageThreadListItem {
+  id: number;
+  campaign: { slug: string; title: string };
+  other_participant: { id: number; name: string };
+  last_message: { body: string; created_at: string; sender_id: number } | null;
+  unread_count: number;
+  created_at: string;
+}
+
+export interface ThreadMessage {
+  id: number;
+  sender_name: string;
+  is_mine: boolean;
+  body: string;
+  created_at: string;
+  read_at: string | null;
+}
+
+export type MessageReportReason =
+  | "SPAM"
+  | "HARCELEMENT"
+  | "CONTENU_INAPPROPRIE"
+  | "TENTATIVE_CONTOURNEMENT"
+  | "AUTRE";
+
 export interface Notification {
   id: number;
   kind: string;
