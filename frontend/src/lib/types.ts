@@ -184,6 +184,27 @@ export type MessageReportReason =
   | "TENTATIVE_CONTOURNEMENT"
   | "AUTRE";
 
+export type DisputeReason =
+  | "PROJET_NON_CONFORME"
+  | "PORTEUR_INJOIGNABLE"
+  | "ERREUR_CONTRIBUTION"
+  | "AUTRE";
+
+export type DisputeStatus = "OUVERT" | "EN_EXAMEN" | "ACCEPTE" | "REJETE";
+
+export interface Dispute {
+  id: number;
+  contribution_reference: string;
+  campaign_title: string;
+  reason: DisputeReason;
+  reason_display: string;
+  details: string;
+  status: DisputeStatus;
+  status_display: string;
+  created_at: string;
+  resolved_at: string | null;
+}
+
 export interface Notification {
   id: number;
   kind: string;
