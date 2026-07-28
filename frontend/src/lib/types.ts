@@ -205,6 +205,15 @@ export interface Dispute {
   resolved_at: string | null;
 }
 
+export interface Score {
+  value: number;
+  effective_value: number;
+  breakdown: Record<string, number>;
+  is_manual_override: boolean;
+  override_note: string;
+  computed_at: string;
+}
+
 export interface Notification {
   id: number;
   kind: string;

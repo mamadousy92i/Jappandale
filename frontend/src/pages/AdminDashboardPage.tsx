@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { BadgeCheck, Banknote, CheckCircle2, Download, ExternalLink, FileText, FolderClock, Headphones, LayoutDashboard, Mail, RefreshCw, Search, ShieldAlert, UserCog, Users, X } from "lucide-react"
+import { BadgeCheck, Banknote, CheckCircle2, Download, ExternalLink, FileText, FolderClock, Gauge, Headphones, LayoutDashboard, Mail, RefreshCw, Search, ShieldAlert, UserCog, Users, X } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { Link } from "react-router-dom"
 
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
 
-type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts" | "message_reports" | "disputes"
+type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts" | "message_reports" | "disputes" | "scores"
 type Person = {
   id: number
   name: string
@@ -125,6 +125,12 @@ interface DashboardData {
     created_at: string
     assigned_to: Person | null
   }>
+  porteurs_scores: Array<{
+    porteur: Person
+    effective_value: number | null
+    is_manual_override: boolean
+    computed_at: string | null
+  }>
 }
 
 interface ManagedUser extends Person {
@@ -184,6 +190,7 @@ const tabItems: Array<{
   { id: "payouts", label: "Reversements", icon: Banknote },
   { id: "message_reports", label: "Signalements messages", icon: ShieldAlert, count: "open_message_reports" },
   { id: "disputes", label: "Litiges", icon: ShieldAlert, count: "open_disputes" },
+  { id: "scores", label: "Scores", icon: Gauge },
 ]
 
 const PAGE_SIZE = 8
@@ -339,6 +346,7 @@ export default function AdminDashboardPage() {
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
   const [documentPreview, setDocumentPreview] = useState<DocumentPreview | null>(null)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [scoreOverrideOpenId, setScoreOverrideOpenId] = useState<number | null>(null)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("TOUS")
   const [localPage, setLocalPage] = useState(1)
@@ -416,7 +424,7 @@ export default function AdminDashboardPage() {
   const currentItems = useMemo(() => {
     if (!data) return [] as unknown[]
     const term = search.trim().toLocaleLowerCase("fr")
-    let items: unknown[] = tab === "kyc" ? data.kyc : tab === "campaigns" ? data.campaigns : tab === "reports" ? data.reports : tab === "support" ? data.support : tab === "payouts" ? data.payouts : tab === "message_reports" ? data.message_reports : tab === "disputes" ? data.disputes : []
+    let items: unknown[] = tab === "kyc" ? data.kyc : tab === "campaigns" ? data.campaigns : tab === "reports" ? data.reports : tab === "support" ? data.support : tab === "payouts" ? data.payouts : tab === "message_reports" ? data.message_reports : tab === "disputes" ? data.disputes : tab === "scores" ? data.porteurs_scores : []
     if (term) items = items.filter((item) => JSON.stringify(item).toLocaleLowerCase("fr").includes(term))
     if (statusFilter !== "TOUS") items = items.filter((item) => (item as { status?: string }).status === statusFilter)
     return items
@@ -498,7 +506,7 @@ export default function AdminDashboardPage() {
   ]
 
   const queueToolbar =
-    tab !== "overview" && tab !== "users" && tab !== "payouts" ? (
+    tab !== "overview" && tab !== "users" && tab !== "payouts" && tab !== "scores" ? (
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted" />
@@ -1028,6 +1036,91 @@ export default function AdminDashboardPage() {
                         Accepter
                       </Button>
                     </div>
+                  </article>
+                )
+              })
+            )}
+            <Pager page={localPage} pages={pages} onChange={setLocalPage} />
+          </section>
+        )}
+
+        {tab === "scores" && (
+          <section className="mt-6 space-y-4" aria-labelledby="scores-title">
+            <div>
+              <h2 id="scores-title" className="font-heading text-2xl font-bold text-ink">
+                Scores Jappandale
+              </h2>
+              <p className="mt-1 text-sm text-ink-secondary">Porteurs avec une identité vérifiée et leur score courant.</p>
+            </div>
+            {visibleItems.length === 0 ? (
+              <EmptyQueue label="porteur" />
+            ) : (
+              (visibleItems as DashboardData["porteurs_scores"]).map((item) => {
+                const noteKey = `score-note-${item.porteur.id}`
+                const valueKey = `score-value-${item.porteur.id}`
+                const note = drafts[noteKey] ?? ""
+                const overrideValue = drafts[valueKey] ?? ""
+                return (
+                  <article key={item.porteur.id} className="rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                      <div>
+                        <h3 className="font-heading text-xl font-bold text-ink">{item.porteur.name}</h3>
+                        <p className="mt-1 text-xs text-ink-muted">{item.porteur.email}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="font-heading text-3xl font-bold text-ink">
+                          {item.effective_value ?? "—"}
+                        </span>
+                        <span className="ml-1 text-sm text-ink-muted">/ 100</span>
+                        {item.is_manual_override && (
+                          <p className="text-xs font-semibold text-gold-dark">Validé manuellement</p>
+                        )}
+                      </div>
+                    </div>
+                    {scoreOverrideOpenId === item.porteur.id ? (
+                      <div className="mt-4 space-y-2 rounded-xl border border-black/10 bg-surface-alt p-4">
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs font-semibold text-ink-secondary" htmlFor={valueKey}>
+                            Score imposé (0-100)
+                          </label>
+                          <input
+                            id={valueKey}
+                            type="number"
+                            min={0}
+                            max={100}
+                            value={overrideValue}
+                            onChange={(event) => setDrafts((current) => ({ ...current, [valueKey]: event.target.value }))}
+                            className="h-9 w-20 rounded-lg border border-black/10 bg-white px-2 text-sm"
+                          />
+                        </div>
+                        <NoteField value={note} onChange={(value) => setDrafts((current) => ({ ...current, [noteKey]: value }))} placeholder="Justification de la validation humaine" rows={2} />
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setScoreOverrideOpenId(null)} className="rounded-full">
+                            Annuler
+                          </Button>
+                          <Button
+                            disabled={!note.trim() || overrideValue === ""}
+                            onClick={() =>
+                              void perform(
+                                `/backoffice/scores/${item.porteur.id}/override/`,
+                                "POST",
+                                { override_value: Number(overrideValue), note },
+                                "Score ajusté manuellement.",
+                              ).then(() => setScoreOverrideOpenId(null))
+                            }
+                            className="rounded-full bg-gold text-ink"
+                          >
+                            Valider le score
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-4 flex justify-end">
+                        <Button variant="outline" onClick={() => setScoreOverrideOpenId(item.porteur.id)} className="rounded-full">
+                          Ajuster manuellement
+                        </Button>
+                      </div>
+                    )}
                   </article>
                 )
               })
