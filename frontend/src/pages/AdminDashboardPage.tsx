@@ -131,6 +131,8 @@ interface ManagedUser extends Person {
   is_active: boolean
   email_verified: boolean
   kyc_status: string
+  account_status: string
+  account_status_display: string
   date_joined: string
   last_login: string | null
 }
@@ -1326,12 +1328,18 @@ export default function AdminDashboardPage() {
                 <p className="p-8 text-center text-ink-muted">Aucun utilisateur trouvé.</p>
               ) : (
                 <div className="divide-y divide-black/5">
-                  {users.results.map((member) => (
+                  {users.results.map((member) => {
+                    const key = `user-${member.id}`
+                    const note = drafts[key] ?? ""
+                    return (
                     <article key={member.id} className="flex flex-col justify-between gap-4 p-5 lg:flex-row lg:items-center">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="font-semibold text-ink">{member.name}</h3>
-                          <StatusPill status={member.is_active ? "PUBLIEE" : "SUSPENDUE"} label={member.is_active ? "Actif" : "Désactivé"} />
+                          <StatusPill
+                            status={member.account_status === "VALIDE" ? "PUBLIEE" : member.account_status === "EN_ATTENTE" ? "EN_MODERATION" : "SUSPENDUE"}
+                            label={member.account_status_display}
+                          />
                           {!member.email_verified && <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">E-mail non vérifié</span>}
                         </div>
                         <p className="mt-1 text-sm text-ink-secondary">
@@ -1342,18 +1350,60 @@ export default function AdminDashboardPage() {
                           Inscrit le {formatDate(member.date_joined)} · KYC {member.kyc_status.replaceAll("_", " ")}
                         </p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <select aria-label={`Rôle de ${member.name}`} value={member.role} onChange={(event) => ask("Modifier le rôle ?", `${member.name} recevra les droits correspondant au nouveau rôle.`, "Modifier", () => perform(`/backoffice/users/${member.id}/`, "PATCH", { role: event.target.value }, "Rôle mis à jour.", true), member.role === "ADMIN")} className="h-10 rounded-xl border border-black/10 bg-white px-3 text-sm">
-                          <option value="CONTRIBUTEUR">Contributeur</option>
-                          <option value="PORTEUR">Porteur</option>
-                          <option value="ADMIN">Administrateur</option>
-                        </select>
-                        <Button variant="outline" onClick={() => ask(member.is_active ? "Désactiver ce compte ?" : "Réactiver ce compte ?", member.is_active ? "La connexion sera bloquée jusqu’à réactivation." : "Le membre pourra de nouveau se connecter.", member.is_active ? "Désactiver" : "Réactiver", () => perform(`/backoffice/users/${member.id}/`, "PATCH", { is_active: !member.is_active }, member.is_active ? "Compte désactivé." : "Compte réactivé.", true), member.is_active)} className={`rounded-full ${member.is_active ? "border-red-200 text-red-700" : "border-emerald-200 text-emerald-700"}`}>
-                          {member.is_active ? "Désactiver" : "Réactiver"}
-                        </Button>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <select aria-label={`Rôle de ${member.name}`} value={member.role} onChange={(event) => ask("Modifier le rôle ?", `${member.name} recevra les droits correspondant au nouveau rôle.`, "Modifier", () => perform(`/backoffice/users/${member.id}/`, "PATCH", { role: event.target.value }, "Rôle mis à jour.", true), member.role === "ADMIN")} className="h-10 rounded-xl border border-black/10 bg-white px-3 text-sm">
+                            <option value="CONTRIBUTEUR">Contributeur</option>
+                            <option value="PORTEUR">Porteur</option>
+                            <option value="ADMIN">Administrateur</option>
+                          </select>
+                          {member.account_status !== "VALIDE" && (
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                ask("Valider ce compte ?", "Le membre pourra de nouveau se connecter normalement.", "Valider", () =>
+                                  perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "VALIDE" }, "Compte validé.", true),
+                                )
+                              }
+                              className="rounded-full border-emerald-200 text-emerald-700"
+                            >
+                              Valider
+                            </Button>
+                          )}
+                          {member.account_status !== "SUSPENDU" && (
+                            <Button
+                              variant="outline"
+                              disabled={!note.trim()}
+                              onClick={() =>
+                                ask("Suspendre ce compte ?", "La connexion sera bloquée jusqu’à réactivation.", "Suspendre", () =>
+                                  perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "SUSPENDU", note }, "Compte suspendu.", true),
+                                )
+                              }
+                              className="rounded-full border-amber-200 text-amber-800"
+                            >
+                              Suspendre
+                            </Button>
+                          )}
+                          {member.account_status !== "REJETE" && (
+                            <Button
+                              variant="outline"
+                              disabled={!note.trim()}
+                              onClick={() =>
+                                ask("Rejeter ce compte ?", "La connexion sera bloquée définitivement, sauf nouvelle décision.", "Rejeter", () =>
+                                  perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "REJETE", note }, "Compte rejeté.", true),
+                                )
+                              }
+                              className="rounded-full border-red-200 text-red-700"
+                            >
+                              Rejeter
+                            </Button>
+                          )}
+                        </div>
+                        <NoteField value={note} onChange={(value) => setDrafts((current) => ({ ...current, [key]: value }))} placeholder="Motif requis pour suspendre ou rejeter" rows={1} />
                       </div>
                     </article>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
