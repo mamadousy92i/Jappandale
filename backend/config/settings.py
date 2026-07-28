@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "apps.backoffice",
     "apps.messaging",
     "apps.disputes",
+    "apps.scoring",
 ]
 
 MIDDLEWARE = [
