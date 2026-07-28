@@ -78,6 +78,7 @@ function Conversation({ thread }: { thread: MessageThreadListItem }) {
   const [reportingId, setReportingId] = useState<number | null>(null)
   const [reportedIds, setReportedIds] = useState<number[]>([])
   const bottomRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const load = () =>
     authFetch(`/messagerie/threads/${thread.id}/messages/`).then((data) => setMessages(data as ThreadMessage[]))
@@ -105,6 +106,7 @@ function Conversation({ thread }: { thread: MessageThreadListItem }) {
       await load()
     } finally {
       setSending(false)
+      textareaRef.current?.focus()
     }
   }
 
@@ -150,6 +152,7 @@ function Conversation({ thread }: { thread: MessageThreadListItem }) {
       </div>
       <div className="flex gap-2 border-t border-black/5 p-3">
         <textarea
+          ref={textareaRef}
           aria-label="Votre message"
           value={body}
           onChange={(event) => setBody(event.target.value)}
