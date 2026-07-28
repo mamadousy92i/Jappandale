@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
 
-type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts"
+type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts" | "message_reports"
 type Person = {
   id: number
   name: string
@@ -16,7 +16,7 @@ type Person = {
   phone: string
   role: string
 }
-type MetricKey = "pending_kyc" | "pending_campaigns" | "open_reports" | "open_support"
+type MetricKey = "pending_kyc" | "pending_campaigns" | "open_reports" | "open_support" | "open_message_reports"
 type CampaignStatus = "EN_MODERATION" | "PUBLIEE" | "SUSPENDUE"
 
 interface DashboardData {
@@ -100,6 +100,18 @@ interface DashboardData {
     gross_amount: number
     net_amount: number
   }>
+  message_reports: Array<{
+    id: number
+    campaign: { slug: string; title: string }
+    message_excerpt: string
+    reporter: Person
+    reason: string
+    details: string
+    status: string
+    admin_note: string
+    created_at: string
+    assigned_to: Person | null
+  }>
 }
 
 interface ManagedUser extends Person {
@@ -155,6 +167,7 @@ const tabItems: Array<{
   },
   { id: "users", label: "Utilisateurs", icon: UserCog },
   { id: "payouts", label: "Reversements", icon: Banknote },
+  { id: "message_reports", label: "Signalements messages", icon: ShieldAlert, count: "open_message_reports" },
 ]
 
 const PAGE_SIZE = 8
@@ -387,7 +400,7 @@ export default function AdminDashboardPage() {
   const currentItems = useMemo(() => {
     if (!data) return [] as unknown[]
     const term = search.trim().toLocaleLowerCase("fr")
-    let items: unknown[] = tab === "kyc" ? data.kyc : tab === "campaigns" ? data.campaigns : tab === "reports" ? data.reports : tab === "support" ? data.support : tab === "payouts" ? data.payouts : []
+    let items: unknown[] = tab === "kyc" ? data.kyc : tab === "campaigns" ? data.campaigns : tab === "reports" ? data.reports : tab === "support" ? data.support : tab === "payouts" ? data.payouts : tab === "message_reports" ? data.message_reports : []
     if (term) items = items.filter((item) => JSON.stringify(item).toLocaleLowerCase("fr").includes(term))
     if (statusFilter !== "TOUS") items = items.filter((item) => (item as { status?: string }).status === statusFilter)
     return items
@@ -485,7 +498,7 @@ export default function AdminDashboardPage() {
                 <option value="SUSPENDUE">Suspendues</option>
               </>
             )}
-            {tab === "reports" && (
+            {(tab === "reports" || tab === "message_reports") && (
               <>
                 <option value="NOUVEAU">Nouveaux</option>
                 <option value="EN_COURS">En cours</option>
@@ -825,6 +838,92 @@ export default function AdminDashboardPage() {
                   </div>
                 </article>
               ))
+            )}
+            <Pager page={localPage} pages={pages} onChange={setLocalPage} />
+          </section>
+        )}
+
+        {tab === "message_reports" && (
+          <section className="mt-6 space-y-4" aria-labelledby="message-report-title">
+            <div>
+              <h2 id="message-report-title" className="font-heading text-2xl font-bold text-ink">
+                Signalements de messages
+              </h2>
+              <p className="mt-1 text-sm text-ink-secondary">Attribuez, examinez et consignez la conclusion.</p>
+            </div>
+            {visibleItems.length === 0 ? (
+              <EmptyQueue label="signalement de message" />
+            ) : (
+              (visibleItems as DashboardData["message_reports"]).map((item) => {
+                const key = `message-report-${item.id}`
+                const note = drafts[key] ?? item.admin_note
+                return (
+                  <article key={item.id} className="rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                    <div className="flex flex-col justify-between gap-4 sm:flex-row">
+                      <div>
+                        <StatusPill status={item.status} label={item.reason} />
+                        <h3 className="mt-3 font-heading text-xl font-bold text-ink">{item.campaign.title}</h3>
+                        <p className="mt-3 max-w-3xl rounded-lg bg-surface-alt px-3 py-2 text-sm text-ink-secondary">« {item.message_excerpt} »</p>
+                        <p className="mt-3 max-w-3xl text-sm text-ink-secondary">{item.details}</p>
+                        <p className="mt-3 text-xs text-ink-muted">
+                          {item.reporter.email} · {formatDate(item.created_at)}
+                        </p>
+                      </div>
+                      <Assignment admins={data.admins} value={item.assigned_to} onChange={(adminId) => assign("message_report", item.id, adminId)} />
+                    </div>
+                    <div className="mt-5">
+                      <NoteField value={note} onChange={(value) => setDrafts((current) => ({ ...current, [key]: value }))} placeholder="Conclusion interne de l’examen" />
+                    </div>
+                    <div className="mt-3 flex flex-wrap justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          void perform(
+                            `/backoffice/message-reports/${item.id}/`,
+                            "PATCH",
+                            { status: "EN_COURS", admin_note: note, assigned_to: item.assigned_to?.id ?? user?.id },
+                            "Signalement pris en charge.",
+                          )
+                        }
+                        className="rounded-full"
+                      >
+                        Prendre en charge
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          ask("Classer ce signalement ?", "Le dossier quittera la file active sans action.", "Classer", () =>
+                            perform(
+                              `/backoffice/message-reports/${item.id}/`,
+                              "PATCH",
+                              { status: "CLASSE", admin_note: note, assigned_to: item.assigned_to?.id ?? user?.id },
+                              "Signalement classé.",
+                            ),
+                          )
+                        }
+                        className="rounded-full"
+                      >
+                        Classer
+                      </Button>
+                      <Button
+                        onClick={() =>
+                          ask("Marquer ce signalement résolu ?", "Assurez-vous que la conclusion est consignée dans la note interne.", "Résoudre", () =>
+                            perform(
+                              `/backoffice/message-reports/${item.id}/`,
+                              "PATCH",
+                              { status: "RESOLU", admin_note: note, assigned_to: item.assigned_to?.id ?? user?.id },
+                              "Signalement résolu.",
+                            ),
+                          )
+                        }
+                        className="rounded-full bg-ink text-white"
+                      >
+                        Résoudre
+                      </Button>
+                    </div>
+                  </article>
+                )
+              })
             )}
             <Pager page={localPage} pages={pages} onChange={setLocalPage} />
           </section>
