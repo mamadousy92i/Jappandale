@@ -29,6 +29,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("role", User.Role.ADMIN)
+        extra_fields.setdefault("account_status", User.AccountStatus.VALIDE)
         return self._create_user(email, password, **extra_fields)
 
 
@@ -44,6 +45,12 @@ class User(AbstractUser):
         NON_SOUMIS = "NON_SOUMIS", "Non soumis"
         EN_ATTENTE = "EN_ATTENTE", "En attente de validation"
         VALIDE = "VALIDE", "Validé"
+        REJETE = "REJETE", "Rejeté"
+
+    class AccountStatus(models.TextChoices):
+        EN_ATTENTE = "EN_ATTENTE", "En attente de validation"
+        VALIDE = "VALIDE", "Validé"
+        SUSPENDU = "SUSPENDU", "Suspendu"
         REJETE = "REJETE", "Rejeté"
 
     username = None
@@ -91,6 +98,25 @@ class User(AbstractUser):
         null=True,
         blank=True,
         related_name="kyc_reviews",
+    )
+
+    account_status = models.CharField(
+        "statut du compte",
+        max_length=20,
+        choices=AccountStatus.choices,
+        default=AccountStatus.EN_ATTENTE,
+    )
+    account_status_note = models.TextField("motif de la dernière décision", blank=True)
+    account_status_changed_at = models.DateTimeField(
+        "statut de compte modifié le", null=True, blank=True
+    )
+    account_status_changed_by = models.ForeignKey(
+        "self",
+        verbose_name="statut modifié par",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="account_status_changes",
     )
 
     USERNAME_FIELD = "email"
@@ -172,3 +198,39 @@ class AdminLoginOtp(models.Model):
             and self.expires_at > timezone.now()
             and self.attempts < 5
         )
+
+
+class UserAuditLog(models.Model):
+    """Journal append-only des actions administratives sur un compte utilisateur."""
+
+    class Action(models.TextChoices):
+        ROLE_CHANGED = "ROLE_CHANGED", "Rôle modifié"
+        ACCOUNT_STATUS_CHANGED = "ACCOUNT_STATUS_CHANGED", "Statut de compte modifié"
+
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="account_audit_logs",
+        verbose_name="utilisateur",
+    )
+    actor = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="performed_user_audits",
+        verbose_name="administrateur",
+    )
+    action = models.CharField("action", max_length=30, choices=Action.choices)
+    previous_value = models.CharField("valeur précédente", max_length=50, blank=True)
+    new_value = models.CharField("nouvelle valeur", max_length=50, blank=True)
+    note = models.TextField("note", blank=True)
+    created_at = models.DateTimeField("créé le", auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "journal d'audit utilisateur"
+        verbose_name_plural = "journaux d'audit utilisateur"
+
+    def __str__(self):
+        return f"{self.get_action_display()} — {self.user_id}"
