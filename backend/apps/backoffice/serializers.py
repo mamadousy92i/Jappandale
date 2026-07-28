@@ -77,3 +77,13 @@ class SupportReplySerializer(serializers.Serializer):
 class UserManagementSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=User.Role.choices, required=False)
     is_active = serializers.BooleanField(required=False)
+    account_status = serializers.ChoiceField(choices=User.AccountStatus.choices, required=False)
+    note = serializers.CharField(required=False, allow_blank=True, max_length=1500)
+
+    def validate(self, attrs):
+        if attrs.get("account_status") in (
+            User.AccountStatus.SUSPENDU,
+            User.AccountStatus.REJETE,
+        ) and not attrs.get("note", "").strip():
+            raise serializers.ValidationError({"note": "Un motif est obligatoire pour cette décision."})
+        return attrs

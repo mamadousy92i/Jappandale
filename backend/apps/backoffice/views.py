@@ -14,6 +14,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.accounts.models import UserAuditLog
 from apps.campaigns.models import Campaign, CampaignAuditLog, CampaignReport
 from apps.contributions.models import Contribution
 from apps.contributions.services import release_campaign_payout
@@ -698,6 +699,8 @@ class UserListView(APIView):
                         "is_active": user.is_active,
                         "email_verified": user.is_email_verified,
                         "kyc_status": user.kyc_status,
+                        "account_status": user.account_status,
+                        "account_status_display": user.get_account_status_display(),
                         "date_joined": user.date_joined,
                         "last_login": user.last_login,
                     }
@@ -710,13 +713,23 @@ class UserListView(APIView):
 class UserManagementView(APIView):
     permission_classes = [IsJappandaleAdmin]
 
+    @transaction.atomic
     def patch(self, request, user_id):
         serializer = UserManagementSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = get_object_or_404(User, pk=user_id)
+        new_account_status = serializer.validated_data.get("account_status")
         if user == request.user and serializer.validated_data.get("is_active") is False:
             return Response(
                 {"is_active": ["Vous ne pouvez pas désactiver votre propre compte."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if user == request.user and new_account_status in (
+            User.AccountStatus.SUSPENDU,
+            User.AccountStatus.REJETE,
+        ):
+            return Response(
+                {"account_status": ["Vous ne pouvez pas suspendre ou rejeter votre propre compte."]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if user == request.user and serializer.validated_data.get("role") not in (
@@ -727,13 +740,52 @@ class UserManagementView(APIView):
                 {"role": ["Vous ne pouvez pas retirer vos propres droits administrateur."]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        note = serializer.validated_data.get("note", "").strip()
         fields = []
-        for field in ("role", "is_active"):
-            if field in serializer.validated_data:
-                setattr(user, field, serializer.validated_data[field])
-                fields.append(field)
+        if "role" in serializer.validated_data:
+            new_role = serializer.validated_data["role"]
+            if new_role != user.role:
+                UserAuditLog.objects.create(
+                    user=user,
+                    actor=request.user,
+                    action=UserAuditLog.Action.ROLE_CHANGED,
+                    previous_value=user.role,
+                    new_value=new_role,
+                    note=note,
+                )
+            user.role = new_role
+            fields.append("role")
+        if "is_active" in serializer.validated_data:
+            user.is_active = serializer.validated_data["is_active"]
+            fields.append("is_active")
+        if new_account_status:
+            if new_account_status != user.account_status:
+                UserAuditLog.objects.create(
+                    user=user,
+                    actor=request.user,
+                    action=UserAuditLog.Action.ACCOUNT_STATUS_CHANGED,
+                    previous_value=user.account_status,
+                    new_value=new_account_status,
+                    note=note,
+                )
+            user.account_status = new_account_status
+            user.account_status_note = note
+            user.account_status_changed_at = timezone.now()
+            user.account_status_changed_by = request.user
+            user.is_active = new_account_status not in (
+                User.AccountStatus.SUSPENDU,
+                User.AccountStatus.REJETE,
+            )
+            fields += [
+                "account_status",
+                "account_status_note",
+                "account_status_changed_at",
+                "account_status_changed_by",
+                "is_active",
+            ]
         if fields:
-            user.save(update_fields=fields)
+            user.save(update_fields=list(dict.fromkeys(fields)))
         return Response({"detail": "Compte utilisateur mis à jour."})
 
 
