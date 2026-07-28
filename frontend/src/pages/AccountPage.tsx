@@ -1,10 +1,9 @@
 import { useState } from "react"
 import type { ChangeEvent, FormEvent, ReactNode } from "react"
-import { Camera, IdCard, LoaderCircle, MessageCircle, Trash2, UserRound, WalletCards } from "lucide-react"
+import { Camera, IdCard, LoaderCircle, Trash2, UserRound, WalletCards } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
 
 import { KycSection } from "@/components/account/KycSection"
-import { MessagesSection } from "@/components/account/MessagesSection"
 import { MyContributions } from "@/components/account/MyContributions"
 import { ReceivedContributions } from "@/components/account/ReceivedContributions"
 import { UserAvatar } from "@/components/account/UserAvatar"
@@ -21,7 +20,7 @@ const roleLabels: Record<Role, string> = {
   ADMIN: "Administrateur",
 }
 
-type TabKey = "profil" | "kyc" | "contributions" | "messages"
+type TabKey = "profil" | "kyc" | "contributions"
 
 function AccountPage() {
   const { user, authFetch, refreshUser } = useAuth()
@@ -46,9 +45,7 @@ function AccountPage() {
 
   const requestedTab = searchParams.get("onglet")
   const activeTab: TabKey =
-    requestedTab === "kyc" || requestedTab === "contributions" || requestedTab === "messages"
-      ? requestedTab
-      : "profil"
+    requestedTab === "kyc" || requestedTab === "contributions" ? requestedTab : "profil"
 
   const goToTab = (tab: TabKey) => {
     setSearchParams(tab === "profil" ? {} : { onglet: tab })
@@ -124,7 +121,6 @@ function AccountPage() {
     { key: "profil", label: "Informations personnelles", icon: UserRound },
     { key: "kyc", label: "Vérification d'identité", icon: IdCard, alert: user.kyc_status !== "VALIDE" },
     { key: "contributions", label: "Contributions", icon: WalletCards },
-    { key: "messages", label: "Messages", icon: MessageCircle },
   ]
 
   let tabContent: ReactNode
@@ -137,8 +133,6 @@ function AccountPage() {
         {user.role === "PORTEUR" && <ReceivedContributions />}
       </div>
     )
-  } else if (activeTab === "messages") {
-    tabContent = <MessagesSection />
   } else {
     tabContent = (
       <div className="space-y-6">

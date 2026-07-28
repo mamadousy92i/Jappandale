@@ -57,7 +57,7 @@ class ThreadListCreateView(generics.ListCreateAPIView):
                 f"{_display_name(request.user)} vous a envoyé un message à propos de "
                 f"« {campaign.title} »."
             ),
-            action_url="/compte?onglet=messages",
+            action_url="/messages",
         )
         return Response(
             ThreadSerializer(thread, context={"request": request}).data,
@@ -117,7 +117,7 @@ class ThreadMessagesView(generics.ListCreateAPIView):
                 f"{_display_name(request.user)} vous a envoyé un message à propos de "
                 f"« {thread.campaign.title} »."
             ),
-            action_url="/compte?onglet=messages",
+            action_url="/messages",
         )
         return Response(
             MessageSerializer(message, context={"request": request}).data,

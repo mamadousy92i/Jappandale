@@ -18,6 +18,7 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import HomePage from "@/pages/HomePage";
 import { LegalNoticePage, PrivacyPage, TermsPage } from "@/pages/LegalPages";
 import LoginPage from "@/pages/LoginPage";
+import MessagesPage from "@/pages/MessagesPage";
 import NotificationsPage from "@/pages/NotificationsPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ReportCampaignPage from "@/pages/ReportCampaignPage";
@@ -112,6 +113,14 @@ function App() {
           element={
             <RequireAuth>
               <NotificationsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <RequireAuth>
+              <MessagesPage />
             </RequireAuth>
           }
         />

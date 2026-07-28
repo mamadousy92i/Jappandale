@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageCircle,
   UserRound,
   X,
 } from "lucide-react";
@@ -14,7 +15,7 @@ import {
 import { UserAvatar } from "@/components/account/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
-import type { Role } from "@/lib/types";
+import type { MessageThreadListItem, Role } from "@/lib/types";
 
 const roleLabels: Record<Role, string> = {
   PORTEUR: "Porteur de projet",
@@ -29,6 +30,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const closeMenus = () => {
     setMenuOpen(false);
     setProfileOpen(false);
@@ -81,6 +83,20 @@ export function Header() {
     authFetch("/notifications/unread-count/")
       .then((data) => setUnreadCount((data as { count: number }).count))
       .catch(() => setUnreadCount(0));
+  }, [authFetch, user]);
+
+  useEffect(() => {
+    if (!user) {
+      setUnreadMessages(0);
+      return;
+    }
+    authFetch("/messagerie/threads/")
+      .then((data) =>
+        setUnreadMessages(
+          (data as MessageThreadListItem[]).reduce((total, thread) => total + thread.unread_count, 0),
+        ),
+      )
+      .catch(() => setUnreadMessages(0));
   }, [authFetch, user]);
 
   return (
@@ -141,6 +157,18 @@ export function Header() {
         <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
           {user ? (
             <>
+              <Link
+                to="/messages"
+                aria-label={`${unreadMessages} message(s) non lu(s)`}
+                className="relative flex size-10 items-center justify-center rounded-full border border-black/10 text-ink-secondary transition hover:border-gold hover:bg-gold/10 hover:text-ink"
+              >
+                <MessageCircle className="size-4.5" />
+                {unreadMessages > 0 && (
+                  <span className="absolute -top-1 -right-1 flex min-w-5 items-center justify-center rounded-full bg-gold-dark px-1 text-[10px] font-bold text-white">
+                    {Math.min(unreadMessages, 99)}
+                  </span>
+                )}
+              </Link>
               <Link
                 to="/notifications"
                 aria-label={`${unreadCount} notification(s) non lue(s)`}
@@ -339,6 +367,18 @@ export function Header() {
                     Mes campagnes
                   </Link>
                 )}
+                <Link
+                  to="/messages"
+                  onClick={closeMenus}
+                  className="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt"
+                >
+                  <span>Messages</span>
+                  {unreadMessages > 0 && (
+                    <span className="rounded-full bg-gold-dark px-2 py-0.5 text-xs font-bold text-white">
+                      {unreadMessages}
+                    </span>
+                  )}
+                </Link>
                 <Link
                   to="/notifications"
                   onClick={closeMenus}

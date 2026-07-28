@@ -97,7 +97,7 @@ function ContactOwnerCard({ campaign }: { campaign: CampaignDetail }) {
     return (
       <p className="mt-4 text-sm text-emerald-700">
         Message envoyé. Retrouvez la conversation dans{" "}
-        <Link to="/compte?onglet=messages" className="font-semibold underline">
+        <Link to="/messages" className="font-semibold underline">
           votre espace Messages
         </Link>
         .
