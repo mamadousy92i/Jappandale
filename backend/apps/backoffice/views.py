@@ -21,6 +21,7 @@ from apps.core.models import SupportReply, SupportRequest
 from apps.core.email import send_branded_email
 from apps.kyc.models import KycAuditLog, KycDocument
 from apps.kyc.services import missing_required_documents
+from apps.messaging.models import MessageReport
 from apps.notifications.models import Notification
 from apps.notifications.services import notify_user
 
@@ -29,6 +30,7 @@ from .serializers import (
     CampaignDecisionSerializer,
     CampaignWorkflowSerializer,
     KycDecisionSerializer,
+    MessageReportReviewSerializer,
     ReportReviewSerializer,
     SupportReplySerializer,
     SupportReviewSerializer,
@@ -90,6 +92,13 @@ class DashboardView(APIView):
             .prefetch_related("replies__sender")
             .order_by("created_at")[:30]
         )
+        open_message_reports = (
+            MessageReport.objects.exclude(
+                status__in=[MessageReport.Status.RESOLU, MessageReport.Status.CLASSE]
+            )
+            .select_related("message__thread__campaign", "reporter", "assigned_to")
+            .order_by("created_at")[:30]
+        )
         recent_contributions = confirmed.select_related("campaign", "contributor")[:10]
         en_sequestre = confirmed.filter(payout_status=Contribution.PayoutStatus.EN_SEQUESTRE)
         reversees = confirmed.filter(payout_status=Contribution.PayoutStatus.REVERSEE)
@@ -117,6 +126,9 @@ class DashboardView(APIView):
                     ).count(),
                     "open_support": SupportRequest.objects.exclude(
                         status=SupportRequest.Status.RESOLUE
+                    ).count(),
+                    "open_message_reports": MessageReport.objects.exclude(
+                        status__in=[MessageReport.Status.RESOLU, MessageReport.Status.CLASSE]
                     ).count(),
                     "published_campaigns": Campaign.objects.filter(
                         status=Campaign.Status.PUBLIEE
@@ -196,6 +208,24 @@ class DashboardView(APIView):
                         "assigned_to": _person(report.assigned_to) if report.assigned_to else None,
                     }
                     for report in open_reports
+                ],
+                "message_reports": [
+                    {
+                        "id": report.id,
+                        "campaign": {
+                            "slug": report.message.thread.campaign.slug,
+                            "title": report.message.thread.campaign.title,
+                        },
+                        "message_excerpt": report.message.body[:200],
+                        "reporter": _person(report.reporter),
+                        "reason": report.get_reason_display(),
+                        "details": report.details,
+                        "status": report.status,
+                        "admin_note": report.admin_note,
+                        "created_at": report.created_at,
+                        "assigned_to": _person(report.assigned_to) if report.assigned_to else None,
+                    }
+                    for report in open_message_reports
                 ],
                 "support": [
                     {
@@ -401,6 +431,21 @@ class ReportReviewView(APIView):
         return Response({"detail": "Signalement mis à jour."})
 
 
+class MessageReportReviewView(APIView):
+    permission_classes = [IsJappandaleAdmin]
+
+    def patch(self, request, report_id):
+        serializer = MessageReportReviewSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        report = get_object_or_404(MessageReport, pk=report_id)
+        report.status = serializer.validated_data["status"]
+        report.admin_note = serializer.validated_data.get("admin_note", "").strip()
+        if "assigned_to" in serializer.validated_data:
+            report.assigned_to = _admin_or_none(serializer.validated_data["assigned_to"])
+        report.save(update_fields=["status", "admin_note", "assigned_to", "updated_at"])
+        return Response({"detail": "Signalement mis à jour."})
+
+
 class SupportReviewView(APIView):
     permission_classes = [IsJappandaleAdmin]
 
@@ -430,6 +475,7 @@ class WorkAssignmentView(APIView):
             "campaign": (Campaign, "moderation_assigned_to"),
             "report": (CampaignReport, "assigned_to"),
             "support": (SupportRequest, "assigned_to"),
+            "message_report": (MessageReport, "assigned_to"),
         }
         model, field = mapping[kind]
         obj = get_object_or_404(model, pk=object_id)
