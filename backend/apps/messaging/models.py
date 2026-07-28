@@ -59,3 +59,54 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.sender.email} — {self.created_at:%d/%m/%Y %H:%M}"
+
+
+class MessageReport(models.Model):
+    """Signalement traçable d'un message par un participant du fil."""
+
+    class Reason(models.TextChoices):
+        SPAM = "SPAM", "Spam ou sollicitation"
+        HARCELEMENT = "HARCELEMENT", "Harcèlement"
+        CONTENU_INAPPROPRIE = "CONTENU_INAPPROPRIE", "Contenu inapproprié"
+        TENTATIVE_CONTOURNEMENT = "TENTATIVE_CONTOURNEMENT", "Tentative de contournement de la plateforme"
+        AUTRE = "AUTRE", "Autre motif"
+
+    class Status(models.TextChoices):
+        NOUVEAU = "NOUVEAU", "Nouveau"
+        EN_COURS = "EN_COURS", "En cours d’examen"
+        RESOLU = "RESOLU", "Résolu"
+        CLASSE = "CLASSE", "Classé sans suite"
+
+    message = models.ForeignKey(
+        Message, on_delete=models.CASCADE, related_name="reports", verbose_name="message"
+    )
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="message_reports",
+        verbose_name="auteur du signalement",
+    )
+    reason = models.CharField("motif", max_length=30, choices=Reason.choices)
+    details = models.TextField("précisions", max_length=1500)
+    status = models.CharField(
+        "statut", max_length=20, choices=Status.choices, default=Status.NOUVEAU
+    )
+    admin_note = models.TextField("note interne", blank=True)
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_message_reports",
+        verbose_name="attribué à",
+    )
+    created_at = models.DateTimeField("créé le", auto_now_add=True)
+    updated_at = models.DateTimeField("mis à jour le", auto_now=True)
+
+    class Meta:
+        verbose_name = "signalement de message"
+        verbose_name_plural = "signalements de messages"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Signalement — message #{self.message_id}"

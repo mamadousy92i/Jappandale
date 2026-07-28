@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.campaigns.models import Campaign
 
-from .models import Message, MessageThread
+from .models import Message, MessageReport, MessageThread
 
 
 def _display_name(user):
@@ -93,3 +93,8 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class MessageCreateSerializer(serializers.Serializer):
     body = serializers.CharField(max_length=3000)
+
+
+class MessageReportCreateSerializer(serializers.Serializer):
+    reason = serializers.ChoiceField(choices=MessageReport.Reason.choices)
+    details = serializers.CharField(max_length=1500)

@@ -9,9 +9,10 @@ from apps.contributions.permissions import IsKycValidated
 from apps.notifications.models import Notification
 from apps.notifications.services import notify_user
 
-from .models import Message, MessageThread
+from .models import Message, MessageReport, MessageThread
 from .serializers import (
     MessageCreateSerializer,
+    MessageReportCreateSerializer,
     MessageSerializer,
     ThreadCreateSerializer,
     ThreadSerializer,
@@ -122,3 +123,26 @@ class ThreadMessagesView(generics.ListCreateAPIView):
             MessageSerializer(message, context={"request": request}).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class MessageReportCreateView(generics.CreateAPIView):
+    serializer_class = MessageReportCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        message = get_object_or_404(
+            Message.objects.select_related("thread__campaign", "thread__other_user"),
+            pk=self.kwargs["message_id"],
+        )
+        thread = message.thread
+        if request.user.id not in (thread.campaign.owner_id, thread.other_user_id):
+            raise Http404
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        MessageReport.objects.create(
+            message=message,
+            reporter=request.user,
+            reason=serializer.validated_data["reason"],
+            details=serializer.validated_data["details"],
+        )
+        return Response({"detail": "Signalement enregistré."}, status=status.HTTP_201_CREATED)
