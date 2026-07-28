@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
 
-type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts" | "message_reports"
+type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts" | "message_reports" | "disputes"
 type Person = {
   id: number
   name: string
@@ -16,7 +16,7 @@ type Person = {
   phone: string
   role: string
 }
-type MetricKey = "pending_kyc" | "pending_campaigns" | "open_reports" | "open_support" | "open_message_reports"
+type MetricKey = "pending_kyc" | "pending_campaigns" | "open_reports" | "open_support" | "open_message_reports" | "open_disputes"
 type CampaignStatus = "EN_MODERATION" | "PUBLIEE" | "SUSPENDUE"
 
 interface DashboardData {
@@ -112,6 +112,19 @@ interface DashboardData {
     created_at: string
     assigned_to: Person | null
   }>
+  disputes: Array<{
+    id: number
+    contribution_reference: string
+    campaign: { slug: string; title: string }
+    amount: number
+    reporter: Person
+    reason: string
+    details: string
+    status: string
+    admin_note: string
+    created_at: string
+    assigned_to: Person | null
+  }>
 }
 
 interface ManagedUser extends Person {
@@ -168,6 +181,7 @@ const tabItems: Array<{
   { id: "users", label: "Utilisateurs", icon: UserCog },
   { id: "payouts", label: "Reversements", icon: Banknote },
   { id: "message_reports", label: "Signalements messages", icon: ShieldAlert, count: "open_message_reports" },
+  { id: "disputes", label: "Litiges", icon: ShieldAlert, count: "open_disputes" },
 ]
 
 const PAGE_SIZE = 8
@@ -400,7 +414,7 @@ export default function AdminDashboardPage() {
   const currentItems = useMemo(() => {
     if (!data) return [] as unknown[]
     const term = search.trim().toLocaleLowerCase("fr")
-    let items: unknown[] = tab === "kyc" ? data.kyc : tab === "campaigns" ? data.campaigns : tab === "reports" ? data.reports : tab === "support" ? data.support : tab === "payouts" ? data.payouts : tab === "message_reports" ? data.message_reports : []
+    let items: unknown[] = tab === "kyc" ? data.kyc : tab === "campaigns" ? data.campaigns : tab === "reports" ? data.reports : tab === "support" ? data.support : tab === "payouts" ? data.payouts : tab === "message_reports" ? data.message_reports : tab === "disputes" ? data.disputes : []
     if (term) items = items.filter((item) => JSON.stringify(item).toLocaleLowerCase("fr").includes(term))
     if (statusFilter !== "TOUS") items = items.filter((item) => (item as { status?: string }).status === statusFilter)
     return items
@@ -919,6 +933,97 @@ export default function AdminDashboardPage() {
                         className="rounded-full bg-ink text-white"
                       >
                         Résoudre
+                      </Button>
+                    </div>
+                  </article>
+                )
+              })
+            )}
+            <Pager page={localPage} pages={pages} onChange={setLocalPage} />
+          </section>
+        )}
+
+        {tab === "disputes" && (
+          <section className="mt-6 space-y-4" aria-labelledby="dispute-title">
+            <div>
+              <h2 id="dispute-title" className="font-heading text-2xl font-bold text-ink">
+                Litiges
+              </h2>
+              <p className="mt-1 text-sm text-ink-secondary">Examinez et tranchez les litiges ouverts par les financeurs.</p>
+            </div>
+            {visibleItems.length === 0 ? (
+              <EmptyQueue label="litige" />
+            ) : (
+              (visibleItems as DashboardData["disputes"]).map((item) => {
+                const key = `dispute-${item.id}`
+                const note = drafts[key] ?? item.admin_note
+                return (
+                  <article key={item.id} className="rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                    <div className="flex flex-col justify-between gap-4 sm:flex-row">
+                      <div>
+                        <StatusPill status={item.status} label={item.reason} />
+                        <h3 className="mt-3 font-heading text-xl font-bold text-ink">{item.campaign.title}</h3>
+                        <p className="mt-2 text-sm text-ink-secondary">Contribution de {formatFcfa(item.amount)}</p>
+                        <p className="mt-3 max-w-3xl text-sm text-ink-secondary">{item.details}</p>
+                        <p className="mt-3 text-xs text-ink-muted">
+                          {item.reporter.email} · {formatDate(item.created_at)}
+                        </p>
+                      </div>
+                      <Assignment admins={data.admins} value={item.assigned_to} onChange={(adminId) => assign("dispute", item.id, adminId)} />
+                    </div>
+                    <div className="mt-5">
+                      <NoteField value={note} onChange={(value) => setDrafts((current) => ({ ...current, [key]: value }))} placeholder="Conclusion interne de l’examen" />
+                    </div>
+                    <div className="mt-3 flex flex-wrap justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          void perform(
+                            `/backoffice/disputes/${item.id}/`,
+                            "PATCH",
+                            { status: "EN_EXAMEN", admin_note: note, assigned_to: item.assigned_to?.id ?? user?.id },
+                            "Litige pris en charge.",
+                          )
+                        }
+                        className="rounded-full"
+                      >
+                        Prendre en charge
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          ask("Rejeter ce litige ?", "Aucune action ne sera prise sur la contribution.", "Rejeter", () =>
+                            perform(
+                              `/backoffice/disputes/${item.id}/`,
+                              "PATCH",
+                              { status: "REJETE", admin_note: note, assigned_to: item.assigned_to?.id ?? user?.id },
+                              "Litige rejeté.",
+                            ),
+                          )
+                        }
+                        className="rounded-full border-red-200 text-red-700"
+                      >
+                        Rejeter
+                      </Button>
+                      <Button
+                        onClick={() =>
+                          ask(
+                            "Accepter ce litige ?",
+                            "La contribution sera marquée remboursée, même si les fonds ont déjà été reversés au porteur.",
+                            "Accepter",
+                            () =>
+                              perform(
+                                `/backoffice/disputes/${item.id}/`,
+                                "PATCH",
+                                { status: "ACCEPTE", admin_note: note, assigned_to: item.assigned_to?.id ?? user?.id },
+                                "Litige accepté.",
+                              ),
+                            true,
+                          )
+                        }
+                        className="rounded-full bg-emerald-600 text-white"
+                      >
+                        Accepter
                       </Button>
                     </div>
                   </article>
