@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "apps.messaging",
     "apps.disputes",
     "apps.scoring",
+    "apps.financial_passport",
 ]
 
 MIDDLEWARE = [
