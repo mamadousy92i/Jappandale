@@ -27,6 +27,7 @@ import type { LucideIcon } from "lucide-react"
 import { ProgressBar } from "@/components/campaigns/CampaignCard"
 import { Button } from "@/components/ui/button"
 import { ApiError, apiFetch } from "@/lib/api"
+import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
 import type { CampaignCategory, CampaignDetail } from "@/lib/types"
 
@@ -54,6 +55,73 @@ function formatDate(iso: string): string {
 function ownerName(owner: CampaignDetail["owner"]): string {
   const initial = owner.last_name ? ` ${owner.last_name.charAt(0).toUpperCase()}.` : ""
   return `${owner.first_name}${initial}`
+}
+
+function ContactOwnerCard({ campaign }: { campaign: CampaignDetail }) {
+  const { user, authFetch } = useAuth()
+  const [body, setBody] = useState("")
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  if (!user) {
+    return (
+      <p className="mt-4 text-sm text-ink-secondary">
+        <Link to="/connexion" className="font-semibold text-gold-dark hover:underline">
+          Connectez-vous
+        </Link>{" "}
+        pour contacter le porteur de ce projet.
+      </p>
+    )
+  }
+
+  const send = async () => {
+    if (!body.trim()) return
+    setSending(true)
+    setError(null)
+    try {
+      await authFetch("/messagerie/threads/", {
+        method: "POST",
+        body: JSON.stringify({ campaign_slug: campaign.slug, body }),
+      })
+      setSent(true)
+      setBody("")
+    } catch {
+      setError("Impossible d’envoyer ce message. Vérifiez votre identité (KYC) et réessayez.")
+    } finally {
+      setSending(false)
+    }
+  }
+
+  if (sent) {
+    return (
+      <p className="mt-4 text-sm text-emerald-700">
+        Message envoyé. Retrouvez la conversation dans{" "}
+        <Link to="/compte?onglet=messages" className="font-semibold underline">
+          votre espace Messages
+        </Link>
+        .
+      </p>
+    )
+  }
+
+  return (
+    <div className="mt-4 space-y-2">
+      {error && <p className="text-sm text-red-700">{error}</p>}
+      <textarea
+        aria-label="Votre message au porteur"
+        value={body}
+        onChange={(event) => setBody(event.target.value)}
+        rows={3}
+        maxLength={3000}
+        placeholder="Posez votre question au porteur du projet…"
+        className="w-full resize-y rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-gold-dark/30"
+      />
+      <Button type="button" disabled={sending || !body.trim()} onClick={() => void send()} className="rounded-full bg-gold px-5 text-ink hover:bg-gold-light">
+        {sending ? "Envoi…" : "Contacter le porteur"}
+      </Button>
+    </div>
+  )
 }
 
 function contentLines(content: string): string[] {
@@ -401,7 +469,13 @@ function CampaignDetailPage() {
             </p>
           </section>
 
-          {(campaign.owner.organization_name || campaign.owner.bio) && <section className="mt-10 rounded-[20px] border border-black/5 bg-surface p-6 shadow-sm" aria-labelledby="porteur-profil"><p className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">Le porteur du projet</p><h2 id="porteur-profil" className="mt-3 font-heading text-2xl font-bold text-ink">{campaign.owner.organization_name || ownerName(campaign.owner)}</h2>{campaign.owner.city && <p className="mt-1 text-sm text-ink-muted">{campaign.owner.city}</p>}{campaign.owner.bio && <p className="mt-4 leading-relaxed text-ink-secondary">{campaign.owner.bio}</p>}</section>}
+          <section className="mt-10 rounded-[20px] border border-black/5 bg-surface p-6 shadow-sm" aria-labelledby="porteur-profil">
+            <p className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">Le porteur du projet</p>
+            <h2 id="porteur-profil" className="mt-3 font-heading text-2xl font-bold text-ink">{campaign.owner.organization_name || ownerName(campaign.owner)}</h2>
+            {campaign.owner.city && <p className="mt-1 text-sm text-ink-muted">{campaign.owner.city}</p>}
+            {campaign.owner.bio && <p className="mt-4 leading-relaxed text-ink-secondary">{campaign.owner.bio}</p>}
+            <ContactOwnerCard campaign={campaign} />
+          </section>
 
           {campaign.recent_contributors.length > 0 && (
             <section className="mt-12" aria-labelledby="contributeurs">
