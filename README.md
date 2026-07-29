@@ -38,10 +38,7 @@ cd backend
 python manage.py shell < scripts/seed_campaigns.py
 ```
 
-L’espace client d’administration est disponible sur
-`http://localhost:5173/administration` avec le compte local
-`admin@jappandale.sn` et le mot de passe `MotDePasse123!`.
-Ce compte est réservé au développement et ne doit pas être créé en production.
+
 
 ### Tests
 
