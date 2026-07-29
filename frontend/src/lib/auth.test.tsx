@@ -24,6 +24,7 @@ const member: User = {
   city: "Dakar",
   bio: "",
   is_diaspora: false,
+  country: "Sénégal",
   kyc_status: "VALIDE",
 };
 

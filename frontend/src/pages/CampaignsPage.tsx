@@ -92,7 +92,7 @@ function CampaignsPage() {
 
   return (
     <section>
-      <div className="mx-auto max-w-6xl px-6 pt-12 pb-20 sm:pt-16 sm:pb-24">
+      <div className="mx-auto max-w-6xl px-4 pt-12 pb-20 sm:px-6 sm:pt-16 sm:pb-24">
         {/* En-tête de section */}
         <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
           <div className="max-w-3xl">

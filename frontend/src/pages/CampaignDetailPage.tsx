@@ -234,7 +234,7 @@ function CampaignDetailPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl px-6 py-14" aria-busy="true">
+      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6" aria-busy="true">
         <div className="aspect-[21/9] w-full animate-pulse rounded-[28px] bg-black/[0.06]" />
         <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_24rem]">
           <div className="space-y-4">
@@ -252,7 +252,7 @@ function CampaignDetailPage() {
 
   if (!campaign) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center px-6 py-24 text-center sm:py-32">
+      <div className="mx-auto flex max-w-md flex-col items-center px-4 py-24 text-center sm:px-6 sm:py-32">
         <span
           aria-hidden="true"
           className="flex size-12 items-center justify-center rounded-2xl bg-gold/15 text-gold-dark"
@@ -284,7 +284,7 @@ function CampaignDetailPage() {
   const Icon = categoryIcons[campaign.category]
 
   return (
-    <article className="mx-auto max-w-6xl px-6 pt-8 pb-20 sm:pt-10 sm:pb-24">
+    <article className="mx-auto max-w-6xl px-4 pt-8 pb-20 sm:px-6 sm:pt-10 sm:pb-24">
       {/* Fil de retour */}
       <Link
         to="/campagnes"

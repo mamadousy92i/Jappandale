@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 
 function LegalLayout({ eyebrow, title, intro, children }: { eyebrow: string; title: string; intro: string; children: ReactNode }) {
   return (
-    <article className="mx-auto max-w-4xl px-6 py-16 sm:py-24">
+    <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
       <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">{eyebrow}</p>
       <h1 className="mt-4 font-heading text-4xl font-bold text-ink sm:text-5xl">{title}</h1>
       <p className="mt-6 max-w-3xl text-lg leading-relaxed text-ink-secondary">{intro}</p>

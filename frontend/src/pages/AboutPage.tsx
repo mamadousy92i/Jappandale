@@ -32,7 +32,7 @@ export default function AboutPage() {
   return (
     <>
       <section className="overflow-hidden border-b border-black/5 bg-[#fbfaf6]">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-14 sm:py-20 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:py-24">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:py-24">
           <div>
             <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">À propos de Jappandale</p>
             <h1 className="mt-5 max-w-2xl font-heading text-4xl leading-[1.08] font-bold text-ink sm:text-5xl lg:text-6xl">
@@ -60,7 +60,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-12 px-6 py-16 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+      <section className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
         <div className="lg:sticky lg:top-28">
           <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">Pourquoi Jappandale</p>
           <h2 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">Un constat local, une réponse collective</h2>
@@ -73,7 +73,7 @@ export default function AboutPage() {
       </section>
 
       <section className="border-y border-black/5 bg-ink text-white">
-        <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold tracking-[4px] text-gold uppercase">Notre mission</p>
             <h2 className="mt-4 font-heading text-3xl font-bold sm:text-4xl">Créer un financement plus lisible, plus proche et mieux suivi</h2>
@@ -93,7 +93,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:py-20 lg:grid-cols-2 lg:items-center">
+      <section className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center">
         <img src="/photos/marche.jpg" alt="Activité économique dans un marché sénégalais" width={1200} height={900} loading="lazy" className="aspect-[4/3] w-full rounded-[24px] object-cover shadow-[0_20px_60px_-35px_rgba(0,0,0,0.4)]" />
         <div className="lg:pl-8">
           <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">Notre ancrage</p>
@@ -104,7 +104,7 @@ export default function AboutPage() {
       </section>
 
       <section className="border-y border-black/5 bg-[#fbfaf6]">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
             <UsersRound aria-hidden="true" className="size-9 text-gold-dark" />
             <h2 className="mt-5 font-heading text-3xl font-bold text-ink sm:text-4xl">La confiance se construit avec des preuves</h2>
@@ -121,7 +121,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-6 py-16 text-center sm:py-24">
+      <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-24">
         <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">Participer</p>
         <h2 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">Un projet à faire grandir ou une initiative à soutenir ?</h2>
         <p className="mx-auto mt-4 max-w-2xl leading-relaxed text-ink-secondary">Rejoignez Jappandale pour présenter votre projet, découvrir les campagnes publiées et contribuer à leur progression.</p>

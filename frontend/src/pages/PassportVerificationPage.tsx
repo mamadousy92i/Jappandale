@@ -23,7 +23,7 @@ export default function PassportVerificationPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-2xl px-6 py-20" aria-busy="true">
+      <div className="mx-auto max-w-2xl px-4 py-20 sm:px-6" aria-busy="true">
         <div className="h-64 animate-pulse rounded-[24px] bg-black/[0.05]" />
       </div>
     )
@@ -31,7 +31,7 @@ export default function PassportVerificationPage() {
 
   if (!verification) {
     return (
-      <div className="mx-auto flex max-w-md flex-col items-center px-6 py-24 text-center">
+      <div className="mx-auto flex max-w-md flex-col items-center px-4 py-24 text-center sm:px-6">
         <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
           <ShieldAlert className="size-6" />
         </span>
@@ -51,7 +51,7 @@ export default function PassportVerificationPage() {
   const { resume } = verification
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-16 sm:py-20">
+    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-20">
       <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
         <BadgeCheck className="size-6 shrink-0 text-emerald-600" />
         <div>

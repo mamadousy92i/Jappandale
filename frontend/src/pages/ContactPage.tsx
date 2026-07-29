@@ -35,7 +35,7 @@ export default function ContactPage() {
   }
 
   return (
-    <section className="mx-auto grid max-w-5xl gap-12 px-6 py-16 sm:py-24 lg:grid-cols-[0.8fr_1.2fr]">
+    <section className="mx-auto grid max-w-5xl gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[0.8fr_1.2fr]">
       <div>
         <Headphones className="size-8 text-gold-dark" />
         <p className="mt-6 text-xs font-semibold tracking-[4px] text-gold-dark uppercase">Assistance</p>

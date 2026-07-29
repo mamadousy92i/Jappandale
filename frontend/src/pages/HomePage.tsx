@@ -97,7 +97,7 @@ function HomePage() {
   return (
     <>
       <section className="border-b border-black/5 bg-[#fbfaf6]">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-24">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-24">
           <div>
             <p className="text-sm font-semibold text-gold-dark">
               Plateforme de projets sénégalais
@@ -151,7 +151,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-gold-dark">
@@ -192,7 +192,7 @@ function HomePage() {
         id="comment-ca-marche"
         className="scroll-mt-24 border-y border-black/5 bg-[#fbfaf6]"
       >
-        <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
               Comment ça marche
@@ -327,7 +327,7 @@ function HomePage() {
       )}
 
       <section className="border-y border-black/5 bg-ink text-white">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-16 sm:py-20 lg:grid-cols-[0.8fr_1.2fr]">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <ShieldCheck aria-hidden="true" className="size-9 text-gold" />
             <h2 className="mt-5 font-heading text-3xl font-bold sm:text-4xl">
@@ -363,7 +363,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-6xl gap-8 px-6 py-16 sm:py-20 lg:grid-cols-2">
+      <section className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2">
         <article className="border-l-4 border-gold pl-6 sm:pl-8">
           <Check aria-hidden="true" className="size-6 text-gold-dark" />
           <h2 className="mt-4 font-heading text-2xl font-bold text-ink">

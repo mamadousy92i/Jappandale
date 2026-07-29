@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 export function Footer() {
   return (
     <footer className="border-t border-black/5 bg-surface-alt">
-      <div className="mx-auto max-w-6xl px-6 py-14">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
         <div className="flex flex-col items-start justify-between gap-10 sm:flex-row sm:items-center">
           <div className="max-w-sm space-y-3">
             <p className="flex items-center gap-2.5 font-heading text-2xl font-bold text-ink">
@@ -26,7 +26,7 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-10 text-sm sm:grid-cols-3">
+          <div className="grid w-full gap-8 text-sm min-[430px]:grid-cols-2 sm:w-auto sm:grid-cols-3 sm:gap-10">
           <nav aria-label="Comprendre" className="flex flex-col gap-2">
             <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">Comprendre</span>
             <Link to="/#comment-ca-marche" className="w-fit text-ink-secondary hover:text-gold-dark">Comment ça marche</Link>

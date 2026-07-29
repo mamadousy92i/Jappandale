@@ -282,7 +282,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
       data-testid="create-campaign-form"
       onSubmit={handleSubmit}
       noValidate
-      className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-10 w-full rounded-[28px] border border-black/5 bg-surface p-8 shadow-[0_18px_60px_-16px_rgba(0,0,0,0.12)] delay-150 duration-700 motion-reduce:animate-none sm:p-12 lg:p-14"
+      className="animate-in fade-in slide-in-from-bottom-3 fill-mode-backwards mt-10 w-full rounded-[28px] border border-black/5 bg-surface p-4 shadow-[0_18px_60px_-16px_rgba(0,0,0,0.12)] delay-150 duration-700 motion-reduce:animate-none sm:p-12 lg:p-14"
     >
       {globalError && (
         <p
@@ -493,7 +493,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
                       items.filter((_, itemIndex) => itemIndex !== index),
                     )
                   }
-                  className="flex size-14 items-center justify-center rounded-xl border border-black/10 text-ink-muted transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30"
+                  className="flex h-12 w-full items-center justify-center rounded-xl border border-black/10 text-ink-muted transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30 sm:size-14"
                   aria-label={`Supprimer la dépense ${index + 1}`}
                 >
                   <Trash2 aria-hidden="true" className="size-5" />
@@ -567,7 +567,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
                       items.filter((_, itemIndex) => itemIndex !== index),
                     )
                   }
-                  className="flex size-14 items-center justify-center rounded-xl border border-black/10 text-ink-muted transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30"
+                  className="flex h-12 w-full items-center justify-center rounded-xl border border-black/10 text-ink-muted transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30 sm:size-14"
                   aria-label={`Supprimer l’étape ${index + 1}`}
                 >
                   <Trash2 aria-hidden="true" className="size-5" />

@@ -46,7 +46,7 @@ export default function CreateCampaignUpdatePage() {
   }
 
   return (
-    <section className="mx-auto max-w-2xl px-6 py-14 sm:py-20">
+    <section className="mx-auto max-w-2xl px-4 py-14 sm:px-6 sm:py-20">
       <Link to="/compte" className="inline-flex items-center gap-2 text-sm font-medium text-ink-secondary hover:text-ink"><ArrowLeft className="size-4" />Retour à mon espace</Link>
       <div className="mt-7 rounded-[24px] border border-black/5 bg-surface p-7 shadow-sm sm:p-10">
         <span className="flex size-11 items-center justify-center rounded-2xl bg-gold/15 text-gold-dark"><Newspaper className="size-5" /></span>

@@ -98,15 +98,15 @@ export default function ContributionPage() {
     }
   }
 
-  if (loading) return <div className="mx-auto max-w-2xl px-6 py-24 text-center text-ink-muted">Chargement…</div>
+  if (loading) return <div className="mx-auto max-w-2xl px-4 py-24 text-center text-ink-muted sm:px-6">Chargement…</div>
 
   if (!campaign) {
-    return <div className="mx-auto max-w-2xl px-6 py-24 text-center"><p className="text-red-700">{error}</p><Link className="mt-6 inline-block font-semibold text-gold-dark" to="/campagnes">Retour aux campagnes</Link></div>
+    return <div className="mx-auto max-w-2xl px-4 py-24 text-center sm:px-6"><p className="text-red-700">{error}</p><Link className="mt-6 inline-block font-semibold text-gold-dark" to="/campagnes">Retour aux campagnes</Link></div>
   }
 
   if (user?.kyc_status !== "VALIDE") {
     return (
-      <section className="mx-auto max-w-2xl px-6 py-20">
+      <section className="mx-auto max-w-2xl px-4 py-20 sm:px-6">
         <TriangleAlert className="size-10 text-gold-dark" />
         <h1 className="mt-5 font-heading text-3xl font-bold text-ink">Vérification d’identité requise</h1>
         <p className="mt-3 leading-relaxed text-ink-secondary">Votre identité doit être validée avant de contribuer. Retrouvez les documents demandés et le statut de votre dossier dans votre compte.</p>
@@ -118,9 +118,9 @@ export default function ContributionPage() {
   const finished = contribution && contribution.status !== "INITIEE"
 
   return (
-    <section className="mx-auto max-w-2xl px-6 py-12 sm:py-20">
+    <section className="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-20">
       <Link to={`/campagnes/${campaign.slug}`} className="inline-flex items-center gap-2 text-sm font-medium text-ink-secondary hover:text-ink"><ArrowLeft className="size-4" />Retour à la campagne</Link>
-      <div className="mt-7 rounded-[24px] border border-black/5 bg-surface p-7 shadow-sm sm:p-10">
+      <div className="mt-7 rounded-[24px] border border-black/5 bg-surface p-5 shadow-sm sm:p-10">
         <div className="flex items-start gap-4">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gold/15 text-gold-dark"><ShieldCheck className="size-5" /></span>
           <div>

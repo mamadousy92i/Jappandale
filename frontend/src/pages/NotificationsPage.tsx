@@ -50,7 +50,7 @@ export default function NotificationsPage() {
   const hasUnread = notifications.some((notification) => !notification.is_read)
 
   return (
-    <section className="mx-auto max-w-3xl px-6 py-14 sm:py-20">
+    <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">Mon espace</p>

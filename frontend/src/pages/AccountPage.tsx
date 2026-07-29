@@ -419,7 +419,7 @@ function AccountPage() {
         className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(250,197,2,0.12),transparent)]"
       />
 
-      <div className="relative mx-auto max-w-5xl px-6 pt-16 pb-24 sm:pt-20">
+      <div className="relative mx-auto max-w-5xl px-4 pt-16 pb-24 sm:px-6 sm:pt-20">
         {/* En-tête compte */}
         <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-start gap-5 duration-700 motion-reduce:animate-none sm:flex-row sm:items-center">
           <UserAvatar user={user} size="lg" className="shadow-md shadow-black/10" />
@@ -443,7 +443,7 @@ function AccountPage() {
         <div
           role="tablist"
           aria-label="Sections de mon compte"
-          className="mt-9 flex flex-wrap gap-2 border-b border-black/8 pb-px"
+          className="mt-9 flex gap-2 overflow-x-auto border-b border-black/8 pb-px"
         >
           {tabs.map((tab) => (
             <button

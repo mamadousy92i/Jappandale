@@ -30,7 +30,7 @@ const principles = [
 
 export default function TrustPage() {
   return (
-    <section className="mx-auto max-w-5xl px-6 py-16 sm:py-24">
+    <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-24">
       <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">Confiance et transparence</p>
       <h1 className="mt-4 max-w-3xl font-heading text-4xl font-bold text-ink sm:text-5xl">Ce que Jappandale vérifie — et ce qu’elle ne promet pas.</h1>
       <p className="mt-6 max-w-3xl text-lg leading-relaxed text-ink-secondary">La confiance vient d’informations précises, de décisions traçables et d’une communication honnête sur les limites du service.</p>

@@ -28,6 +28,51 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Empêche un mot long, une image ou un composant tiers de créer un défilement
+   horizontal sur les petits écrans. Les contenus restent toutefois lisibles. */
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+@media (max-width: 639px) {
+  /* Évite le zoom automatique de Safari iOS à la prise de focus. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
+  }
+
+  h1,
+  h2,
+  h3,
+  p,
+  li {
+    overflow-wrap: anywhere;
+  }
+}
+
 h1, h2, h3, h4, h5 {
   font-family: var(--font-heading);
   font-weight: 700;
