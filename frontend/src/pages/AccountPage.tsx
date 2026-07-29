@@ -1,6 +1,6 @@
 import { useState } from "react"
 import type { ChangeEvent, FormEvent, ReactNode } from "react"
-import { Camera, IdCard, LoaderCircle, Trash2, UserRound, WalletCards } from "lucide-react"
+import { Camera, IdCard, LayoutDashboard, LoaderCircle, Pencil, Trash2, UserRound, WalletCards } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
 
 import { KycSection } from "@/components/account/KycSection"
@@ -22,7 +22,7 @@ const roleLabels: Record<Role, string> = {
   ADMIN: "Administrateur",
 }
 
-type TabKey = "profil" | "kyc" | "contributions"
+type TabKey = "apercu" | "profil" | "kyc" | "contributions"
 
 function AccountPage() {
   const { user, authFetch, refreshUser } = useAuth()
@@ -35,22 +35,29 @@ function AccountPage() {
   const [city, setCity] = useState(user?.city ?? "")
   const [bio, setBio] = useState(user?.bio ?? "")
   const [isDiaspora, setIsDiaspora] = useState(user?.is_diaspora ?? false)
+  const [country, setCountry] = useState(user?.country ?? "")
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [avatarBusy, setAvatarBusy] = useState(false)
   const [avatarMessage, setAvatarMessage] = useState<string | null>(null)
   const [avatarError, setAvatarError] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
 
   // La route est protégée par RequireAuth : user est garanti non nul ici.
   if (!user) return null
 
+  const defaultTab: TabKey = user.role === "PORTEUR" ? "apercu" : "profil"
   const requestedTab = searchParams.get("onglet")
   const activeTab: TabKey =
-    requestedTab === "kyc" || requestedTab === "contributions" ? requestedTab : "profil"
+    requestedTab === "apercu" || requestedTab === "kyc" || requestedTab === "contributions"
+      ? requestedTab
+      : requestedTab === "profil"
+        ? "profil"
+        : defaultTab
 
   const goToTab = (tab: TabKey) => {
-    setSearchParams(tab === "profil" ? {} : { onglet: tab })
+    setSearchParams(tab === defaultTab ? {} : { onglet: tab })
   }
 
   const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +103,20 @@ function AccountPage() {
     }
   }
 
+  const cancelEdit = () => {
+    setFirstName(user?.first_name ?? "")
+    setLastName(user?.last_name ?? "")
+    setPhone(user?.phone ?? "")
+    setOrganizationName(user?.organization_name ?? "")
+    setCity(user?.city ?? "")
+    setBio(user?.bio ?? "")
+    setIsDiaspora(user?.is_diaspora ?? false)
+    setCountry(user?.country ?? "")
+    setError(null)
+    setSaved(false)
+    setIsEditing(false)
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
@@ -104,10 +125,11 @@ function AccountPage() {
     try {
       await authFetch("/auth/me/", {
         method: "PATCH",
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone, organization_name: organizationName, city, bio, is_diaspora: isDiaspora }),
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone, organization_name: organizationName, city, bio, is_diaspora: isDiaspora, country: isDiaspora ? country : "" }),
       })
       await refreshUser()
       setSaved(true)
+      setIsEditing(false)
     } catch (err) {
       if (err instanceof ApiError && err.status === 400) {
         setError("Certaines informations sont invalides. Vérifiez le formulaire.")
@@ -120,13 +142,23 @@ function AccountPage() {
   }
 
   const tabs: { key: TabKey; label: string; icon: typeof UserRound; alert?: boolean }[] = [
+    ...(user.role === "PORTEUR"
+      ? [{ key: "apercu" as const, label: "Vue d'ensemble", icon: LayoutDashboard }]
+      : []),
     { key: "profil", label: "Informations personnelles", icon: UserRound },
     { key: "kyc", label: "Vérification d'identité", icon: IdCard, alert: user.kyc_status !== "VALIDE" },
     { key: "contributions", label: "Contributions", icon: WalletCards },
   ]
 
   let tabContent: ReactNode
-  if (activeTab === "kyc") {
+  if (activeTab === "apercu") {
+    tabContent = (
+      <div className="space-y-6">
+        <ScoreCard />
+        <PassportSection />
+      </div>
+    )
+  } else if (activeTab === "kyc") {
     tabContent = <KycSection status={user.kyc_status} role={user.role} />
   } else if (activeTab === "contributions") {
     tabContent = (
@@ -138,8 +170,6 @@ function AccountPage() {
   } else {
     tabContent = (
       <div className="space-y-6">
-        {user.role === "PORTEUR" && <ScoreCard />}
-        {user.role === "PORTEUR" && <PassportSection />}
         <div className="flex flex-col justify-between gap-4 rounded-[20px] border border-black/5 bg-surface p-5 shadow-sm sm:flex-row sm:items-center">
           <div>
             <p className="font-semibold text-ink">Photo de profil</p>
@@ -165,10 +195,25 @@ function AccountPage() {
           noValidate
           className="rounded-[20px] border border-black/5 bg-surface p-8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.08)] sm:p-10"
         >
-          <h2 className="font-heading text-xl font-bold text-ink">Informations personnelles</h2>
-          <p className="mt-1 text-sm text-ink-muted">
-            Votre adresse e-mail et votre rôle ne sont pas modifiables.
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-heading text-xl font-bold text-ink">Informations personnelles</h2>
+              <p className="mt-1 text-sm text-ink-muted">
+                Votre adresse e-mail et votre rôle ne sont pas modifiables.
+              </p>
+            </div>
+            {!isEditing && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditing(true)}
+                className="shrink-0 h-9 rounded-full border-black/15 px-4 text-sm font-semibold text-ink-secondary hover:text-ink"
+              >
+                <Pencil aria-hidden="true" className="size-3.5" />
+                Modifier
+              </Button>
+            )}
+          </div>
 
           {error && (
             <p
@@ -195,9 +240,10 @@ function AccountPage() {
               <Input
                 id="firstName"
                 autoComplete="given-name"
+                readOnly={!isEditing}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="h-11 rounded-xl px-3.5"
+                className={`h-11 rounded-xl px-3.5 transition-colors ${!isEditing ? "cursor-default border-transparent bg-black/[0.03] shadow-none focus-visible:ring-0" : ""}`}
               />
             </div>
             <div className="space-y-2">
@@ -207,9 +253,10 @@ function AccountPage() {
               <Input
                 id="lastName"
                 autoComplete="family-name"
+                readOnly={!isEditing}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="h-11 rounded-xl px-3.5"
+                className={`h-11 rounded-xl px-3.5 transition-colors ${!isEditing ? "cursor-default border-transparent bg-black/[0.03] shadow-none focus-visible:ring-0" : ""}`}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -220,40 +267,146 @@ function AccountPage() {
                 id="phone"
                 type="tel"
                 autoComplete="tel"
-                placeholder="+221 77 000 00 00"
+                placeholder={isEditing ? "+221 77 000 00 00" : "—"}
+                readOnly={!isEditing}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="h-11 rounded-xl px-3.5"
+                className={`h-11 rounded-xl px-3.5 transition-colors ${!isEditing ? "cursor-default border-transparent bg-black/[0.03] shadow-none focus-visible:ring-0" : ""}`}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-ink-secondary">
+              <label className={`flex items-start gap-3 text-sm text-ink-secondary ${isEditing ? "cursor-pointer" : "cursor-default"}`}>
                 <input
                   type="checkbox"
                   checked={isDiaspora}
+                  disabled={!isEditing}
                   onChange={(event) => setIsDiaspora(event.target.checked)}
-                  className="mt-0.5 size-4 accent-[#d4a900]"
+                  className="mt-0.5 size-4 accent-[#d4a900] disabled:opacity-60"
                 />
                 <span>
-                  <span className="font-medium text-ink">Je réside à l'étranger (diaspora)</span>
+                  <span className="font-medium text-ink">Je réside à l’étranger (diaspora)</span>
                   <br />
                   <span className="text-xs text-ink-muted">
                     Une vérification renforcée (justificatif de résidence et origine des
-                    fonds) sera demandée dans l'onglet Vérification d'identité.
+                    fonds) sera demandée dans l’onglet Vérification d’identité.
                   </span>
                 </span>
               </label>
             </div>
-            {user.role === "PORTEUR" && <><div className="space-y-2"><Label htmlFor="organization">Organisation <span className="font-normal text-ink-muted">(facultatif)</span></Label><Input id="organization" value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} placeholder="Nom de l’association ou de l’activité" className="h-11 rounded-xl" /></div><div className="space-y-2"><Label htmlFor="city">Ville</Label><Input id="city" value={city} onChange={(event) => setCity(event.target.value)} placeholder="Dakar" className="h-11 rounded-xl" /></div><div className="space-y-2 sm:col-span-2"><Label htmlFor="bio">Présentation publique</Label><textarea id="bio" rows={4} maxLength={700} value={bio} onChange={(event) => setBio(event.target.value)} placeholder="Présentez votre expérience et ce qui vous motive…" className="w-full rounded-xl border border-input bg-transparent px-3 py-3 text-sm text-ink outline-none focus:ring-2 focus:ring-gold-dark/30" /><p className="text-right text-xs text-ink-muted">{bio.length}/700</p></div></>}
+            {isDiaspora && (
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="country" className="text-ink">
+                  Pays de résidence
+                </Label>
+                {isEditing ? (
+                  <select
+                    id="country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="h-11 w-full rounded-xl border border-input bg-transparent px-3.5 text-sm text-ink outline-none focus:ring-2 focus:ring-gold-dark/30"
+                  >
+                    <option value="">— Sélectionnez un pays —</option>
+                    <optgroup label="Afrique de l’Ouest">
+                      <option value="Sénégal">Sénégal</option>
+                      <option value="Côte d’Ivoire">Côte d’Ivoire</option>
+                      <option value="Mali">Mali</option>
+                      <option value="Guinée">Guinée</option>
+                      <option value="Mauritanie">Mauritanie</option>
+                      <option value="Gambie">Gambie</option>
+                      <option value="Ghana">Ghana</option>
+                      <option value="Nigeria">Nigeria</option>
+                      <option value="Bénin">Bénin</option>
+                      <option value="Burkina Faso">Burkina Faso</option>
+                      <option value="Togo">Togo</option>
+                      <option value="Niger">Niger</option>
+                      <option value="Cap-Vert">Cap-Vert</option>
+                      <option value="Sierra Leone">Sierra Leone</option>
+                      <option value="Liberia">Liberia</option>
+                    </optgroup>
+                    <optgroup label="Afrique centrale et du Nord">
+                      <option value="Maroc">Maroc</option>
+                      <option value="Algérie">Algérie</option>
+                      <option value="Tunisie">Tunisie</option>
+                      <option value="Égypte">Égypte</option>
+                      <option value="Cameroun">Cameroun</option>
+                      <option value="Gabon">Gabon</option>
+                      <option value="Congo">Congo</option>
+                      <option value="RD Congo">RD Congo</option>
+                    </optgroup>
+                    <optgroup label="Europe">
+                      <option value="France">France</option>
+                      <option value="Espagne">Espagne</option>
+                      <option value="Italie">Italie</option>
+                      <option value="Allemagne">Allemagne</option>
+                      <option value="Belgique">Belgique</option>
+                      <option value="Portugal">Portugal</option>
+                      <option value="Pays-Bas">Pays-Bas</option>
+                      <option value="Royaume-Uni">Royaume-Uni</option>
+                      <option value="Suisse">Suisse</option>
+                      <option value="Suède">Suède</option>
+                      <option value="Norvège">Norvège</option>
+                      <option value="Autriche">Autriche</option>
+                    </optgroup>
+                    <optgroup label="Amérique du Nord">
+                      <option value="États-Unis">États-Unis</option>
+                      <option value="Canada">Canada</option>
+                    </optgroup>
+                    <optgroup label="Moyen-Orient">
+                      <option value="Arabie Saoudite">Arabie Saoudite</option>
+                      <option value="Émirats arabes unis">Émirats arabes unis</option>
+                      <option value="Qatar">Qatar</option>
+                    </optgroup>
+                    <optgroup label="Asie">
+                      <option value="Chine">Chine</option>
+                      <option value="Turquie">Turquie</option>
+                    </optgroup>
+                  </select>
+                ) : (
+                  <div className="flex h-11 items-center rounded-xl border-transparent bg-black/[0.03] px-3.5 text-sm text-ink">
+                    {country || <span className="text-ink-muted">—</span>}
+                  </div>
+                )}
+              </div>
+            )}
+            {user.role === "PORTEUR" && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="organization">Organisation <span className="font-normal text-ink-muted">(facultatif)</span></Label>
+                  <Input id="organization" readOnly={!isEditing} value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} placeholder={isEditing ? "Nom de l’association ou de l’activité" : "—"} className={`h-11 rounded-xl transition-colors ${!isEditing ? "cursor-default border-transparent bg-black/[0.03] shadow-none focus-visible:ring-0" : ""}`} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city">Ville</Label>
+                  <Input id="city" readOnly={!isEditing} value={city} onChange={(event) => setCity(event.target.value)} placeholder={isEditing ? "Dakar" : "—"} className={`h-11 rounded-xl transition-colors ${!isEditing ? "cursor-default border-transparent bg-black/[0.03] shadow-none focus-visible:ring-0" : ""}`} />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="bio">Présentation publique</Label>
+                  <textarea id="bio" rows={4} maxLength={700} readOnly={!isEditing} value={bio} onChange={(event) => setBio(event.target.value)} placeholder={isEditing ? "Présentez votre expérience et ce qui vous motive…" : "—"} className={`w-full rounded-xl border px-3 py-3 text-sm text-ink outline-none transition-colors ${isEditing ? "border-input bg-transparent focus:ring-2 focus:ring-gold-dark/30" : "cursor-default border-transparent bg-black/[0.03]"}`} />
+                  {isEditing && <p className="text-right text-xs text-ink-muted">{bio.length}/700</p>}
+                </div>
+              </>
+            )}
           </div>
 
-          <Button
-            type="submit"
-            disabled={submitting}
-            className="mt-8 h-12 rounded-full bg-gold px-8 text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
-          >
-            {submitting ? "Enregistrement…" : "Enregistrer les modifications"}
-          </Button>
+          {isEditing && (
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="h-12 rounded-full bg-gold px-8 text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
+              >
+                {submitting ? "Enregistrement…" : "Enregistrer les modifications"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={submitting}
+                onClick={cancelEdit}
+                className="h-12 rounded-full px-8 text-base font-semibold"
+              >
+                Annuler
+              </Button>
+            </div>
+          )}
         </form>
       </div>
     )
@@ -266,7 +419,7 @@ function AccountPage() {
         className="pointer-events-none absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(250,197,2,0.12),transparent)]"
       />
 
-      <div className="relative mx-auto max-w-3xl px-6 pt-16 pb-24 sm:pt-20">
+      <div className="relative mx-auto max-w-5xl px-6 pt-16 pb-24 sm:pt-20">
         {/* En-tête compte */}
         <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-start gap-5 duration-700 motion-reduce:animate-none sm:flex-row sm:items-center">
           <UserAvatar user={user} size="lg" className="shadow-md shadow-black/10" />

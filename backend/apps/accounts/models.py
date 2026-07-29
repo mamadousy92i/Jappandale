@@ -71,6 +71,7 @@ class User(AbstractUser):
     is_diaspora = models.BooleanField(
         "réside à l'étranger (diaspora)", default=False
     )
+    country = models.CharField("pays de résidence", max_length=100, blank=True)
     email_verified_at = models.DateTimeField(
         "adresse e-mail vérifiée le", null=True, blank=True
     )

@@ -30,6 +30,7 @@ export interface User {
   city: string;
   bio: string;
   is_diaspora: boolean;
+  country: string;
   kyc_status: KycStatus;
 }
 
