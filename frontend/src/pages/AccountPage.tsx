@@ -5,6 +5,7 @@ import { Link, useSearchParams } from "react-router-dom"
 
 import { KycSection } from "@/components/account/KycSection"
 import { MyContributions } from "@/components/account/MyContributions"
+import { PassportSection } from "@/components/account/PassportSection"
 import { ReceivedContributions } from "@/components/account/ReceivedContributions"
 import { ScoreCard } from "@/components/account/ScoreCard"
 import { UserAvatar } from "@/components/account/UserAvatar"
@@ -138,6 +139,7 @@ function AccountPage() {
     tabContent = (
       <div className="space-y-6">
         {user.role === "PORTEUR" && <ScoreCard />}
+        {user.role === "PORTEUR" && <PassportSection />}
         <div className="flex flex-col justify-between gap-4 rounded-[20px] border border-black/5 bg-surface p-5 shadow-sm sm:flex-row sm:items-center">
           <div>
             <p className="font-semibold text-ink">Photo de profil</p>

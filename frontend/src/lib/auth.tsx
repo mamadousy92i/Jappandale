@@ -8,7 +8,7 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 
-import { ApiError, apiFetch } from "@/lib/api";
+import { ApiError, apiFetch, apiFetchBlob } from "@/lib/api";
 import type { RegisterData, User } from "@/lib/types";
 
 interface AuthContextValue {
@@ -19,6 +19,7 @@ interface AuthContextValue {
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   authFetch: (path: string, options?: RequestInit) => Promise<unknown>;
+  authFetchBlob: (path: string, options?: RequestInit) => Promise<Blob>;
   refreshUser: () => Promise<void>;
 }
 
@@ -54,6 +55,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (error instanceof ApiError && error.status === 401) {
           const refreshed = await refreshSession();
           if (refreshed) return apiFetch(path, options);
+          setUser(null);
+        }
+        throw error;
+      }
+    },
+    [],
+  );
+
+  const authFetchBlob = useCallback(
+    async (path: string, options?: RequestInit): Promise<Blob> => {
+      try {
+        return await apiFetchBlob(path, options);
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          const refreshed = await refreshSession();
+          if (refreshed) return apiFetchBlob(path, options);
           setUser(null);
         }
         throw error;
@@ -153,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         authFetch,
+        authFetchBlob,
         refreshUser,
       }}
     >

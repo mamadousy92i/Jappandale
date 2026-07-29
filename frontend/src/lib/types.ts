@@ -214,6 +214,29 @@ export interface Score {
   computed_at: string;
 }
 
+export interface PassportData {
+  porteur_name: string;
+  porteur_city: string;
+  member_since: string;
+  score: number;
+  campaigns_total: number;
+  campaigns_published: number;
+  campaigns_closed_success: number;
+  campaigns_rejected_or_suspended: number;
+  total_collected: number;
+  confirmed_contributions_count: number;
+  distinct_contributors: number;
+  disputes_received: number;
+  disputes_accepted_rate: number;
+}
+
+export interface PassportVerification {
+  valide: boolean;
+  porteur: string;
+  genere_le: string;
+  resume: PassportData;
+}
+
 export interface Notification {
   id: number;
   kind: string;

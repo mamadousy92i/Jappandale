@@ -83,3 +83,29 @@ export async function apiFetch(
   if (response.status === 204) return null;
   return response.json();
 }
+
+/** Variante d'apiFetch pour les réponses binaires (ex. export PDF), sans parsing JSON. */
+export async function apiFetchBlob(
+  path: string,
+  options?: RequestInit,
+): Promise<Blob> {
+  const method = (options?.method ?? "GET").toUpperCase();
+  const csrfHeaders: Record<string, string> = [
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+  ].includes(method)
+    ? { "X-CSRFToken": await csrfToken() }
+    : {};
+
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    credentials: "include",
+    headers: { ...csrfHeaders, ...options?.headers },
+  });
+  if (!response.ok) {
+    throw new ApiError(response.status, `Erreur API ${response.status}`);
+  }
+  return response.blob();
+}

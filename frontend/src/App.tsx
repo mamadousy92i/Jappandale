@@ -20,6 +20,7 @@ import { LegalNoticePage, PrivacyPage, TermsPage } from "@/pages/LegalPages";
 import LoginPage from "@/pages/LoginPage";
 import MessagesPage from "@/pages/MessagesPage";
 import NotificationsPage from "@/pages/NotificationsPage";
+import PassportVerificationPage from "@/pages/PassportVerificationPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ReportCampaignPage from "@/pages/ReportCampaignPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
@@ -59,6 +60,10 @@ function App() {
           element={<Navigate to="/#comment-ca-marche" replace />}
         />
         <Route path="/confiance" element={<TrustPage />} />
+        <Route
+          path="/passeport/verifier/:verificationId"
+          element={<PassportVerificationPage />}
+        />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/mentions-legales" element={<LegalNoticePage />} />
         <Route path="/confidentialite" element={<PrivacyPage />} />
