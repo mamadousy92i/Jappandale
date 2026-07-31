@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "mainLabel": "Yoonu doxin bu mag",
+    "mobileLabel": "Yoonu doxin ci telefon",
+    "campaigns": "Kanpaañ yi",
+    "myCampaigns": "Sama kanpaañ yi",
+    "about": "Ci mbiru Jappandale"
+  },
+  "header": {
+    "unreadMessages": "{{count}} bataaxal bu/yu jàngul",
+    "unreadNotifications": "{{count}} xibaar bu/yu jàngul",
+    "openMenu": "Ubbi menu bi",
+    "closeMenu": "Tëj menu bi",
+    "admin": "Administrasion",
+    "myProfile": "Sama profil",
+    "logout": "Génn ci kont bi",
+    "login": "Dugg ci sa kont",
+    "register": "Sos kont",
+    "seeCampaigns": "Xool kanpaañ yi",
+    "messages": "Bataaxal yi",
+    "notifications": "Xibaar yi"
+  },
+  "roles": {
+    "PORTEUR": "Boroom porojet",
+    "CONTRIBUTEUR": "Kiy dokkal",
+    "ADMIN": "Administrateur"
+  },
+  "footer": {
+    "tagline": "Dokkal bu jàppale porojet yu Senegaal. Ñépp bokk, nu jox xalaat yi dund.",
+    "understandLabel": "Xam",
+    "howItWorks": "Naka Jappandale di doxe",
+    "about": "Ci mbiru Jappandale",
+    "trust": "Wóolu ak leerandaay",
+    "support": "Ndimbal",
+    "accountLabel": "Kont",
+    "createAccount": "Sos kont",
+    "login": "Dugg ci sa kont",
+    "legalNavLabel": "Xibaar yu sart",
+    "legalLabel": "Sart",
+    "legalNotice": "Xibaar yu sart",
+    "privacy": "Kaaraange sa xibaar",
+    "terms": "Sartu jëfandikoo",
+    "copyright": "© {{year}} Jappandale — Dakar, Senegaal"
+  }
+}

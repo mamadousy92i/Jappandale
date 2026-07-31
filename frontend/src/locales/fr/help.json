@@ -1,0 +1,114 @@
+{
+  "homepage": {
+    "hero": {
+      "eyebrow": "Plateforme de projets sénégalais",
+      "title": "Financer les projets qui font avancer le Sénégal.",
+      "intro": "Découvrez des projets locaux documentés, portés par des personnes vérifiées, et suivez concrètement l’utilisation prévue des fonds et leur avancement.",
+      "ctaDiscover": "Voir les projets publiés",
+      "ctaSubmit": "Déposer un projet",
+      "note": "Chaque contribution est enregistrée et peut être suivie depuis votre espace personnel.",
+      "imageAlt": "Tailleur dans son atelier à Dakar",
+      "imageCaption": "Atelier de couture — Médina, Dakar"
+    },
+    "published": {
+      "eyebrow": "En cours de préparation",
+      "title": "Les projets publiés",
+      "intro": "Chaque fiche présente le besoin, le lieu, les bénéficiaires et l’usage prévu du financement.",
+      "seeAll": "Toutes les campagnes",
+      "empty": "Les campagnes seront affichées ici dès que le service sera disponible."
+    },
+    "modal": {
+      "previewLabel": "Aperçu du parcours",
+      "closeLabel": "Fermer l’aperçu",
+      "zoomedLabel": "Capture agrandie : {{title}}"
+    },
+    "today": {
+      "title": "Disponible aujourd’hui",
+      "items": [
+        "Création de compte et profil porteur",
+        "Dépôt et revue manuelle des pièces KYC",
+        "Création, modération et publication d’une campagne",
+        "Consultation publique des projets publiés"
+      ]
+    },
+    "contribJourney": {
+      "title": "Parcours de contribution",
+      "text": "Choisissez un montant, confirmez votre contribution et retrouvez immédiatement son statut dans votre historique personnel.",
+      "cta": "Créer mon espace"
+    },
+    "eyebrow": "Comment ça marche",
+    "title": "Un parcours clair, de l’idée au suivi",
+    "intro": "Jappandale accompagne chaque projet à travers quatre étapes simples, avec la transparence comme fil conducteur.",
+    "stepLabel": "Étape 0{{number}}",
+    "expandLabel": "Agrandir",
+    "steps": {
+      "create": {
+        "title": "Présenter le projet",
+        "text": "Décrivez le besoin, les bénéficiaires, le budget et les étapes prévues."
+      },
+      "verify": {
+        "title": "Faire vérifier le dossier",
+        "text": "L’identité, l’activité et les informations de campagne sont relues avant publication."
+      },
+      "mobilize": {
+        "title": "Mobiliser les contributeurs",
+        "text": "Partagez la page publique et suivez l’évolution de la collecte en toute clarté."
+      },
+      "report": {
+        "title": "Rendre compte",
+        "text": "Pilotez vos collectes et publiez des nouvelles sur les étapes franchies."
+      }
+    },
+    "ctaDiscover": "Découvrir les projets",
+    "ctaSubmit": "Déposer un projet",
+    "verified": {
+      "title": "Ce que signifie « projet vérifié »",
+      "intro": "Une validation ne garantit pas la réussite du projet. Elle confirme que le porteur a transmis les pièces demandées et que les informations de la campagne ont été relues avant publication.",
+      "steps": {
+        "identity": {
+          "title": "Identité et activité",
+          "text": "Le porteur transmet ses justificatifs. L’équipe vérifie le dossier avant toute publication."
+        },
+        "project": {
+          "title": "Projet et besoin financier",
+          "text": "Le montant, l’utilisation des fonds, les bénéficiaires et le calendrier sont relus."
+        },
+        "publication": {
+          "title": "Publication encadrée",
+          "text": "La campagne n’est visible qu’après validation. Un rejet doit être motivé et corrigé."
+        }
+      }
+    }
+  },
+  "trust": {
+    "eyebrow": "Confiance et transparence",
+    "title": "Ce que Jappandale vérifie — et ce qu’elle ne promet pas.",
+    "intro": "La confiance vient d’informations précises, de décisions traçables et d’une communication honnête sur les limites du service.",
+    "principles": {
+      "identity": {
+        "title": "Identité contrôlée",
+        "text": "Une campagne n’est publiée qu’après vérification des pièces requises du porteur et revue manuelle du dossier."
+      },
+      "budget": {
+        "title": "Budget visible",
+        "text": "Les bénéficiaires, l’utilisation prévue des fonds, le calendrier et les actualités restent accessibles sur la page du projet."
+      },
+      "promises": {
+        "title": "Promesses mesurées",
+        "text": "La vérification confirme la cohérence du dossier ; elle ne garantit ni le succès du projet ni un rendement financier."
+      },
+      "contributions": {
+        "title": "Contributions traçables",
+        "text": "Chaque contribution est associée à une référence et reste consultable depuis l’historique personnel du membre."
+      },
+      "reports": {
+        "title": "Signalements examinés",
+        "text": "Chaque membre peut transmettre un signalement confidentiel. Il est conservé et traité depuis le back-office."
+      }
+    },
+    "transparency": {
+      "title": "La transparence à chaque étape",
+      "text": "Les statuts des campagnes, des vérifications et des contributions restent accessibles dans les espaces concernés afin de faciliter le suivi de chaque opération."
+    }
+  }
+}

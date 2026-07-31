@@ -1,0 +1,40 @@
+{
+  "categories": {
+    "ARTISANAT": "Liggéeyu loxo",
+    "COMMERCE": "Njaay",
+    "AGRICULTURE": "Mbay",
+    "EDUCATION": "Njàngale",
+    "SANTE": "Wergu-yaram",
+    "TECHNOLOGIE": "Tekknolosi",
+    "CULTURE": "Aada",
+    "AUTRE": "Yeneen"
+  },
+  "card": {
+    "amountOutOf": "ci {{amount}}",
+    "ended": "Jeex na",
+    "daysLeft": "Bis-{{count}}"
+  },
+  "list": {
+    "eyebrowMine": "Bérabu boroom porojet",
+    "eyebrowAll": "Porojet yi feeñ",
+    "titleMine": "Toppatoo sa kanpaañ yi",
+    "titleAll": "Soxla yu leer, yu boroom yi wone",
+    "introMine": "Gis sa dàkkantal yi, toppatoo seen wóoral, te wone xibaar yu bees ci sa dokkal yi.",
+    "introAll": "Xool jubluwaay yi, ni xaalis bi war a jëfandikoo, ak jaataayu kanpaañ bu ne.",
+    "discover": "Xool porojet yi",
+    "myCampaigns": "Sama kanpaañ yi",
+    "createCampaign": "Sos kanpaañ",
+    "searchPlaceholder": "Wut porojet, mbir…",
+    "searchLabel": "Wut kanpaañ",
+    "filterLabel": "Xool ci kategori",
+    "all": "Lépp",
+    "errorTitle": "Manunu wàll kanpaañ yi",
+    "errorText": "Am na njumte. Xool sa konneksion te jéema beneen yoon.",
+    "retry": "Jéema beneen yoon",
+    "emptyFilteredTitle": "Amul kanpaañ bu dëppóo",
+    "emptyTitle": "Amul kanpaañ tey",
+    "emptyFilteredText": "Jéemal beneen baat walla beneen kategori. Ndax porojet bi neex, moo doon sa bopp ?",
+    "emptyText": "Bokk ci ñi jëkk : sosal sa porojet te ubbil yoon wi.",
+    "launchProject": "Sosal sa porojet"
+  }
+}

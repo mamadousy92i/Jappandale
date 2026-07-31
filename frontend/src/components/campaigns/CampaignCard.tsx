@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import {
   BookOpen,
   Hammer,
@@ -44,6 +45,7 @@ export function ProgressBar({ percent }: { percent: number }) {
 }
 
 export function CampaignCard({ campaign }: { campaign: CampaignListItem }) {
+  const { t } = useTranslation("campaigns")
   const Icon = categoryIcons[campaign.category]
 
   return (
@@ -68,6 +70,12 @@ export function CampaignCard({ campaign }: { campaign: CampaignListItem }) {
           <Icon aria-hidden="true" className="size-3.5 text-gold-dark" />
           {campaign.category_display}
         </span>
+        {campaign.campaign_type === "INVESTISSEMENT_PARTICIPATIF" &&
+          campaign.expected_return_rate != null && (
+            <span className="absolute top-3 right-3 rounded-full bg-gold px-3 py-1 text-xs font-semibold text-ink shadow-sm">
+              +{campaign.expected_return_rate}%
+            </span>
+          )}
       </div>
 
       <div className="flex flex-1 flex-col p-6">
@@ -95,9 +103,11 @@ export function CampaignCard({ campaign }: { campaign: CampaignListItem }) {
             </span>
           </div>
           <div className="mt-1 flex items-center justify-between text-xs text-ink-muted">
-            <span>sur {formatFcfa(campaign.goal_amount)}</span>
+            <span>{t("card.amountOutOf", { amount: formatFcfa(campaign.goal_amount) })}</span>
             <span>
-              {campaign.days_left > 0 ? `J-${campaign.days_left}` : "Terminée"}
+              {campaign.days_left > 0
+                ? t("card.daysLeft", { count: campaign.days_left })
+                : t("card.ended")}
             </span>
           </div>
         </div>

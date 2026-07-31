@@ -1,0 +1,143 @@
+{
+  "types": {
+    "DON_LIBRE": {
+      "title": "Don libre",
+      "description": "Les contributeurs donnent sans contrepartie matérielle."
+    },
+    "DON_CONTREPARTIE": {
+      "title": "Don avec contrepartie",
+      "description": "Proposez des paliers de récompense pour remercier vos contributeurs."
+    },
+    "INVESTISSEMENT_PARTICIPATIF": {
+      "title": "Investissement participatif",
+      "description": "Les financeurs investissent en attendant un retour, à un taux de rendement annoncé."
+    }
+  },
+  "access": {
+    "campaignUnavailableTitle": "Campagne inaccessible",
+    "campaignUnavailableText": "Cette campagne n’existe pas ou ne vous appartient pas.",
+    "ownerOnlyTitle": "Espace réservé aux porteurs de projet",
+    "ownerOnlyText": "La création de campagnes est réservée aux porteurs de projet. Votre compte est enregistré comme contributeur : vous pouvez soutenir les campagnes existantes.",
+    "kycTitle": "Vérifiez d’abord votre identité",
+    "kycText": "Pour lancer une campagne, votre identité doit être vérifiée. Complétez la vérification depuis votre espace compte : cela ne prend que quelques minutes.",
+    "kycCta": "Compléter ma vérification",
+    "lockedTitle": "Modification indisponible",
+    "lockedText": "Une campagne en modération, publiée ou clôturée ne peut pas être modifiée depuis cet espace."
+  },
+  "page": {
+    "eyebrowEdit": "Correction de campagne",
+    "eyebrowNew": "Nouvelle campagne",
+    "titleEdit": "Modifier votre campagne",
+    "titleNew": "Lancer votre campagne",
+    "introEdit": "Corrigez les informations signalées, enregistrez vos modifications puis renvoyez la campagne en validation.",
+    "introNew": "Présentez votre projet avec soin : notre équipe le relira avant publication pour garantir la confiance des contributeurs."
+  },
+  "form": {
+    "errors": {
+      "forbidden": "Vous n’êtes pas autorisé à créer une campagne.",
+      "invalid": "Certaines informations sont invalides. Vérifiez le formulaire.",
+      "generic": "Une erreur est survenue. Réessayez."
+    },
+    "title": "Titre de la campagne",
+    "titlePlaceholder": "Un atelier de couture à Thiès",
+    "summary": "Accroche",
+    "summaryHint": "(une ou deux phrases)",
+    "summaryPlaceholder": "Résumez votre projet en quelques mots percutants.",
+    "description": "Description détaillée",
+    "descriptionPlaceholder": "Racontez votre histoire : d’où vient le projet, à quoi serviront les fonds, quel impact pour votre communauté…",
+    "typeLegend": "Type de campagne",
+    "returnRateLabel": "Taux de rendement attendu",
+    "returnRateUnit": "(%)",
+    "manageRewardsPrefix": "Gérer les contreparties",
+    "manageRewardsSuffix": "de cette campagne.",
+    "location": "Localisation du projet",
+    "locationPlaceholder": "Médina, Dakar",
+    "beneficiaries": "Bénéficiaires attendus",
+    "beneficiariesPlaceholder": "10 apprenties couturières",
+    "fundingLegend": "Utilisation prévue des fonds",
+    "fundingHint": "Détaillez les principales dépenses et leur montant estimé.",
+    "expenseLabel": "Dépense {{number}}",
+    "expensePlaceholder": "Ex. Machines à coudre",
+    "amountLabel": "Montant (F CFA)",
+    "amountPlaceholder": "150 000",
+    "removeExpense": "Supprimer la dépense {{number}}",
+    "addExpense": "Ajouter une dépense",
+    "timelineLegend": "Étapes prévues du projet",
+    "timelineHint": "Présentez les actions dans l’ordre et indiquez leur période prévue.",
+    "stepLabel": "Étape {{number}}",
+    "stepPlaceholder": "Ex. Achat du matériel",
+    "periodLabel": "Période",
+    "periodPlaceholder": "Ex. Semaine 1",
+    "removeStep": "Supprimer l’étape {{number}}",
+    "addStep": "Ajouter une étape",
+    "category": "Catégorie",
+    "goalAmount": "Objectif",
+    "goalAmountUnit": "(F CFA)",
+    "goalAmountPlaceholder": "500 000",
+    "deadline": "Échéance de la collecte",
+    "coverImage": "Image de couverture",
+    "optional": "(facultatif)",
+    "coverAlt": "Aperçu de l’image de couverture",
+    "removeCover": "Retirer l’image sélectionnée",
+    "coverHint": "Une belle image donne deux fois plus envie de contribuer.",
+    "saving": "Enregistrement…",
+    "creating": "Création…",
+    "saveSubmit": "Enregistrer les modifications",
+    "createSubmit": "Créer ma campagne",
+    "editNote": "Après vos corrections, revenez dans « Mes campagnes » pour la renvoyer en validation.",
+    "createNote": "Votre campagne sera d’abord enregistrée en brouillon. Vous pourrez la soumettre à validation depuis votre espace « Mes campagnes »."
+  },
+  "update": {
+    "notFound": "Cette campagne est introuvable ou ne vous appartient pas.",
+    "validationError": "Ajoutez un titre précis et au moins quelques phrases sur l’avancement.",
+    "publishError": "La publication a échoué. Vérifiez que la campagne est toujours publiée.",
+    "backToAccount": "Retour à mon espace",
+    "eyebrow": "Actualité de campagne",
+    "title": "Tenir les contributeurs informés",
+    "introWithCampaign": "Partagez une avancée, une difficulté ou une étape franchie pour « {{title}} ».",
+    "loading": "Chargement de la campagne…",
+    "titleLabel": "Titre de l’actualité",
+    "titlePlaceholder": "Ex. Le matériel a été commandé",
+    "messageLabel": "Message aux contributeurs",
+    "messagePlaceholder": "Expliquez ce qui a été réalisé, les prochaines étapes et les éventuels écarts par rapport au calendrier.",
+    "publishing": "Publication…",
+    "publish": "Publier l’actualité"
+  },
+  "rewards": {
+    "backToAccount": "Retour à mon espace",
+    "eyebrow": "Contreparties",
+    "titleWithCampaign": "Contreparties de « {{title}} »",
+    "loading": "Chargement…",
+    "intro": "Proposez des paliers pour remercier vos contributeurs selon le montant de leur don.",
+    "notFound": "Cette campagne est introuvable ou ne vous appartient pas.",
+    "notRewardType": "Cette campagne est de type « don libre » : elle ne propose pas de contreparties.",
+    "notEditableStatus": "Les contreparties ne peuvent être modifiées que sur une campagne en brouillon, rejetée ou suspendue.",
+    "empty": "Aucune contrepartie pour le moment.",
+    "addReward": "Ajouter une contrepartie",
+    "form": {
+      "genericError": "Une erreur est survenue. Réessayez.",
+      "title": "Titre de la contrepartie",
+      "titlePlaceholder": "Ex. Sac cousu main",
+      "description": "Description",
+      "descriptionPlaceholder": "Décrivez ce que recevra le contributeur.",
+      "minimum": "Montant minimum (F CFA)",
+      "minimumPlaceholder": "15 000",
+      "quantity": "Quantité disponible",
+      "quantityHint": "(vide = illimitée)",
+      "quantityPlaceholder": "20",
+      "saving": "Enregistrement…",
+      "save": "Enregistrer",
+      "add": "Ajouter la contrepartie",
+      "cancel": "Annuler"
+    },
+    "row": {
+      "soldOut": "Épuisée",
+      "minimum": "minimum",
+      "unlimited": "quantité illimitée",
+      "remaining": "{{remaining}} restante(s) sur {{limit}}",
+      "editLabel": "Modifier {{title}}",
+      "deleteLabel": "Supprimer {{title}}",
+      "deleteError": "La suppression a échoué."
+    }
+  }
+}

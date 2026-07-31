@@ -1,0 +1,143 @@
+{
+  "types": {
+    "DON_LIBRE": {
+      "title": "Dokkal bu yomb",
+      "description": "Ñiy dokkal, dañuy jox xaalis te amul lu ñu leen jox ci wetu."
+    },
+    "DON_CONTREPARTIE": {
+      "title": "Dokkal ak contrepartie",
+      "description": "Wone tàllim yu njëriñ ngir gerte ñi la dokkal."
+    },
+    "INVESTISSEMENT_PARTICIPATIF": {
+      "title": "Investisman bu bokk",
+      "description": "Ñiy dokkal dañuy investir, di xaar ñu delloo leen ab njariñ, ci taux bu ñu wax."
+    }
+  },
+  "access": {
+    "campaignUnavailableTitle": "Kanpaañ bi jotewul",
+    "campaignUnavailableText": "Kanpaañ bii amul walla boroom moo ko.",
+    "ownerOnlyTitle": "Bérab bu boroom porojet rekk",
+    "ownerOnlyText": "Sos kanpaañ, boroom porojet rekk la ngir. Sa kont bindeeko ni kiy dokkal : mën nga ndimbal kanpaañ yi am.",
+    "kycTitle": "Wóoral bu njëkk sa idantite",
+    "kycText": "Ngir sos ab kanpaañ, war nga wóoral sa idantite. Jeexal wóoral bi ci sa kont : du yàgg.",
+    "kycCta": "Jeexal sama wóoral",
+    "lockedTitle": "Soppi amul",
+    "lockedText": "Kanpaañ bu ci xool, bu feeñ, walla bu tëj mën na soppeeku ci bérab bii."
+  },
+  "page": {
+    "eyebrowEdit": "Soppi kanpaañ",
+    "eyebrowNew": "Kanpaañ bu bees",
+    "titleEdit": "Soppi sa kanpaañ",
+    "titleNew": "Sosal sa kanpaañ",
+    "introEdit": "Soppi xibaar yu ñu wax, denc say soppi te yónnee kanpaañ bi ci wóoral.",
+    "introNew": "Wone sa porojet bu baax : sunu ekip dina ko xool laata mu feeñ, ngir wóolu ñiy dokkal."
+  },
+  "form": {
+    "errors": {
+      "forbidden": "Amoo sañ-sañ ngir sos ab kanpaañ.",
+      "invalid": "Yenn xibaar baaxuñu. Xool porum bi.",
+      "generic": "Am na njumte. Jéema beneen yoon."
+    },
+    "title": "Turu kanpaañ bi",
+    "titlePlaceholder": "Ab ateliye taaru ci Thiès",
+    "summary": "Xibaar bu gaaw",
+    "summaryHint": "(benn walla ñaari kàddu)",
+    "summaryPlaceholder": "Wone sa porojet ci ay baat yu am doole.",
+    "description": "Leeral bu doy",
+    "descriptionPlaceholder": "Wax sa mbir : fu porojet bi joge, lu xaalis bi di jëfandikoo, lan njariñ ngir sa mbokk…",
+    "typeLegend": "Xeetu kanpaañ",
+    "returnRateLabel": "Taux njariñ bu ñu xaar",
+    "returnRateUnit": "(%)",
+    "manageRewardsPrefix": "Toppatoo contrepartie yi",
+    "manageRewardsSuffix": "ci kanpaañ bii.",
+    "location": "Bérabu porojet bi",
+    "locationPlaceholder": "Médina, Dakar",
+    "beneficiaries": "Ñi koy jariñu",
+    "beneficiariesPlaceholder": "10 jàngalekat taaru",
+    "fundingLegend": "Ni xaalis bi war a jëfandikoo",
+    "fundingHint": "Wone njëkk say lipp ak seen njëg.",
+    "expenseLabel": "Lipp {{number}}",
+    "expensePlaceholder": "Misaal: Masin yu taaru",
+    "amountLabel": "Xaalis (F CFA)",
+    "amountPlaceholder": "150 000",
+    "removeExpense": "Far lipp {{number}}",
+    "addExpense": "Yokk ab lipp",
+    "timelineLegend": "Tàllim yu porojet bi",
+    "timelineHint": "Wone jëf yi ci njëkk-njëkk te wone seen diir.",
+    "stepLabel": "Tàllim {{number}}",
+    "stepPlaceholder": "Misaal: Jënd jumtukaay yi",
+    "periodLabel": "Diir",
+    "periodPlaceholder": "Misaal: Ayubés bu 1",
+    "removeStep": "Far tàllim {{number}}",
+    "addStep": "Yokk ab tàllim",
+    "category": "Kategori",
+    "goalAmount": "Jubluwaay",
+    "goalAmountUnit": "(F CFA)",
+    "goalAmountPlaceholder": "500 000",
+    "deadline": "Jeexal dajale bi",
+    "coverImage": "Nataal bu njëkk",
+    "optional": "(du war)",
+    "coverAlt": "Melokaanu nataal bu njëkk",
+    "removeCover": "Far nataal bi nga tann",
+    "coverHint": "Ab nataal bu rafet dafay yokk bëgg-bëgg dokkal.",
+    "saving": "Di denc…",
+    "creating": "Di sos…",
+    "saveSubmit": "Denc soppi yi",
+    "createSubmit": "Sos sama kanpaañ",
+    "editNote": "Ginaaw sa soppi yi, dellusi ci « Sama kanpaañ yi » ngir yónnee ko ci wóoral.",
+    "createNote": "Sa kanpaañ dina njëkk denc ni dàkkantal. Mën ngaa ko yónnee ci wóoral ci sa bérabu « Sama kanpaañ yi »."
+  },
+  "update": {
+    "notFound": "Kanpaañ bii gisul walla boroom moo ko.",
+    "validationError": "Yokk ab tur bu leer ak ci suuf ay kàddu ci ni mu jëmm ci kanam.",
+    "publishError": "Génn ci kanam baaxul. Xool ndax kanpaañ bi feeñ na.",
+    "backToAccount": "Dellu ci sama bérab",
+    "eyebrow": "Xibaaru kanpaañ",
+    "title": "Wone ñiy dokkal xibaar",
+    "introWithCampaign": "Wàllaale ni mu jëmm ci kanam, ab jafe-jafe, walla ab tàllim bu jeex ngir « {{title}} ».",
+    "loading": "Di yebbi kanpaañ bi…",
+    "titleLabel": "Turu xibaar bi",
+    "titlePlaceholder": "Misaal: Jumtukaay yi ñu ko sant",
+    "messageLabel": "Bataaxal ci ñiy dokkal",
+    "messagePlaceholder": "Leeral lu ñu def, tàllim yi ci kanam, ak li mëna wuute ak jaataay bi.",
+    "publishing": "Di génn ci kanam…",
+    "publish": "Génn xibaar bi ci kanam"
+  },
+  "rewards": {
+    "backToAccount": "Dellu ci sama bérab",
+    "eyebrow": "Contrepartie yi",
+    "titleWithCampaign": "Contrepartie yu « {{title}} »",
+    "loading": "Di yebbi…",
+    "intro": "Wone tàllim ngir gerte ñi la dokkal, ci njëg bu seen dokkal.",
+    "notFound": "Kanpaañ bii gisul walla boroom moo ko.",
+    "notRewardType": "Kanpaañ bii mooy xeet « dokkal bu yomb » : amul contrepartie.",
+    "notEditableStatus": "Contrepartie yi mën nañu soppeeku rekk ci kanpaañ bu dàkkantal, bu ñu bàyyi, walla bu taxaw.",
+    "empty": "Amul contrepartie tey.",
+    "addReward": "Yokk ab contrepartie",
+    "form": {
+      "genericError": "Am na njumte. Jéema beneen yoon.",
+      "title": "Turu contrepartie bi",
+      "titlePlaceholder": "Misaal: Sak bu ñu taaru ak loxo",
+      "description": "Leeral",
+      "descriptionPlaceholder": "Wax lu kiy dokkal dina jot.",
+      "minimum": "Xaalis bu suuf (F CFA)",
+      "minimumPlaceholder": "15 000",
+      "quantity": "Xayma bu am",
+      "quantityHint": "(neen = amul dayo)",
+      "quantityPlaceholder": "20",
+      "saving": "Di denc…",
+      "save": "Denc",
+      "add": "Yokk contrepartie bi",
+      "cancel": "Bàyyi"
+    },
+    "row": {
+      "soldOut": "Jeex na",
+      "minimum": "ci suuf",
+      "unlimited": "xayma bu amul dayo",
+      "remaining": "{{remaining}} desna ci {{limit}}",
+      "editLabel": "Soppi {{title}}",
+      "deleteLabel": "Far {{title}}",
+      "deleteError": "Far bi baaxul."
+    }
+  }
+}

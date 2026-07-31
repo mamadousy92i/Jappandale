@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { FormEvent } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,31 +12,7 @@ import type { RegisterData } from "@/lib/types"
 
 type RegisterRole = RegisterData["role"]
 
-const roleOptions: {
-  value: RegisterRole
-  title: string
-  description: string
-}[] = [
-  {
-    value: "PORTEUR",
-    title: "Je porte un projet",
-    description: "Je souhaite collecter des fonds pour donner vie à mon idée.",
-  },
-  {
-    value: "CONTRIBUTEUR",
-    title: "Je veux contribuer",
-    description: "Je souhaite soutenir les projets qui me tiennent à cœur.",
-  },
-]
-
-const fieldLabels: Record<string, string> = {
-  first_name: "Prénom",
-  last_name: "Nom",
-  email: "Adresse e-mail",
-  password: "Mot de passe",
-  phone: "Téléphone",
-  role: "Profil",
-}
+const roleValues: RegisterRole[] = ["PORTEUR", "CONTRIBUTEUR"]
 
 function toMessage(value: unknown): string {
   if (Array.isArray(value)) return value.join(" ")
@@ -43,6 +20,20 @@ function toMessage(value: unknown): string {
 }
 
 function RegisterPage() {
+  const { t } = useTranslation("auth")
+  const fieldLabels: Record<string, string> = {
+    first_name: t("register.fields.first_name"),
+    last_name: t("register.fields.last_name"),
+    email: t("register.fields.email"),
+    password: t("register.fields.password"),
+    phone: t("register.fields.phone"),
+    role: t("register.fields.role"),
+  }
+  const roleOptions = roleValues.map((value) => ({
+    value,
+    title: t(`register.roles.${value}.title`),
+    description: t(`register.roles.${value}.description`),
+  }))
   const { register } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -86,10 +77,10 @@ function RegisterPage() {
         if (Object.keys(nextErrors).length > 0) {
           setFieldErrors(nextErrors)
         } else {
-          setGlobalError("Une erreur est survenue. Réessayez.")
+          setGlobalError(t("register.genericError"))
         }
       } else {
-        setGlobalError("Une erreur est survenue. Réessayez.")
+        setGlobalError(t("register.genericError"))
       }
       setSubmitting(false)
     }
@@ -117,18 +108,17 @@ function RegisterPage() {
       <div className="relative mx-auto flex max-w-3xl flex-col items-center px-5 pt-16 pb-24 sm:px-8 sm:pt-24 sm:pb-32">
         <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-center text-center duration-700 motion-reduce:animate-none">
           <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-            Rejoindre Jappandale
+            {t("register.eyebrow")}
           </span>
           <h1 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-            Créez votre compte
+            {t("register.title")}
           </h1>
           <div
             aria-hidden="true"
             className="mt-6 h-[3px] w-16 rounded-full bg-gradient-to-r from-gold to-gold-dark"
           />
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-ink-secondary">
-            Quelques instants suffisent pour rejoindre la communauté et faire
-            avancer les projets d'ici.
+            {t("register.intro")}
           </p>
         </div>
 
@@ -149,7 +139,7 @@ function RegisterPage() {
 
           <fieldset className="space-y-3">
             <legend className="mb-3 text-sm leading-none font-medium text-ink">
-              Vous êtes…
+              {t("register.youAre")}
             </legend>
             <div className="grid gap-3 sm:grid-cols-2">
               {roleOptions.map((option) => (
@@ -195,7 +185,7 @@ function RegisterPage() {
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="first_name" className="text-ink">
-                  Prénom
+                  {t("register.fields.first_name")}
                 </Label>
                 <Input
                   id="first_name"
@@ -212,7 +202,7 @@ function RegisterPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="last_name" className="text-ink">
-                  Nom
+                  {t("register.fields.last_name")}
                 </Label>
                 <Input
                   id="last_name"
@@ -230,7 +220,7 @@ function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-ink">
-                Adresse e-mail
+                {t("register.fields.email")}
               </Label>
               <Input
                 id="email"
@@ -248,14 +238,14 @@ function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-ink">
-                Mot de passe
+                {t("register.fields.password")}
               </Label>
               <Input
                 id="password"
                 type="password"
                 autoComplete="new-password"
                 required
-                placeholder="8 caractères minimum"
+                placeholder={t("register.passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                   className="h-14 rounded-xl px-5 text-base"
@@ -266,8 +256,8 @@ function RegisterPage() {
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-ink">
-                Téléphone{" "}
-                <span className="font-normal text-ink-muted">(optionnel)</span>
+                {t("register.fields.phone")}{" "}
+                <span className="font-normal text-ink-muted">{t("register.phoneOptional")}</span>
               </Label>
               <Input
                 id="phone"
@@ -288,17 +278,17 @@ function RegisterPage() {
             disabled={submitting}
             className="mt-9 h-14 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
           >
-            {submitting ? "Création du compte…" : "Créer mon compte"}
+            {submitting ? t("register.submitting") : t("register.submit")}
           </Button>
         </form>
 
         <p className="animate-in fade-in fill-mode-backwards mt-8 text-sm text-ink-secondary delay-300 duration-700 motion-reduce:animate-none">
-          Déjà un compte ?{" "}
+          {t("register.haveAccount")}{" "}
           <Link
             to="/connexion"
             className="rounded-sm font-semibold text-gold-dark underline-offset-4 transition-colors outline-none hover:text-ink hover:underline focus-visible:ring-2 focus-visible:ring-gold-dark/50"
           >
-            Se connecter
+            {t("register.login")}
           </Link>
         </p>
       </div>

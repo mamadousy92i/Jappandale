@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { MailCheck } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { apiFetch } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
+  const { t } = useTranslation("auth");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -25,9 +27,7 @@ export default function ForgotPasswordPage() {
       });
       setSent(true);
     } catch {
-      setError(
-        "La demande n’a pas pu être traitée. Réessayez dans quelques instants.",
-      );
+      setError(t("forgotPassword.error"));
     } finally {
       setSubmitting(false);
     }
@@ -39,37 +39,35 @@ export default function ForgotPasswordPage() {
         <div className="text-center">
           <MailCheck className="mx-auto size-12 text-emerald-600" />
           <h1 className="mt-6 font-heading text-3xl font-bold text-ink">
-            Consultez votre messagerie
+            {t("forgotPassword.sentTitle")}
           </h1>
           <p className="mt-4 leading-relaxed text-ink-secondary">
-            Si un compte correspond à cette adresse, vous recevrez un lien
-            valable pendant une heure.
+            {t("forgotPassword.sentText")}
           </p>
           <Link
             to="/connexion"
             className="mt-8 inline-block font-semibold text-gold-dark hover:underline"
           >
-            Retour à la connexion
+            {t("forgotPassword.backToLogin")}
           </Link>
         </div>
       ) : (
         <>
           <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-            Accès au compte
+            {t("forgotPassword.eyebrow")}
           </p>
           <h1 className="mt-4 font-heading text-4xl font-bold text-ink">
-            Mot de passe oublié ?
+            {t("forgotPassword.title")}
           </h1>
           <p className="mt-4 leading-relaxed text-ink-secondary">
-            Indiquez l’adresse associée à votre compte. Nous vous enverrons un
-            lien sécurisé.
+            {t("forgotPassword.intro")}
           </p>
           <form
             onSubmit={submit}
             className="mt-9 rounded-[28px] border border-black/5 bg-surface p-8 shadow-[0_18px_60px_-16px_rgba(0,0,0,0.12)] sm:p-12"
           >
             <div className="space-y-2">
-              <Label htmlFor="reset-email">Adresse e-mail</Label>
+              <Label htmlFor="reset-email">{t("forgotPassword.emailLabel")}</Label>
               <Input
                 id="reset-email"
                 type="email"
@@ -93,7 +91,7 @@ export default function ForgotPasswordPage() {
               disabled={submitting}
               className="mt-8 h-14 w-full rounded-full bg-gold text-base text-ink hover:bg-gold-light"
             >
-              {submitting ? "Envoi…" : "Recevoir le lien"}
+              {submitting ? t("forgotPassword.sending") : t("forgotPassword.submit")}
             </Button>
           </form>
         </>

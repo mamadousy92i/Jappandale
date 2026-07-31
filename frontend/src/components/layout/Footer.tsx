@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 export function Footer() {
+  const { t } = useTranslation("common")
   return (
     <footer className="border-t border-black/5 bg-surface-alt">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
@@ -21,46 +23,45 @@ export function Footer() {
             </p>
             <div aria-hidden="true" className="h-[3px] w-20 rounded-full bg-gradient-to-r from-gold to-gold-dark" />
             <p className="text-sm leading-relaxed text-ink-secondary">
-              Le financement participatif au service des projets sénégalais. Ensemble,
-              donnons vie aux idées d'ici.
+              {t("footer.tagline")}
             </p>
           </div>
 
           <div className="grid w-full gap-8 text-sm min-[430px]:grid-cols-2 sm:w-auto sm:grid-cols-3 sm:gap-10">
-          <nav aria-label="Comprendre" className="flex flex-col gap-2">
-            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">Comprendre</span>
-            <Link to="/#comment-ca-marche" className="w-fit text-ink-secondary hover:text-gold-dark">Comment ça marche</Link>
-            <Link to="/a-propos" className="w-fit text-ink-secondary hover:text-gold-dark">À propos</Link>
-            <Link to="/confiance" className="w-fit text-ink-secondary hover:text-gold-dark">Confiance et transparence</Link>
-            <Link to="/contact" className="w-fit text-ink-secondary hover:text-gold-dark">Assistance</Link>
+          <nav aria-label={t("footer.understandLabel")} className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">{t("footer.understandLabel")}</span>
+            <Link to="/#comment-ca-marche" className="w-fit text-ink-secondary hover:text-gold-dark">{t("footer.howItWorks")}</Link>
+            <Link to="/a-propos" className="w-fit text-ink-secondary hover:text-gold-dark">{t("footer.about")}</Link>
+            <Link to="/confiance" className="w-fit text-ink-secondary hover:text-gold-dark">{t("footer.trust")}</Link>
+            <Link to="/contact" className="w-fit text-ink-secondary hover:text-gold-dark">{t("footer.support")}</Link>
           </nav>
-          <nav aria-label="Compte" className="flex flex-col gap-2">
-            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">Compte</span>
+          <nav aria-label={t("footer.accountLabel")} className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">{t("footer.accountLabel")}</span>
             <Link
               to="/inscription"
               className="w-fit rounded-sm text-ink-secondary transition-colors outline-none hover:text-gold-dark focus-visible:ring-2 focus-visible:ring-gold-dark/50"
             >
-              Créer un compte
+              {t("footer.createAccount")}
             </Link>
             <Link
               to="/connexion"
               className="w-fit rounded-sm text-ink-secondary transition-colors outline-none hover:text-gold-dark focus-visible:ring-2 focus-visible:ring-gold-dark/50"
             >
-              Se connecter
+              {t("footer.login")}
             </Link>
           </nav>
-          <nav aria-label="Informations légales" className="flex flex-col gap-2">
-            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">Légal</span>
-            <Link to="/mentions-legales" className="w-fit text-ink-secondary hover:text-gold-dark">Mentions légales</Link>
-            <Link to="/confidentialite" className="w-fit text-ink-secondary hover:text-gold-dark">Confidentialité</Link>
-            <Link to="/conditions" className="w-fit text-ink-secondary hover:text-gold-dark">Conditions d’utilisation</Link>
+          <nav aria-label={t("footer.legalNavLabel")} className="flex flex-col gap-2">
+            <span className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">{t("footer.legalLabel")}</span>
+            <Link to="/mentions-legales" className="w-fit text-ink-secondary hover:text-gold-dark">{t("footer.legalNotice")}</Link>
+            <Link to="/confidentialite" className="w-fit text-ink-secondary hover:text-gold-dark">{t("footer.privacy")}</Link>
+            <Link to="/conditions" className="w-fit text-ink-secondary hover:text-gold-dark">{t("footer.terms")}</Link>
           </nav>
           </div>
         </div>
 
         <div className="mt-12 border-t border-black/5 pt-6">
           <p className="text-xs text-ink-muted">
-            © {new Date().getFullYear()} Jappandale — Dakar, Sénégal
+            {t("footer.copyright", { year: new Date().getFullYear() })}
           </p>
         </div>
       </div>

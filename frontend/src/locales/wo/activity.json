@@ -1,0 +1,78 @@
+{
+  "contribution": {
+    "genericError": "Jëf bi baaxul. Xool xibaar yi te jéema beneen yoon.",
+    "notFound": "Kanpaañ bii gisul walla amul.",
+    "loading": "Di yebbi…",
+    "backToCampaigns": "Dellu ci kanpaañ yi",
+    "amountRange": "Xaalis bi war na nekk diggante 1 000 ak 5 000 000 FCFA.",
+    "rewardMinimum": "Xaalis bu suuf ngir contrepartie bii mooy {{amount}}.",
+    "kycRequired": {
+      "title": "Wóoral idantite war na",
+      "text": "War nga wóoral sa idantite laata nga dokkal. Gis ay dokimaan yu ñu laaj ak sasa sa dosye ci sa kont.",
+      "cta": "Dugg ci sama kont"
+    },
+    "backToCampaign": "Dellu ci kanpaañ bi",
+    "eyebrow": "Dokkal",
+    "title": "Dokkal ci {{campaign}}",
+    "verifyNote": "Xool xaalis bi ak xibaar yu kanpaañ bi laata nga wóorloo sa dokkal.",
+    "reward": {
+      "label": "Contrepartie",
+      "none": "Amul contrepartie — dokkal bu yomb",
+      "soldOut": "Jeex na",
+      "from": "Dale ci {{amount}}",
+      "remaining": " · {{count}} desna"
+    },
+    "amountLabel": "Xaalis ci FCFA",
+    "hideNameLabel": "Nëbb sama tur ci liistu ñiy dokkal bu ubbeeku",
+    "preparing": "Di waaj…",
+    "continue": "Jëm ci kanam",
+    "confirmed": "Dokkal wóorloo na",
+    "notConfirmed": "Dokkal wóorloowul",
+    "reference": "nimero {{ref}}",
+    "seeCampaign": "Xool kanpaañ bi",
+    "seeHistory": "Xool sama taariix",
+    "reviewTitle": "Xool sa dokkal",
+    "amount": "Xaalis",
+    "display": "Wone",
+    "anonymous": "Bu ñu xamul",
+    "nameVisible": "Tur wone",
+    "status": "Sasa",
+    "pending": "Di xaar wóorloo",
+    "confirmHint": "Wóorloo xibaar yii ci kaw ngir jeexal sa dokkal.",
+    "confirmSubmit": "Wóorloo dokkal bi",
+    "cancel": "Bàyyi"
+  },
+  "notifications": {
+    "eyebrow": "Sama bérab",
+    "title": "Xibaar yi",
+    "intro": "Dogal KYC, kanpaañ yi ak jëf yu sa dokkal yi.",
+    "markAllRead": "Firndeel lépp mu jàng",
+    "loadError": "Manunu wàll say xibaar.",
+    "retry": "Jéema beneen yoon",
+    "emptyTitle": "Amul lu bees",
+    "emptyText": "Say wóorloo yu ci kanam dinañu feeñ fi.",
+    "seeDetail": "Xool leeral bi →"
+  },
+  "messages": {
+    "eyebrow": "Sama bérab",
+    "title": "Bataaxal yi",
+    "intro": "Say waxtaan ak boroom porojet yi ak ñiy dokkal.",
+    "empty": "Amul waxtaan tey.",
+    "selectConversation": "Tann ab waxtaan.",
+    "messagePlaceholder": "Bind sa bataaxal…",
+    "messageLabel": "Sa bataaxal",
+    "report": "Yedd",
+    "reported": "Yedd na",
+    "reportReasonLabel": "Ballaayu yedd bi",
+    "reportDetailsLabel": "Leeral",
+    "reportDetailsPlaceholder": "Leeral (du war)",
+    "cancel": "Bàyyi",
+    "reasons": {
+      "SPAM": "Spam walla laaj bu bare",
+      "HARCELEMENT": "Tuñi",
+      "CONTENU_INAPPROPRIE": "Mbir bu baaxul",
+      "TENTATIVE_CONTOURNEMENT": "Jéem a wittéeku platfor bi",
+      "AUTRE": "Yeneen ballaay"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Bell,
   ChevronDown,
@@ -13,17 +14,18 @@ import {
 } from "lucide-react";
 
 import { UserAvatar } from "@/components/account/UserAvatar";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import type { MessageThreadListItem, Role } from "@/lib/types";
 
-const roleLabels: Record<Role, string> = {
-  PORTEUR: "Porteur de projet",
-  CONTRIBUTEUR: "Contributeur",
-  ADMIN: "Administrateur",
-};
-
 export function Header() {
+  const { t } = useTranslation("common");
+  const roleLabels: Record<Role, string> = {
+    PORTEUR: t("roles.PORTEUR"),
+    CONTRIBUTEUR: t("roles.CONTRIBUTEUR"),
+    ADMIN: t("roles.ADMIN"),
+  };
   const { user, logout, authFetch } = useAuth();
   const location = useLocation();
   const profileRef = useRef<HTMLDivElement>(null);
@@ -121,7 +123,7 @@ export function Header() {
         </Link>
 
         <nav
-          aria-label="Navigation principale"
+          aria-label={t("nav.mainLabel")}
           className="hidden flex-1 items-center justify-center gap-1 md:flex"
         >
           <Link
@@ -129,37 +131,32 @@ export function Header() {
             aria-current={isCurrentPath("/campagnes") ? "page" : undefined}
             className="rounded-full px-4 py-2 text-sm font-medium text-ink-secondary hover:bg-surface-alt hover:text-ink aria-[current=page]:bg-gold/15 aria-[current=page]:text-ink"
           >
-            Campagnes
+            {t("nav.campaigns")}
           </Link>
           {user?.role === "PORTEUR" && (
             <Link
               to="/campagnes?vue=mes-campagnes"
               className="rounded-full px-4 py-2 text-sm font-medium text-ink-secondary hover:bg-surface-alt hover:text-ink"
             >
-              Mes campagnes
+              {t("nav.myCampaigns")}
             </Link>
           )}
-          <Link
-            to="/#comment-ca-marche"
-            className="rounded-full px-4 py-2 text-sm font-medium text-ink-secondary hover:bg-surface-alt hover:text-ink"
-          >
-            Comment ça marche
-          </Link>
           <Link
             to="/a-propos"
             aria-current={isCurrentPath("/a-propos") ? "page" : undefined}
             className="rounded-full px-4 py-2 text-sm font-medium text-ink-secondary hover:bg-surface-alt hover:text-ink aria-[current=page]:bg-gold/15 aria-[current=page]:text-ink"
           >
-            À propos
+            {t("nav.about")}
           </Link>
         </nav>
 
-        <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
+        <div className="ml-auto hidden shrink-0 items-center gap-3 md:flex">
+          <LanguageSwitcher />
           {user ? (
             <>
               <Link
                 to="/messages"
-                aria-label={`${unreadMessages} message(s) non lu(s)`}
+                aria-label={t("header.unreadMessages", { count: unreadMessages })}
                 className="relative flex size-10 items-center justify-center rounded-full border border-black/10 text-ink-secondary transition hover:border-gold hover:bg-gold/10 hover:text-ink"
               >
                 <MessageCircle className="size-4.5" />
@@ -171,7 +168,7 @@ export function Header() {
               </Link>
               <Link
                 to="/notifications"
-                aria-label={`${unreadCount} notification(s) non lue(s)`}
+                aria-label={t("header.unreadNotifications", { count: unreadCount })}
                 className="relative flex size-10 items-center justify-center rounded-full border border-black/10 text-ink-secondary transition hover:border-gold hover:bg-gold/10 hover:text-ink"
               >
                 <Bell className="size-4.5" />
@@ -232,7 +229,7 @@ export function Header() {
                           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt"
                         >
                           <LayoutDashboard className="size-4 text-gold-dark" />
-                          Administration
+                          {t("header.admin")}
                         </Link>
                       )}
                       {user.role === "PORTEUR" && (
@@ -242,7 +239,7 @@ export function Header() {
                           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt"
                         >
                           <FolderKanban className="size-4 text-gold-dark" />
-                          Mes campagnes
+                          {t("nav.myCampaigns")}
                         </Link>
                       )}
                       <Link
@@ -251,7 +248,7 @@ export function Header() {
                         className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt"
                       >
                         <UserRound className="size-4 text-gold-dark" />
-                        Mon profil
+                        {t("header.myProfile")}
                       </Link>
                     </div>
                     <div className="border-t border-black/5 pt-2">
@@ -262,7 +259,7 @@ export function Header() {
                         className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-700 hover:bg-red-50"
                       >
                         <LogOut className="size-4" />
-                        Se déconnecter
+                        {t("header.logout")}
                       </button>
                     </div>
                   </div>
@@ -276,13 +273,13 @@ export function Header() {
                 variant="ghost"
                 className="rounded-full px-4 text-ink-secondary"
               >
-                <Link to="/connexion">Se connecter</Link>
+                <Link to="/connexion">{t("header.login")}</Link>
               </Button>
               <Button
                 asChild
                 className="rounded-full bg-gold px-5 font-semibold text-ink hover:bg-gold-light"
               >
-                <Link to="/inscription">Créer un compte</Link>
+                <Link to="/inscription">{t("header.register")}</Link>
               </Button>
             </>
           )}
@@ -290,7 +287,7 @@ export function Header() {
 
         <button
           type="button"
-          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-label={menuOpen ? t("header.closeMenu") : t("header.openMenu")}
           aria-controls="mobile-navigation"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((value) => !value)}
@@ -307,10 +304,13 @@ export function Header() {
       {menuOpen && (
         <nav
           id="mobile-navigation"
-          aria-label="Navigation mobile"
+          aria-label={t("nav.mobileLabel")}
           className="border-t border-black/5 bg-surface px-4 py-4 shadow-lg md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-2">
+            <div className="mb-1 flex justify-start">
+              <LanguageSwitcher />
+            </div>
             {user && (
               <div className="mb-2 flex items-center gap-3 rounded-2xl bg-surface-alt p-3">
                 <UserAvatar user={user} />
@@ -330,14 +330,7 @@ export function Header() {
               aria-current={isCurrentPath("/campagnes") ? "page" : undefined}
               className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt aria-[current=page]:bg-gold/15"
             >
-              Voir les campagnes
-            </Link>
-            <Link
-              to="/#comment-ca-marche"
-              onClick={closeMenus}
-              className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt"
-            >
-              Comment ça marche
+              {t("header.seeCampaigns")}
             </Link>
             <Link
               to="/a-propos"
@@ -345,7 +338,7 @@ export function Header() {
               aria-current={isCurrentPath("/a-propos") ? "page" : undefined}
               className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt aria-[current=page]:bg-gold/15"
             >
-              À propos
+              {t("nav.about")}
             </Link>
             {user ? (
               <>
@@ -355,7 +348,7 @@ export function Header() {
                     onClick={closeMenus}
                     className="rounded-xl bg-ink px-4 py-3 font-semibold text-white"
                   >
-                    Administration
+                    {t("header.admin")}
                   </Link>
                 )}
                 {user.role === "PORTEUR" && (
@@ -364,7 +357,7 @@ export function Header() {
                     onClick={closeMenus}
                     className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt"
                   >
-                    Mes campagnes
+                    {t("nav.myCampaigns")}
                   </Link>
                 )}
                 <Link
@@ -372,7 +365,7 @@ export function Header() {
                   onClick={closeMenus}
                   className="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt"
                 >
-                  <span>Messages</span>
+                  <span>{t("header.messages")}</span>
                   {unreadMessages > 0 && (
                     <span className="rounded-full bg-gold-dark px-2 py-0.5 text-xs font-bold text-white">
                       {unreadMessages}
@@ -384,7 +377,7 @@ export function Header() {
                   onClick={closeMenus}
                   className="flex items-center justify-between rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt"
                 >
-                  <span>Notifications</span>
+                  <span>{t("header.notifications")}</span>
                   {unreadCount > 0 && (
                     <span className="rounded-full bg-gold-dark px-2 py-0.5 text-xs font-bold text-white">
                       {unreadCount}
@@ -396,14 +389,14 @@ export function Header() {
                   onClick={closeMenus}
                   className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt"
                 >
-                  Mon profil
+                  {t("header.myProfile")}
                 </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
                   className="rounded-xl px-4 py-3 text-left font-medium text-red-700 hover:bg-red-50"
                 >
-                  Se déconnecter
+                  {t("header.logout")}
                 </button>
               </>
             ) : (
@@ -413,14 +406,14 @@ export function Header() {
                   onClick={closeMenus}
                   className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt"
                 >
-                  Se connecter
+                  {t("header.login")}
                 </Link>
                 <Link
                   to="/inscription"
                   onClick={closeMenus}
                   className="rounded-xl bg-gold px-4 py-3 text-center font-semibold text-ink"
                 >
-                  Créer un compte
+                  {t("header.register")}
                 </Link>
               </>
             )}

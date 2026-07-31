@@ -1,0 +1,129 @@
+{
+  "main": {
+    "roles": {
+      "PORTEUR": "Porteur de projet",
+      "CONTRIBUTEUR": "Contributeur",
+      "ADMIN": "Administrateur"
+    },
+    "eyebrow": "Mon compte",
+    "greeting": "Bonjour {{name}}",
+    "greetingFallback": "à vous",
+    "tabsLabel": "Sections de mon compte",
+    "tabs": {
+      "apercu": "Vue d’ensemble",
+      "profil": "Informations personnelles",
+      "kyc": "Vérification d’identité",
+      "contributions": "Contributions",
+      "guichet": "Guichet Unique"
+    },
+    "actionRequired": "Action requise",
+    "avatar": {
+      "title": "Photo de profil",
+      "hint": "JPG, PNG ou WebP · 3 Mo maximum.",
+      "change": "Changer la photo",
+      "add": "Ajouter une photo",
+      "remove": "Supprimer",
+      "invalidFile": "Choisissez une image JPG, PNG ou WebP de 3 Mo maximum.",
+      "updated": "Votre photo de profil a été mise à jour.",
+      "saveError": "Impossible d’enregistrer cette photo.",
+      "removed": "La photo a été supprimée.",
+      "removeError": "Impossible de supprimer cette photo."
+    },
+    "emailNotVerified": {
+      "title": "Adresse e-mail non vérifiée",
+      "text": "Saisissez le code reçu par e-mail pour sécuriser votre compte.",
+      "cta": "Vérifier maintenant"
+    },
+    "form": {
+      "title": "Informations personnelles",
+      "hint": "Votre adresse e-mail et votre rôle ne sont pas modifiables.",
+      "edit": "Modifier",
+      "invalid": "Certaines informations sont invalides. Vérifiez le formulaire.",
+      "genericError": "Une erreur est survenue. Réessayez.",
+      "saved": "Vos informations ont été enregistrées.",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "phone": "Téléphone",
+      "optional": "(facultatif)",
+      "diasporaLabel": "Je réside à l’étranger (diaspora)",
+      "diasporaHint": "Une vérification renforcée (justificatif de résidence et origine des fonds) sera demandée dans l’onglet Vérification d’identité.",
+      "country": "Pays de résidence",
+      "countryPlaceholder": "— Sélectionnez un pays —",
+      "regions": {
+        "westAfrica": "Afrique de l’Ouest",
+        "centralNorthAfrica": "Afrique centrale et du Nord",
+        "europe": "Europe",
+        "northAmerica": "Amérique du Nord",
+        "middleEast": "Moyen-Orient",
+        "asia": "Asie"
+      },
+      "organization": "Organisation",
+      "organizationPlaceholder": "Nom de l’association ou de l’activité",
+      "city": "Ville",
+      "bio": "Présentation publique",
+      "bioPlaceholder": "Présentez votre expérience et ce qui vous motive…",
+      "saving": "Enregistrement…",
+      "save": "Enregistrer les modifications",
+      "cancel": "Annuler"
+    }
+  },
+  "score": {
+    "title": "Score Jappandale®",
+    "subtitle": "Indicateur de fiabilité calculé à partir de votre historique.",
+    "manualOverride": "Validé manuellement",
+    "overrideNote": "Note de l’équipe Jappandale : {{note}}",
+    "factors": {
+      "base": "Score de base",
+      "kyc": "Identité vérifiée",
+      "anciennete": "Ancienneté du compte",
+      "activite": "Campagnes publiées",
+      "reussite": "Taux de réussite",
+      "montant_collecte": "Montant collecté",
+      "litiges": "Litiges",
+      "signalements": "Signalements",
+      "campagnes_rejetees": "Campagnes rejetées/suspendues"
+    },
+    "recentEvolution": "Évolution récente",
+    "historyLabel": "Historique récent du Score Jappandale",
+    "historyHint": "Chaque consultation met à jour votre historique à partir des données de la plateforme."
+  },
+  "passport": {
+    "title": "Passeport Financier Jappandale®",
+    "subtitle": "Votre historique consolidé, exportable et vérifiable.",
+    "exporting": "Génération…",
+    "export": "Exporter en PDF",
+    "exportError": "Impossible de générer le PDF pour le moment. Réessayez.",
+    "stats": {
+      "campaignsTotal": "Campagnes créées",
+      "campaignsSuccess": "Clôturées avec succès",
+      "totalCollected": "Montant collecté",
+      "distinctContributors": "Financeurs distincts",
+      "confirmedContributions": "Contributions reçues",
+      "disputesReceived": "Litiges reçus"
+    },
+    "exportsTitle": "Passeports exportés",
+    "exportsHint": "Un lien de vérification est privé par défaut. Activez-le uniquement lorsque vous souhaitez le partager avec un tiers.",
+    "exportDate": "Export du {{date}}",
+    "linkActive": "Lien de vérification actif",
+    "linkPrivate": "Lien privé",
+    "copyLink": "Copier le lien",
+    "makePrivate": "Rendre privé",
+    "allowSharing": "Autoriser le partage",
+    "sharingError": "Impossible de modifier le partage de ce passeport.",
+    "copyError": "Impossible de copier le lien. Vous pouvez réessayer depuis un navigateur sécurisé."
+  },
+  "guichet": {
+    "title": "Guichet Unique du Financement",
+    "subtitle": "Les dispositifs de financement pour lesquels votre profil est éligible.",
+    "empty": "Aucun dispositif de financement n’est publié pour le moment. Revenez bientôt.",
+    "eligible": "Vous êtes éligible",
+    "notEligible": "Non éligible",
+    "minScore": "Score minimum : {{score}}/100",
+    "goalRange": "Objectif {{min}} à {{max}}",
+    "websiteLink": "Site du dispositif",
+    "expressInterest": "Manifester mon intérêt",
+    "referralPrefix": "Orientation : {{status}}",
+    "eligibilityLostError": "Vous ne remplissez plus les critères d’éligibilité de ce dispositif.",
+    "genericError": "Impossible d’enregistrer votre intérêt pour le moment."
+  }
+}

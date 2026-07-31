@@ -1,0 +1,129 @@
+{
+  "main": {
+    "roles": {
+      "PORTEUR": "Boroom porojet",
+      "CONTRIBUTEUR": "Kiy dokkal",
+      "ADMIN": "Administrateur"
+    },
+    "eyebrow": "Sama kont",
+    "greeting": "Nanga def {{name}}",
+    "greetingFallback": "yaw",
+    "tabsLabel": "Xeetu sama kont",
+    "tabs": {
+      "apercu": "Melokaan gu yon",
+      "profil": "Xibaar yu sa bopp",
+      "kyc": "Wóoral idantite",
+      "contributions": "Dokkal yi",
+      "guichet": "Guichet Unique"
+    },
+    "actionRequired": "Jëf war a def",
+    "avatar": {
+      "title": "Nataalu profil",
+      "hint": "JPG, PNG walla WebP · 3 Mo bu gën a bare.",
+      "change": "Soppi nataal bi",
+      "add": "Yokk ab nataal",
+      "remove": "Far",
+      "invalidFile": "Tann ab nataal JPG, PNG walla WebP bu dul weesu 3 Mo.",
+      "updated": "Sa nataalu profil soppi na.",
+      "saveError": "Manunu denc nataal bi.",
+      "removed": "Nataal bi far na.",
+      "removeError": "Manunu far nataal bi."
+    },
+    "emailNotVerified": {
+      "title": "Adres imel wóoralu ko",
+      "text": "Bind kod bi nga jot ci imel ngir kaaraange sa kont.",
+      "cta": "Wóoral tey"
+    },
+    "form": {
+      "title": "Xibaar yu sa bopp",
+      "hint": "Sa adres imel ak sa wàll du soppeeku.",
+      "edit": "Soppi",
+      "invalid": "Yenn xibaar baaxuñu. Xool porum bi.",
+      "genericError": "Am na njumte. Jéema beneen yoon.",
+      "saved": "Sa xibaar yi denc nañu.",
+      "firstName": "Turu njëkk",
+      "lastName": "Sant",
+      "phone": "Telefon",
+      "optional": "(du war)",
+      "diasporaLabel": "Dama dëkk ci biir-réew (diaspora)",
+      "diasporaHint": "Ab wóoral bu doy (xaymawukaayu dëkkuwaay ak jóge xaalis bi) dinañu la ko laaj ci onglet Wóoral idantite.",
+      "country": "Réewu dëkkuwaay",
+      "countryPlaceholder": "— Tann ab réew —",
+      "regions": {
+        "westAfrica": "Afrik Sowu-jant",
+        "centralNorthAfrica": "Afrik Digg ak Bëj-gànnaar",
+        "europe": "Erop",
+        "northAmerica": "Amerik Bëj-gànnaar",
+        "middleEast": "Penku Digg",
+        "asia": "Asi"
+      },
+      "organization": "Asosiyasion",
+      "organizationPlaceholder": "Turu asosiyasion walla liggéey bi",
+      "city": "Dëkk",
+      "bio": "Wone bu ubbeeku",
+      "bioPlaceholder": "Wone sa xarit ak li lay dënn…",
+      "saving": "Di denc…",
+      "save": "Denc soppi yi",
+      "cancel": "Bàyyi"
+    }
+  },
+  "score": {
+    "title": "Score Jappandale®",
+    "subtitle": "Wone bu wóor, ñu jël ko ci sa taariix.",
+    "manualOverride": "Wóoral ak loxo",
+    "overrideNote": "Bindu ekipu Jappandale : {{note}}",
+    "factors": {
+      "base": "Score njëkk",
+      "kyc": "Idantite wóoral",
+      "anciennete": "Diirub kont bi",
+      "activite": "Kanpaañ yu feeñ",
+      "reussite": "Taux yekk",
+      "montant_collecte": "Xaalis bu dajale",
+      "litiges": "Jumtukaay yi",
+      "signalements": "Yédd yi",
+      "campagnes_rejetees": "Kanpaañ yu ñu bàyyi/taxaw"
+    },
+    "recentEvolution": "Coppite bu bees",
+    "historyLabel": "Taariixu Score Jappandale bu bees",
+    "historyHint": "Bépp xool dafay soppi sa taariix ci xibaar yu platfor bi."
+  },
+  "passport": {
+    "title": "Passeport Financier Jappandale®",
+    "subtitle": "Sa taariix bu ñu dajale, mën koo yónnee te wóoral ko.",
+    "exporting": "Di sos…",
+    "export": "Yónnee ci PDF",
+    "exportError": "Manunu sos PDF bi tey. Jéema beneen yoon.",
+    "stats": {
+      "campaignsTotal": "Kanpaañ yu sos",
+      "campaignsSuccess": "Yekk nañu te tëj",
+      "totalCollected": "Xaalis bu dajale",
+      "distinctContributors": "Ñiy dokkal yu wuute",
+      "confirmedContributions": "Dokkal yu jot",
+      "disputesReceived": "Jumtukaay yu jot"
+    },
+    "exportsTitle": "Paspoor yu ñu yónnee",
+    "exportsHint": "Ab lien wóoral, ci njëkk, mooy sutura. Ubbi ko rekk bu nga bëggee wàllaale ko ak keneen.",
+    "exportDate": "Yónnee bu {{date}}",
+    "linkActive": "Lien wóoral dafa dox",
+    "linkPrivate": "Lien bu sutura",
+    "copyLink": "Nangu lien bi",
+    "makePrivate": "Def ko sutura",
+    "allowSharing": "May wàllaale",
+    "sharingError": "Manunu soppi wàllaale paspoor bii.",
+    "copyError": "Manunu nangu lien bi. Mën nga jéema ci ab navigatër bu wóor."
+  },
+  "guichet": {
+    "title": "Guichet Unique du Financement",
+    "subtitle": "Dispositif yu xaalis yu sa profil mëna am.",
+    "empty": "Amul dispositif bu xaalis bu feeñ tey. Dellusi ci kanam.",
+    "eligible": "Mën nga ko am",
+    "notEligible": "Mën nga ko amul",
+    "minScore": "Score ci suuf : {{score}}/100",
+    "goalRange": "Jubluwaay {{min}} ba {{max}}",
+    "websiteLink": "Sit bu dispositif bi",
+    "expressInterest": "Wone sama xalaat",
+    "referralPrefix": "Yóbbu : {{status}}",
+    "eligibilityLostError": "Doo fi am sart yi ngir am dispositif bii.",
+    "genericError": "Manunu denc sa xalaat tey."
+  }
+}

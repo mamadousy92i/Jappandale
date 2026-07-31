@@ -1,0 +1,58 @@
+{
+  "backToCampaigns": "Kanpaañ yépp",
+  "verifiedOwner": "Boroom bu ñu wóoral",
+  "flexibleCollection": "Dajale bu yomb",
+  "byLine": "Boroom bi mooy",
+  "publishedOn": "Feeñ na {{date}}",
+  "notFound": {
+    "title": "Kanpaañ bi gisul",
+    "text404": "Kanpaañ bii amul walla amutna.",
+    "textError": "Manunu wàll kanpaañ bi tey.",
+    "back": "Dellu ci kanpaañ yi"
+  },
+  "about": "Ci mbiru porojet bi",
+  "impact": "Njariñ bu ñu xaar",
+  "rewards": {
+    "title": "Contrepartie yi",
+    "soldOut": "Jeex na",
+    "minimum": "ci suuf",
+    "unlimited": "Xayma bu amul dayo",
+    "remaining": "{{remaining}} desna ci {{limit}}"
+  },
+  "fundingPlan": "Ni xaalis bi di jëfandikoo",
+  "timeline": "Jaataayu porojet bi",
+  "verification": {
+    "title": "Lu ñu wóoral laata mu feeñ",
+    "text": "Identiteb boroom porojet bi ak xibaar yi ñu wax ci kanpaañ bii, ekipu wóoral bi xool na leen. Wóoral bii duñu firndeel ne dina yekk walla ne mooy ab digal ci investisman."
+  },
+  "owner": {
+    "eyebrow": "Boroom porojet bi",
+    "loginPrompt": "Dugg ci sa kont",
+    "loginSuffix": "ngir jokkoo ak boroom porojet bii.",
+    "messagePlaceholder": "Laaj boroom porojet bi sa laaj…",
+    "messageLabel": "Sa bataaxal ci boroom bi",
+    "sendError": "Manunu yónnee bataaxal bi. Xool sa idantite (KYC) te jéema beneen yoon.",
+    "sentPrefix": "Bataaxal bi yónnee na. Gis waxtaan wi ci",
+    "sentLinkText": "sa bérabu Bataaxal",
+    "sending": "Di yónnee…",
+    "contact": "Jokkoo ak boroom bi"
+  },
+  "contributors": "Dokkal yu bees",
+  "updates": "Xibaar yu bees",
+  "donation": {
+    "collectedOutOf": "dajale ci jubluwaay bu {{amount}}",
+    "ofGoal": "ci jubluwaay bi",
+    "daysLeft": "Bis-{{count}}",
+    "ended": "Jeex na",
+    "beforeClosing": "laata mu tëj",
+    "closed": "kanpaañ bi tëj na",
+    "expectedReturn": "Njariñ bu ñu xaar",
+    "contribute": "Dokkal tey",
+    "suspended": "Kanpaañ bi taxaw ci ab diir",
+    "endedButton": "Kanpaañ bi tëj na",
+    "note": "Sa dokkal dina bokk ci sa kont ak kanpaañ bii.",
+    "shareCopied": "Lien bi nangu na",
+    "share": "Wàllaale kanpaañ bii",
+    "report": "Yedd kanpaañ bii"
+  }
+}

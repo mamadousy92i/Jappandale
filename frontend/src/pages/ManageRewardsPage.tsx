@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import type { FormEvent } from "react"
 import { Link, useParams } from "react-router-dom"
 import { ArrowLeft, Gift, Pencil, Plus, Trash2, X } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -45,6 +46,7 @@ function RewardForm({
   slug: string
   rewardId?: number
 }) {
+  const { t } = useTranslation("createCampaign")
   const { authFetch } = useAuth()
   const [form, setForm] = useState(initial)
   const [error, setError] = useState<string | null>(null)
@@ -71,7 +73,7 @@ function RewardForm({
       if (err instanceof ApiError && err.details) {
         setError(toMessage(Object.values(err.details)[0]))
       } else {
-        setError("Une erreur est survenue. Réessayez.")
+        setError(t("rewards.form.genericError"))
       }
     } finally {
       setSubmitting(false)
@@ -89,32 +91,32 @@ function RewardForm({
         </p>
       )}
       <div className="space-y-2">
-        <Label htmlFor="reward-title">Titre de la contrepartie</Label>
+        <Label htmlFor="reward-title">{t("rewards.form.title")}</Label>
         <Input
           id="reward-title"
           required
           value={form.title}
           onChange={(event) => setForm({ ...form, title: event.target.value })}
-          placeholder="Ex. Sac cousu main"
+          placeholder={t("rewards.form.titlePlaceholder")}
           className="h-12 rounded-xl"
         />
       </div>
       <div className="space-y-2">
         <Label htmlFor="reward-description">
-          Description <span className="font-normal text-ink-muted">(facultatif)</span>
+          {t("rewards.form.description")} <span className="font-normal text-ink-muted">{t("form.optional")}</span>
         </Label>
         <textarea
           id="reward-description"
           rows={3}
           value={form.description}
           onChange={(event) => setForm({ ...form, description: event.target.value })}
-          placeholder="Décrivez ce que recevra le contributeur."
+          placeholder={t("rewards.form.descriptionPlaceholder")}
           className="w-full rounded-xl border border-black/10 bg-surface px-4 py-3 text-sm leading-relaxed outline-none focus:border-gold-dark focus:ring-2 focus:ring-gold/20"
         />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="reward-minimum">Montant minimum (F CFA)</Label>
+          <Label htmlFor="reward-minimum">{t("rewards.form.minimum")}</Label>
           <Input
             id="reward-minimum"
             type="number"
@@ -123,14 +125,14 @@ function RewardForm({
             required
             value={form.minimum_amount}
             onChange={(event) => setForm({ ...form, minimum_amount: event.target.value })}
-            placeholder="15 000"
+            placeholder={t("rewards.form.minimumPlaceholder")}
             className="h-12 rounded-xl"
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="reward-quantity">
-            Quantité disponible{" "}
-            <span className="font-normal text-ink-muted">(vide = illimitée)</span>
+            {t("rewards.form.quantity")}{" "}
+            <span className="font-normal text-ink-muted">{t("rewards.form.quantityHint")}</span>
           </Label>
           <Input
             id="reward-quantity"
@@ -139,7 +141,7 @@ function RewardForm({
             min={1}
             value={form.quantity_limit}
             onChange={(event) => setForm({ ...form, quantity_limit: event.target.value })}
-            placeholder="20"
+            placeholder={t("rewards.form.quantityPlaceholder")}
             className="h-12 rounded-xl"
           />
         </div>
@@ -150,11 +152,11 @@ function RewardForm({
           disabled={submitting}
           className="h-11 rounded-full bg-gold px-6 font-semibold text-ink hover:bg-gold-light"
         >
-          {submitting ? "Enregistrement…" : rewardId ? "Enregistrer" : "Ajouter la contrepartie"}
+          {submitting ? t("rewards.form.saving") : rewardId ? t("rewards.form.save") : t("rewards.form.add")}
         </Button>
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel} className="h-11 rounded-full">
-            Annuler
+            {t("rewards.form.cancel")}
           </Button>
         )}
       </div>
@@ -173,6 +175,7 @@ function RewardRow({
   onUpdated: (reward: Reward) => void
   onDeleted: (id: number) => void
 }) {
+  const { t } = useTranslation("createCampaign")
   const { authFetch } = useAuth()
   const [editing, setEditing] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -188,7 +191,7 @@ function RewardRow({
       if (err instanceof ApiError && err.details) {
         setError(toMessage(Object.values(err.details)[0]))
       } else {
-        setError("La suppression a échoué.")
+        setError(t("rewards.row.deleteError"))
       }
       setDeleting(false)
     }
@@ -224,7 +227,7 @@ function RewardRow({
             {reward.title}
             {reward.sold_out && (
               <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">
-                Épuisée
+                {t("rewards.row.soldOut")}
               </span>
             )}
           </p>
@@ -237,17 +240,17 @@ function RewardRow({
             <span className="font-semibold text-gold-dark">
               {formatFcfa(reward.minimum_amount)}
             </span>{" "}
-            minimum ·{" "}
+            {t("rewards.row.minimum")} ·{" "}
             {reward.quantity_limit === null
-              ? "quantité illimitée"
-              : `${reward.remaining} restante(s) sur ${reward.quantity_limit}`}
+              ? t("rewards.row.unlimited")
+              : t("rewards.row.remaining", { remaining: reward.remaining, limit: reward.quantity_limit })}
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
           <button
             type="button"
             onClick={() => setEditing(true)}
-            aria-label={`Modifier ${reward.title}`}
+            aria-label={t("rewards.row.editLabel", { title: reward.title })}
             className="flex size-9 items-center justify-center rounded-full border border-black/10 text-ink-secondary transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold-dark"
           >
             <Pencil aria-hidden="true" className="size-4" />
@@ -257,7 +260,7 @@ function RewardRow({
               type="button"
               onClick={() => void remove()}
               disabled={deleting}
-              aria-label={`Supprimer ${reward.title}`}
+              aria-label={t("rewards.row.deleteLabel", { title: reward.title })}
               className="flex size-9 items-center justify-center rounded-full border border-black/10 text-ink-secondary transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
             >
               <Trash2 aria-hidden="true" className="size-4" />
@@ -271,6 +274,7 @@ function RewardRow({
 }
 
 export default function ManageRewardsPage() {
+  const { t } = useTranslation("createCampaign")
   const { slug } = useParams<{ slug: string }>()
   const { authFetch } = useAuth()
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null)
@@ -308,7 +312,7 @@ export default function ManageRewardsPage() {
         className="inline-flex items-center gap-2 text-sm font-medium text-ink-secondary hover:text-ink"
       >
         <ArrowLeft className="size-4" />
-        Retour à mon espace
+        {t("rewards.backToAccount")}
       </Link>
 
       <div className="mt-7 rounded-[24px] border border-black/5 bg-surface p-5 shadow-sm sm:p-10">
@@ -316,27 +320,26 @@ export default function ManageRewardsPage() {
           <Gift className="size-5" />
         </span>
         <p className="mt-5 text-xs font-semibold tracking-[3px] text-gold-dark uppercase">
-          Contreparties
+          {t("rewards.eyebrow")}
         </p>
         <h1 className="mt-2 font-heading text-3xl font-bold text-ink">
-          {campaign ? `Contreparties de « ${campaign.title} »` : "Chargement…"}
+          {campaign ? t("rewards.titleWithCampaign", { title: campaign.title }) : t("rewards.loading")}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
-          Proposez des paliers pour remercier vos contributeurs selon le montant de
-          leur don.
+          {t("rewards.intro")}
         </p>
 
         {loading ? (
           <div className="mt-8 h-40 animate-pulse rounded-2xl bg-black/[0.05]" />
         ) : error || !campaign ? (
           <p className="mt-8 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            Cette campagne est introuvable ou ne vous appartient pas.
+            {t("rewards.notFound")}
           </p>
         ) : !canManage ? (
           <p className="mt-8 rounded-xl border border-gold/25 bg-gold/10 px-4 py-3 text-sm text-ink-secondary">
             {campaign.campaign_type !== "DON_CONTREPARTIE"
-              ? "Cette campagne est de type « don libre » : elle ne propose pas de contreparties."
-              : "Les contreparties ne peuvent être modifiées que sur une campagne en brouillon, rejetée ou suspendue."}
+              ? t("rewards.notRewardType")
+              : t("rewards.notEditableStatus")}
           </p>
         ) : (
           <div className="mt-8 space-y-4">
@@ -375,14 +378,14 @@ export default function ManageRewardsPage() {
                 className="h-12 rounded-full border-gold/60 px-6 text-ink hover:bg-gold/10"
               >
                 <Plus aria-hidden="true" className="size-4" />
-                Ajouter une contrepartie
+                {t("rewards.addReward")}
               </Button>
             )}
 
             {rewards.length === 0 && !showForm && (
               <p className="flex items-center gap-2 text-sm text-ink-muted">
                 <X aria-hidden="true" className="size-4" />
-                Aucune contrepartie pour le moment.
+                {t("rewards.empty")}
               </p>
             )}
           </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 
 function LoginPage() {
+  const { t } = useTranslation("auth");
   const { login, verifyAdminMfa } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,8 +36,7 @@ function LoginPage() {
         if (result.mfaRequired && result.challengeId) {
           setMfaChallenge(result.challengeId);
           setMfaMessage(
-            result.message ??
-              "Un code de sécurité vous a été envoyé par e-mail.",
+            result.message ?? t("login.defaultMfaMessage"),
           );
           setSubmitting(false);
           return;
@@ -46,11 +47,11 @@ function LoginPage() {
       navigate(destination, { replace: true });
     } catch (err) {
       if (mfaChallenge && err instanceof ApiError && err.status === 400) {
-        setError("Le code est incorrect ou a expiré.");
+        setError(t("login.errors.invalidCode"));
       } else if (err instanceof ApiError && err.status === 401) {
-        setError("E-mail ou mot de passe incorrect.");
+        setError(t("login.errors.invalidCredentials"));
       } else {
-        setError("Une erreur est survenue. Réessayez.");
+        setError(t("login.errors.generic"));
       }
       setSubmitting(false);
     }
@@ -66,12 +67,10 @@ function LoginPage() {
       <div className="relative mx-auto flex max-w-2xl flex-col items-center px-5 pt-16 pb-24 sm:px-8 sm:pt-24 sm:pb-32">
         <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-center text-center duration-700 motion-reduce:animate-none">
           <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-            {mfaChallenge ? "Sécurité administrateur" : "Espace membre"}
+            {mfaChallenge ? t("login.adminSecurity") : t("login.memberSpace")}
           </span>
           <h1 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-            {mfaChallenge
-              ? "Confirmez votre connexion"
-              : "Content de vous revoir"}
+            {mfaChallenge ? t("login.confirmTitle") : t("login.welcomeTitle")}
           </h1>
           <div
             aria-hidden="true"
@@ -104,7 +103,7 @@ function LoginPage() {
               </p>
               <div className="space-y-2">
                 <Label htmlFor="admin-code" className="text-ink">
-                  Code à six chiffres
+                  {t("login.codeLabel")}
                 </Label>
                 <Input
                   id="admin-code"
@@ -128,7 +127,7 @@ function LoginPage() {
             <div className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-ink">
-                  Adresse e-mail
+                  {t("login.emailLabel")}
                 </Label>
                 <Input
                   id="email"
@@ -145,13 +144,13 @@ function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-4">
                   <Label htmlFor="password" className="text-ink">
-                    Mot de passe
+                    {t("login.passwordLabel")}
                   </Label>
                   <Link
                     to="/mot-de-passe/oublie"
                     className="text-xs font-semibold text-gold-dark hover:underline"
                   >
-                    Mot de passe oublié ?
+                    {t("login.forgotPassword")}
                   </Link>
                 </div>
                 <Input
@@ -159,7 +158,7 @@ function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  placeholder="Votre mot de passe"
+                  placeholder={t("login.passwordPlaceholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="h-14 rounded-xl px-5 text-base"
@@ -174,10 +173,10 @@ function LoginPage() {
             className="mt-9 h-14 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
           >
             {submitting
-              ? "Vérification…"
+              ? t("login.verifying")
               : mfaChallenge
-                ? "Vérifier et se connecter"
-                : "Se connecter"}
+                ? t("login.verifyAndLogin")
+                : t("login.submit")}
           </Button>
 
           {mfaChallenge && (
@@ -192,19 +191,19 @@ function LoginPage() {
               className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold text-ink-secondary transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-dark/50"
             >
               <ArrowLeft aria-hidden="true" className="size-4" />
-              Revenir à la connexion
+              {t("login.backToLogin")}
             </button>
           )}
         </form>
 
         {!mfaChallenge && (
           <p className="animate-in fade-in fill-mode-backwards mt-8 text-sm text-ink-secondary delay-300 duration-700 motion-reduce:animate-none">
-            Pas encore de compte ?{" "}
+            {t("login.noAccount")}{" "}
             <Link
               to="/inscription"
               className="rounded-sm font-semibold text-gold-dark underline-offset-4 transition-colors outline-none hover:text-ink hover:underline focus-visible:ring-2 focus-visible:ring-gold-dark/50"
             >
-              S'inscrire
+              {t("login.signUp")}
             </Link>
           </p>
         )}

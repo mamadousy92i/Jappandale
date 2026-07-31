@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "mainLabel": "Navigation principale",
+    "mobileLabel": "Navigation mobile",
+    "campaigns": "Campagnes",
+    "myCampaigns": "Mes campagnes",
+    "about": "À propos"
+  },
+  "header": {
+    "unreadMessages": "{{count}} message(s) non lu(s)",
+    "unreadNotifications": "{{count}} notification(s) non lue(s)",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "admin": "Administration",
+    "myProfile": "Mon profil",
+    "logout": "Se déconnecter",
+    "login": "Se connecter",
+    "register": "Créer un compte",
+    "seeCampaigns": "Voir les campagnes",
+    "messages": "Messages",
+    "notifications": "Notifications"
+  },
+  "roles": {
+    "PORTEUR": "Porteur de projet",
+    "CONTRIBUTEUR": "Contributeur",
+    "ADMIN": "Administrateur"
+  },
+  "footer": {
+    "tagline": "Le financement participatif au service des projets sénégalais. Ensemble, donnons vie aux idées d’ici.",
+    "understandLabel": "Comprendre",
+    "howItWorks": "Comment ça marche",
+    "about": "À propos",
+    "trust": "Confiance et transparence",
+    "support": "Assistance",
+    "accountLabel": "Compte",
+    "createAccount": "Créer un compte",
+    "login": "Se connecter",
+    "legalNavLabel": "Informations légales",
+    "legalLabel": "Légal",
+    "legalNotice": "Mentions légales",
+    "privacy": "Confidentialité",
+    "terms": "Conditions d’utilisation",
+    "copyright": "© {{year}} Jappandale — Dakar, Sénégal"
+  }
+}

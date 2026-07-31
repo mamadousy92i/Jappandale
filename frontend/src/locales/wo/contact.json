@@ -1,0 +1,17 @@
+{
+  "eyebrow": "Ndimbal",
+  "title": "Naka nu mëna la ndimbal ?",
+  "intro": "Am nga laaj ci ab kanpaañ, KYC bi, walla ab dokkal ? Wone sa mbir te bul yónnee sa mot de passe walla xibaaru bank.",
+  "reportNote": "Ngir yedd ab mbir bu réy, jëfandikoo loppitaanu « Yedd » bi nekk ci kanpaañ bi.",
+  "sentTitle": "Laaj bi jot na",
+  "sentText": "Mu nekk na tey ci bérabu ndimbal bu Jappandale.",
+  "form": {
+    "name": "Turu bépp",
+    "email": "Adres imel",
+    "subject": "Mbir mi",
+    "message": "Sa bataaxal",
+    "sending": "Di yónnee…",
+    "submit": "Yónnee laaj bi",
+    "error": "Manunu yónnee sa laaj. Xool xibaar yi nga bind."
+  }
+}

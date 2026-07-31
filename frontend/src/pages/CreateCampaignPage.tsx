@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ImagePlus,
   Plus,
@@ -17,33 +18,21 @@ import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { CampaignCategory, CampaignDetail, CampaignType } from "@/lib/types";
 
-const campaignTypeOptions: {
-  value: CampaignType;
-  title: string;
-  description: string;
-}[] = [
-  {
-    value: "DON_LIBRE",
-    title: "Don libre",
-    description: "Les contributeurs donnent sans contrepartie matérielle.",
-  },
-  {
-    value: "DON_CONTREPARTIE",
-    title: "Don avec contrepartie",
-    description:
-      "Proposez des paliers de récompense pour remercier vos contributeurs.",
-  },
+const campaignTypeValues: CampaignType[] = [
+  "DON_LIBRE",
+  "DON_CONTREPARTIE",
+  "INVESTISSEMENT_PARTICIPATIF",
 ];
 
-const categories: { code: CampaignCategory; label: string }[] = [
-  { code: "ARTISANAT", label: "Artisanat" },
-  { code: "COMMERCE", label: "Commerce" },
-  { code: "AGRICULTURE", label: "Agriculture" },
-  { code: "EDUCATION", label: "Éducation" },
-  { code: "SANTE", label: "Santé" },
-  { code: "TECHNOLOGIE", label: "Technologie" },
-  { code: "CULTURE", label: "Culture" },
-  { code: "AUTRE", label: "Autre" },
+const categoryCodes: CampaignCategory[] = [
+  "ARTISANAT",
+  "COMMERCE",
+  "AGRICULTURE",
+  "EDUCATION",
+  "SANTE",
+  "TECHNOLOGIE",
+  "CULTURE",
+  "AUTRE",
 ];
 
 const fieldNames = [
@@ -51,6 +40,7 @@ const fieldNames = [
   "summary",
   "description",
   "campaign_type",
+  "expected_return_rate",
   "location",
   "beneficiaries",
   "funding_plan",
@@ -131,6 +121,17 @@ function AccessNotice({
 }
 
 function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
+  const { t } = useTranslation("createCampaign");
+  const { t: tCampaigns } = useTranslation("campaigns");
+  const campaignTypeOptions = campaignTypeValues.map((value) => ({
+    value,
+    title: t(`types.${value}.title`),
+    description: t(`types.${value}.description`),
+  }));
+  const categories = categoryCodes.map((code) => ({
+    code,
+    label: tCampaigns(`categories.${code}`),
+  }));
   const { authFetch } = useAuth();
   const navigate = useNavigate();
 
@@ -139,6 +140,9 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
   const [description, setDescription] = useState(campaign?.description ?? "");
   const [campaignType, setCampaignType] = useState<CampaignType>(
     campaign?.campaign_type ?? "DON_LIBRE",
+  );
+  const [expectedReturnRate, setExpectedReturnRate] = useState(
+    campaign?.expected_return_rate != null ? String(campaign.expected_return_rate) : "",
   );
   const [location, setLocation] = useState(campaign?.location ?? "");
   const [beneficiaries, setBeneficiaries] = useState(
@@ -214,6 +218,9 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
     data.append("summary", summary);
     data.append("description", description);
     data.append("campaign_type", campaignType);
+    if (campaignType === "INVESTISSEMENT_PARTICIPATIF") {
+      data.append("expected_return_rate", expectedReturnRate);
+    }
     data.append("location", location);
     data.append("beneficiaries", beneficiaries);
     data.append(
@@ -244,7 +251,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
         setGlobalError(
           err.details?.detail
             ? toMessage(err.details.detail)
-            : "Vous n'êtes pas autorisé à créer une campagne.",
+            : t("form.errors.forbidden"),
         );
       } else if (err instanceof ApiError && err.status === 400 && err.details) {
         const nextErrors: Record<string, string> = {};
@@ -254,12 +261,10 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
         if (Object.keys(nextErrors).length > 0) {
           setFieldErrors(nextErrors);
         } else {
-          setGlobalError(
-            "Certaines informations sont invalides. Vérifiez le formulaire.",
-          );
+          setGlobalError(t("form.errors.invalid"));
         }
       } else {
-        setGlobalError("Une erreur est survenue. Réessayez.");
+        setGlobalError(t("form.errors.generic"));
       }
       setSubmitting(false);
     }
@@ -296,12 +301,12 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
       <div className="space-y-7">
         <div className="space-y-2">
           <Label htmlFor="title" className="text-ink">
-            Titre de la campagne
+            {t("form.title")}
           </Label>
           <Input
             id="title"
             required
-            placeholder="Un atelier de couture à Thiès"
+            placeholder={t("form.titlePlaceholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="h-14 rounded-xl px-5 text-base"
@@ -312,15 +317,15 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
 
         <div className="space-y-2">
           <Label htmlFor="summary" className="text-ink">
-            Accroche{" "}
+            {t("form.summary")}{" "}
             <span className="font-normal text-ink-muted">
-              (une ou deux phrases)
+              {t("form.summaryHint")}
             </span>
           </Label>
           <Input
             id="summary"
             required
-            placeholder="Résumez votre projet en quelques mots percutants."
+            placeholder={t("form.summaryPlaceholder")}
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
             className="h-14 rounded-xl px-5 text-base"
@@ -331,15 +336,13 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
 
         <div className="space-y-2">
           <Label htmlFor="description" className="text-ink">
-            Description détaillée
+            {t("form.description")}
           </Label>
           <textarea
             id="description"
             required
             rows={8}
-            placeholder={
-              "Racontez votre histoire : d'où vient le projet, à quoi serviront les fonds, quel impact pour votre communauté…"
-            }
+            placeholder={t("form.descriptionPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full rounded-xl border border-black/10 bg-surface px-5 py-4 text-base leading-relaxed text-ink outline-none placeholder:text-ink-muted focus-visible:border-gold-dark focus-visible:ring-2 focus-visible:ring-gold-dark/30"
@@ -350,7 +353,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
 
         <fieldset>
           <legend className="text-sm font-medium text-ink">
-            Type de campagne
+            {t("form.typeLegend")}
           </legend>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {campaignTypeOptions.map((option) => (
@@ -390,15 +393,37 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
             ))}
           </div>
           {errorFor("campaign_type")}
+          {campaignType === "INVESTISSEMENT_PARTICIPATIF" && (
+            <div className="mt-4 space-y-2">
+              <Label htmlFor="expected_return_rate" className="text-ink">
+                {t("form.returnRateLabel")}{" "}
+                <span className="font-normal text-ink-muted">{t("form.returnRateUnit")}</span>
+              </Label>
+              <Input
+                id="expected_return_rate"
+                type="number"
+                inputMode="decimal"
+                min={0.01}
+                step={0.01}
+                required
+                placeholder="8"
+                value={expectedReturnRate}
+                onChange={(e) => setExpectedReturnRate(e.target.value)}
+                className="h-14 max-w-xs rounded-xl px-5 text-base"
+                {...invalidProps("expected_return_rate")}
+              />
+              {errorFor("expected_return_rate")}
+            </div>
+          )}
           {campaign && campaign.campaign_type === "DON_CONTREPARTIE" && (
             <p className="mt-3 text-sm text-ink-secondary">
               <Link
                 to={`/campagnes/${campaign.slug}/contreparties`}
                 className="font-semibold text-gold-dark underline-offset-4 hover:underline"
               >
-                Gérer les contreparties
+                {t("form.manageRewardsPrefix")}
               </Link>{" "}
-              de cette campagne.
+              {t("form.manageRewardsSuffix")}
             </p>
           )}
         </fieldset>
@@ -406,12 +431,12 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
         <div className="grid gap-7 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="location" className="text-ink">
-              Localisation du projet
+              {t("form.location")}
             </Label>
             <Input
               id="location"
               required
-              placeholder="Médina, Dakar"
+              placeholder={t("form.locationPlaceholder")}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="h-14 rounded-xl px-5 text-base"
@@ -422,12 +447,12 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
 
           <div className="space-y-2">
             <Label htmlFor="beneficiaries" className="text-ink">
-              Bénéficiaires attendus
+              {t("form.beneficiaries")}
             </Label>
             <Input
               id="beneficiaries"
               required
-              placeholder="10 apprenties couturières"
+              placeholder={t("form.beneficiariesPlaceholder")}
               value={beneficiaries}
               onChange={(e) => setBeneficiaries(e.target.value)}
               className="h-14 rounded-xl px-5 text-base"
@@ -440,10 +465,10 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
         <fieldset className="space-y-4">
           <div>
             <legend className="text-sm font-medium text-ink">
-              Utilisation prévue des fonds
+              {t("form.fundingLegend")}
             </legend>
             <p className="mt-1 text-sm text-ink-muted">
-              Détaillez les principales dépenses et leur montant estimé.
+              {t("form.fundingHint")}
             </p>
           </div>
           <div className="space-y-3">
@@ -454,7 +479,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
               >
                 <div className="space-y-2">
                   <Label htmlFor={`funding-label-${index}`}>
-                    Dépense {index + 1}
+                    {t("form.expenseLabel", { number: index + 1 })}
                   </Label>
                   <Input
                     id={`funding-label-${index}`}
@@ -463,13 +488,13 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
                     onChange={(event) =>
                       updateFundingItem(index, "label", event.target.value)
                     }
-                    placeholder="Ex. Machines à coudre"
+                    placeholder={t("form.expensePlaceholder")}
                     className="h-14 rounded-xl px-5 text-base"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor={`funding-amount-${index}`}>
-                    Montant (F CFA)
+                    {t("form.amountLabel")}
                   </Label>
                   <Input
                     id={`funding-amount-${index}`}
@@ -481,7 +506,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
                     onChange={(event) =>
                       updateFundingItem(index, "amount", event.target.value)
                     }
-                    placeholder="150 000"
+                    placeholder={t("form.amountPlaceholder")}
                     className="h-14 rounded-xl px-5 text-base"
                   />
                 </div>
@@ -494,7 +519,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
                     )
                   }
                   className="flex h-12 w-full items-center justify-center rounded-xl border border-black/10 text-ink-muted transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30 sm:size-14"
-                  aria-label={`Supprimer la dépense ${index + 1}`}
+                  aria-label={t("form.removeExpense", { number: index + 1 })}
                 >
                   <Trash2 aria-hidden="true" className="size-5" />
                 </button>
@@ -510,7 +535,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
             className="h-12 rounded-full border-gold/60 px-6 text-ink hover:bg-gold/10"
           >
             <Plus aria-hidden="true" className="size-4" />
-            Ajouter une dépense
+            {t("form.addExpense")}
           </Button>
           {errorFor("funding_plan")}
         </fieldset>
@@ -518,11 +543,10 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
         <fieldset className="space-y-4">
           <div>
             <legend className="text-sm font-medium text-ink">
-              Étapes prévues du projet
+              {t("form.timelineLegend")}
             </legend>
             <p className="mt-1 text-sm text-ink-muted">
-              Présentez les actions dans l’ordre et indiquez leur période
-              prévue.
+              {t("form.timelineHint")}
             </p>
           </div>
           <div className="space-y-3">
@@ -533,7 +557,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
               >
                 <div className="space-y-2">
                   <Label htmlFor={`timeline-step-${index}`}>
-                    Étape {index + 1}
+                    {t("form.stepLabel", { number: index + 1 })}
                   </Label>
                   <Input
                     id={`timeline-step-${index}`}
@@ -542,12 +566,12 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
                     onChange={(event) =>
                       updateTimelineItem(index, "step", event.target.value)
                     }
-                    placeholder="Ex. Achat du matériel"
+                    placeholder={t("form.stepPlaceholder")}
                     className="h-14 rounded-xl px-5 text-base"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor={`timeline-period-${index}`}>Période</Label>
+                  <Label htmlFor={`timeline-period-${index}`}>{t("form.periodLabel")}</Label>
                   <Input
                     id={`timeline-period-${index}`}
                     required
@@ -555,7 +579,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
                     onChange={(event) =>
                       updateTimelineItem(index, "period", event.target.value)
                     }
-                    placeholder="Ex. Semaine 1"
+                    placeholder={t("form.periodPlaceholder")}
                     className="h-14 rounded-xl px-5 text-base"
                   />
                 </div>
@@ -568,7 +592,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
                     )
                   }
                   className="flex h-12 w-full items-center justify-center rounded-xl border border-black/10 text-ink-muted transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-30 sm:size-14"
-                  aria-label={`Supprimer l’étape ${index + 1}`}
+                  aria-label={t("form.removeStep", { number: index + 1 })}
                 >
                   <Trash2 aria-hidden="true" className="size-5" />
                 </button>
@@ -584,7 +608,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
             className="h-12 rounded-full border-gold/60 px-6 text-ink hover:bg-gold/10"
           >
             <Plus aria-hidden="true" className="size-4" />
-            Ajouter une étape
+            {t("form.addStep")}
           </Button>
           {errorFor("project_timeline")}
         </fieldset>
@@ -592,7 +616,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
         <div className="grid gap-7 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="category" className="text-ink">
-              Catégorie
+              {t("form.category")}
             </Label>
             <select
               id="category"
@@ -612,8 +636,8 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
 
           <div className="space-y-2">
             <Label htmlFor="goal_amount" className="text-ink">
-              Objectif{" "}
-              <span className="font-normal text-ink-muted">(F CFA)</span>
+              {t("form.goalAmount")}{" "}
+              <span className="font-normal text-ink-muted">{t("form.goalAmountUnit")}</span>
             </Label>
             <Input
               id="goal_amount"
@@ -622,7 +646,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
               min={1000}
               step={1}
               required
-              placeholder="500 000"
+              placeholder={t("form.goalAmountPlaceholder")}
               value={goalAmount}
               onChange={(e) => setGoalAmount(e.target.value)}
               className="h-14 rounded-xl px-5 text-base"
@@ -634,7 +658,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
 
         <div className="space-y-2">
           <Label htmlFor="deadline" className="text-ink">
-            Échéance de la collecte
+            {t("form.deadline")}
           </Label>
           <Input
             id="deadline"
@@ -651,8 +675,8 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
 
         <div className="space-y-2">
           <Label htmlFor="cover_image" className="text-ink">
-            Image de couverture{" "}
-            <span className="font-normal text-ink-muted">(facultatif)</span>
+            {t("form.coverImage")}{" "}
+            <span className="font-normal text-ink-muted">{t("form.optional")}</span>
           </Label>
           <input
             id="cover_image"
@@ -667,13 +691,13 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
             <div className="relative mt-3 overflow-hidden rounded-2xl border border-black/5">
               <img
                 src={coverPreview}
-                alt="Aperçu de l'image de couverture"
+                alt={t("form.coverAlt")}
                 className="aspect-[16/9] w-full object-cover"
               />
               <button
                 type="button"
                 onClick={() => handleCoverChange(null)}
-                aria-label="Retirer l'image sélectionnée"
+                aria-label={t("form.removeCover")}
                 className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition-colors outline-none hover:bg-white focus-visible:ring-2 focus-visible:ring-gold-dark/50"
               >
                 <X aria-hidden="true" className="size-4" />
@@ -682,7 +706,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
           ) : (
             <p className="flex items-center gap-2 text-xs text-ink-muted">
               <ImagePlus aria-hidden="true" className="size-4" />
-              Une belle image donne deux fois plus envie de contribuer.
+              {t("form.coverHint")}
             </p>
           )}
         </div>
@@ -696,22 +720,21 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
         <Sparkles aria-hidden="true" className="size-4" />
         {submitting
           ? campaign
-            ? "Enregistrement…"
-            : "Création…"
+            ? t("form.saving")
+            : t("form.creating")
           : campaign
-            ? "Enregistrer les modifications"
-            : "Créer ma campagne"}
+            ? t("form.saveSubmit")
+            : t("form.createSubmit")}
       </Button>
       <p className="mt-4 text-xs leading-relaxed text-ink-muted">
-        {campaign
-          ? "Après vos corrections, revenez dans « Mes campagnes » pour la renvoyer en validation."
-          : "Votre campagne sera d'abord enregistrée en brouillon. Vous pourrez la soumettre à validation depuis votre espace « Mes campagnes »."}
+        {campaign ? t("form.editNote") : t("form.createNote")}
       </p>
     </form>
   );
 }
 
 function CreateCampaignPage() {
+  const { t } = useTranslation("createCampaign");
   const { slug } = useParams<{ slug: string }>();
   const { user, authFetch } = useAuth();
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null);
@@ -746,33 +769,29 @@ function CreateCampaignPage() {
     );
   } else if (campaignError) {
     content = (
-      <AccessNotice title="Campagne inaccessible">
-        <p>Cette campagne n’existe pas ou ne vous appartient pas.</p>
+      <AccessNotice title={t("access.campaignUnavailableTitle")}>
+        <p>{t("access.campaignUnavailableText")}</p>
       </AccessNotice>
     );
   } else if (user.role !== "PORTEUR") {
     content = (
-      <AccessNotice title="Espace réservé aux porteurs de projet">
+      <AccessNotice title={t("access.ownerOnlyTitle")}>
         <p>
-          La création de campagnes est réservée aux porteurs de projet. Votre
-          compte est enregistré comme contributeur : vous pouvez soutenir les
-          campagnes existantes.
+          {t("access.ownerOnlyText")}
         </p>
       </AccessNotice>
     );
   } else if (user.kyc_status !== "VALIDE") {
     content = (
-      <AccessNotice title="Vérifiez d'abord votre identité">
+      <AccessNotice title={t("access.kycTitle")}>
         <p>
-          Pour lancer une campagne, votre identité doit être vérifiée. Complétez
-          la vérification depuis votre espace compte : cela ne prend que
-          quelques minutes.
+          {t("access.kycText")}
         </p>
         <Button
           asChild
           className="mt-6 h-11 rounded-full bg-gold px-7 font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
         >
-          <Link to="/compte?onglet=kyc">Compléter ma vérification</Link>
+          <Link to="/compte?onglet=kyc">{t("access.kycCta")}</Link>
         </Button>
       </AccessNotice>
     );
@@ -781,10 +800,9 @@ function CreateCampaignPage() {
     !["BROUILLON", "REJETEE", "SUSPENDUE"].includes(campaign.status)
   ) {
     content = (
-      <AccessNotice title="Modification indisponible">
+      <AccessNotice title={t("access.lockedTitle")}>
         <p>
-          Une campagne en modération, publiée ou clôturée ne peut pas être
-          modifiée depuis cet espace.
+          {t("access.lockedText")}
         </p>
       </AccessNotice>
     );
@@ -802,19 +820,17 @@ function CreateCampaignPage() {
       <div className="relative mx-auto flex max-w-5xl flex-col px-5 pt-16 pb-24 sm:px-8 sm:pt-24 sm:pb-32">
         <div className="animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards flex flex-col items-center text-center duration-700 motion-reduce:animate-none">
           <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-            {campaign ? "Correction de campagne" : "Nouvelle campagne"}
+            {campaign ? t("page.eyebrowEdit") : t("page.eyebrowNew")}
           </span>
           <h1 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-            {campaign ? "Modifier votre campagne" : "Lancer votre campagne"}
+            {campaign ? t("page.titleEdit") : t("page.titleNew")}
           </h1>
           <div
             aria-hidden="true"
             className="mt-6 h-[3px] w-16 rounded-full bg-gradient-to-r from-gold to-gold-dark"
           />
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-secondary">
-            {campaign
-              ? "Corrigez les informations signalées, enregistrez vos modifications puis renvoyez la campagne en validation."
-              : "Présentez votre projet avec soin : notre équipe le relira avant publication pour garantir la confiance des contributeurs."}
+            {campaign ? t("page.introEdit") : t("page.introNew")}
           </p>
         </div>
 

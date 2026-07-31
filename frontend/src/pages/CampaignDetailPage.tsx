@@ -23,6 +23,7 @@ import {
   WalletCards,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { ProgressBar } from "@/components/campaigns/CampaignCard"
 import { Button } from "@/components/ui/button"
@@ -58,6 +59,7 @@ function ownerName(owner: CampaignDetail["owner"]): string {
 }
 
 function ContactOwnerCard({ campaign }: { campaign: CampaignDetail }) {
+  const { t } = useTranslation("campaignDetail")
   const { user, authFetch } = useAuth()
   const [body, setBody] = useState("")
   const [sending, setSending] = useState(false)
@@ -68,9 +70,9 @@ function ContactOwnerCard({ campaign }: { campaign: CampaignDetail }) {
     return (
       <p className="mt-4 text-sm text-ink-secondary">
         <Link to="/connexion" className="font-semibold text-gold-dark hover:underline">
-          Connectez-vous
+          {t("owner.loginPrompt")}
         </Link>{" "}
-        pour contacter le porteur de ce projet.
+        {t("owner.loginSuffix")}
       </p>
     )
   }
@@ -87,7 +89,7 @@ function ContactOwnerCard({ campaign }: { campaign: CampaignDetail }) {
       setSent(true)
       setBody("")
     } catch {
-      setError("Impossible d’envoyer ce message. Vérifiez votre identité (KYC) et réessayez.")
+      setError(t("owner.sendError"))
     } finally {
       setSending(false)
     }
@@ -96,9 +98,9 @@ function ContactOwnerCard({ campaign }: { campaign: CampaignDetail }) {
   if (sent) {
     return (
       <p className="mt-4 text-sm text-emerald-700">
-        Message envoyé. Retrouvez la conversation dans{" "}
+        {t("owner.sentPrefix")}{" "}
         <Link to="/messages" className="font-semibold underline">
-          votre espace Messages
+          {t("owner.sentLinkText")}
         </Link>
         .
       </p>
@@ -109,16 +111,16 @@ function ContactOwnerCard({ campaign }: { campaign: CampaignDetail }) {
     <div className="mt-4 space-y-2">
       {error && <p className="text-sm text-red-700">{error}</p>}
       <textarea
-        aria-label="Votre message au porteur"
+        aria-label={t("owner.messageLabel")}
         value={body}
         onChange={(event) => setBody(event.target.value)}
         rows={3}
         maxLength={3000}
-        placeholder="Posez votre question au porteur du projet…"
+        placeholder={t("owner.messagePlaceholder")}
         className="w-full resize-y rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-gold-dark/30"
       />
       <Button type="button" disabled={sending || !body.trim()} onClick={() => void send()} className="rounded-full bg-gold px-5 text-ink hover:bg-gold-light">
-        {sending ? "Envoi…" : "Contacter le porteur"}
+        {sending ? t("owner.sending") : t("owner.contact")}
       </Button>
     </div>
   )
@@ -133,6 +135,7 @@ function contentLines(content: string): string[] {
 
 /** Carte de collecte : montants, progression et appel à contribuer. */
 function DonationCard({ campaign }: { campaign: CampaignDetail }) {
+  const { t } = useTranslation("campaignDetail")
   const [shared, setShared] = useState(false)
 
   const shareCampaign = async () => {
@@ -156,7 +159,7 @@ function DonationCard({ campaign }: { campaign: CampaignDetail }) {
         {formatFcfa(campaign.collected_amount)}
       </p>
       <p className="mt-1 text-sm text-ink-muted">
-        collectés sur un objectif de {formatFcfa(campaign.goal_amount)}
+        {t("donation.collectedOutOf", { amount: formatFcfa(campaign.goal_amount) })}
       </p>
 
       <div className="mt-5">
@@ -168,42 +171,57 @@ function DonationCard({ campaign }: { campaign: CampaignDetail }) {
           <p className="font-heading text-xl font-bold text-gold-dark">
             {campaign.progress_percent}%
           </p>
-          <p className="text-xs text-ink-muted">de l'objectif</p>
+          <p className="text-xs text-ink-muted">{t("donation.ofGoal")}</p>
         </div>
         <div>
           <p className="font-heading text-xl font-bold text-ink">
-            {campaign.days_left > 0 ? `J-${campaign.days_left}` : "Terminée"}
+            {campaign.days_left > 0
+              ? t("donation.daysLeft", { count: campaign.days_left })
+              : t("donation.ended")}
           </p>
           <p className="text-xs text-ink-muted">
-            {campaign.days_left > 0 ? "avant la clôture" : "campagne clôturée"}
+            {campaign.days_left > 0 ? t("donation.beforeClosing") : t("donation.closed")}
           </p>
         </div>
       </div>
 
+      {campaign.campaign_type === "INVESTISSEMENT_PARTICIPATIF" &&
+        campaign.expected_return_rate != null && (
+          <div className="mt-4 flex items-center justify-between rounded-xl bg-gold/10 px-4 py-3">
+            <span className="text-sm font-medium text-ink-secondary">
+              {t("donation.expectedReturn")}
+            </span>
+            <span className="font-heading text-lg font-bold text-gold-dark">
+              {campaign.expected_return_rate}%
+            </span>
+          </div>
+        )}
+
       {campaign.status === "PUBLIEE" ? (
         <Button asChild className="mt-6 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink shadow-md shadow-gold/25 hover:bg-gold-light">
-          <Link to={`/campagnes/${campaign.slug}/contribuer`}>Contribuer maintenant</Link>
+          <Link to={`/campagnes/${campaign.slug}/contribuer`}>{t("donation.contribute")}</Link>
         </Button>
       ) : (
         <Button disabled className="mt-6 h-12 w-full rounded-full bg-gold text-base font-semibold text-ink">
           {campaign.status === "SUSPENDUE"
-            ? "Campagne temporairement suspendue"
-            : "Campagne clôturée"}
+            ? t("donation.suspended")
+            : t("donation.endedButton")}
         </Button>
       )}
       <p className="mt-3 text-center text-xs leading-relaxed text-ink-muted">
-        Votre contribution sera associée à votre compte et à cette campagne.
+        {t("donation.note")}
       </p>
       <Button variant="ghost" onClick={() => void shareCampaign()} className="mt-2 w-full rounded-full text-ink-secondary hover:bg-surface-alt hover:text-ink">
         <Share2 className="size-4" />
-        {shared ? "Lien copié" : "Partager cette campagne"}
+        {shared ? t("donation.shareCopied") : t("donation.share")}
       </Button>
-      <Link to={`/campagnes/${campaign.slug}/signaler`} className="mt-2 flex items-center justify-center gap-2 rounded-full py-2 text-xs font-medium text-ink-muted transition-colors hover:bg-red-50 hover:text-red-700"><Flag className="size-3.5" />Signaler cette campagne</Link>
+      <Link to={`/campagnes/${campaign.slug}/signaler`} className="mt-2 flex items-center justify-center gap-2 rounded-full py-2 text-xs font-medium text-ink-muted transition-colors hover:bg-red-50 hover:text-red-700"><Flag className="size-3.5" />{t("donation.report")}</Link>
     </div>
   )
 }
 
 function CampaignDetailPage() {
+  const { t } = useTranslation("campaignDetail")
   const { slug } = useParams<{ slug: string }>()
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -260,12 +278,10 @@ function CampaignDetailPage() {
           <Tag className="size-6" />
         </span>
         <h1 className="mt-5 font-heading text-2xl font-bold text-ink sm:text-3xl">
-          Campagne introuvable
+          {t("notFound.title")}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
-          {notFound
-            ? "Cette campagne n'existe pas ou n'est plus disponible."
-            : "Impossible de charger cette campagne pour le moment."}
+          {notFound ? t("notFound.text404") : t("notFound.textError")}
         </p>
         <Button
           asChild
@@ -274,7 +290,7 @@ function CampaignDetailPage() {
         >
           <Link to="/campagnes">
             <ArrowLeft aria-hidden="true" className="size-4" />
-            Retour aux campagnes
+            {t("notFound.back")}
           </Link>
         </Button>
       </div>
@@ -294,7 +310,7 @@ function CampaignDetailPage() {
           aria-hidden="true"
           className="size-4 transition-transform duration-300 group-hover:-translate-x-1"
         />
-        Toutes les campagnes
+        {t("backToCampaigns")}
       </Link>
 
       {/* Le titre et la confiance restent visibles avant le grand média. */}
@@ -302,9 +318,9 @@ function CampaignDetailPage() {
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
             <ShieldCheck aria-hidden="true" className="size-3.5" />
-            Porteur vérifié
+            {t("verifiedOwner")}
           </span>
-          <span className="rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold text-gold-dark">Collecte flexible</span>
+          <span className="rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold text-gold-dark">{t("flexibleCollection")}</span>
         </div>
         <h1 className="mt-4 max-w-4xl font-heading text-3xl leading-tight font-bold text-balance text-ink sm:text-4xl lg:text-5xl">
           {campaign.title}
@@ -313,9 +329,9 @@ function CampaignDetailPage() {
         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-secondary">
           <span className="inline-flex items-center gap-2">
             <span aria-hidden="true" className="flex size-7 items-center justify-center rounded-full bg-gold/15 text-gold-dark"><UserRound className="size-4" /></span>
-            Porté par <span className="font-semibold text-ink">{ownerName(campaign.owner)}</span>
+            {t("byLine")} <span className="font-semibold text-ink">{ownerName(campaign.owner)}</span>
           </span>
-          {campaign.published_at && <span className="inline-flex items-center gap-1.5 text-ink-muted"><CalendarDays aria-hidden="true" className="size-4" />Publiée le {formatDate(campaign.published_at)}</span>}
+          {campaign.published_at && <span className="inline-flex items-center gap-1.5 text-ink-muted"><CalendarDays aria-hidden="true" className="size-4" />{t("publishedOn", { date: formatDate(campaign.published_at) })}</span>}
           {campaign.location && <span className="inline-flex items-center gap-1.5 text-ink-muted"><MapPin aria-hidden="true" className="size-4" />{campaign.location}</span>}
         </div>
       </header>
@@ -352,7 +368,7 @@ function CampaignDetailPage() {
               id="a-propos"
               className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase"
             >
-              À propos du projet
+              {t("about")}
             </h2>
             <p className="mt-5 leading-relaxed whitespace-pre-line text-ink-secondary">
               {campaign.description}
@@ -364,7 +380,7 @@ function CampaignDetailPage() {
               <UsersRound aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-gold-dark" />
               <div>
                 <p className="text-xs font-semibold tracking-wide text-ink-muted uppercase">
-                  Impact attendu
+                  {t("impact")}
                 </p>
                 <p className="mt-1 font-medium text-ink">{campaign.beneficiaries}</p>
               </div>
@@ -378,7 +394,7 @@ function CampaignDetailPage() {
                 className="flex items-center gap-2 text-xs font-semibold tracking-[4px] text-gold-dark uppercase"
               >
                 <Gift aria-hidden="true" className="size-4" />
-                Contreparties
+                {t("rewards.title")}
               </h2>
               <ul className="mt-5 grid gap-4 sm:grid-cols-2">
                 {campaign.rewards.map((reward) => (
@@ -394,7 +410,7 @@ function CampaignDetailPage() {
                       {reward.title}
                       {reward.sold_out && (
                         <span className="rounded-full bg-black/[0.06] px-2.5 py-0.5 text-xs font-semibold text-ink-secondary">
-                          Épuisée
+                          {t("rewards.soldOut")}
                         </span>
                       )}
                     </p>
@@ -407,12 +423,12 @@ function CampaignDetailPage() {
                       <span className="font-semibold text-gold-dark">
                         {formatFcfa(reward.minimum_amount)}
                       </span>
-                      <span className="text-ink-muted"> minimum</span>
+                      <span className="text-ink-muted"> {t("rewards.minimum")}</span>
                     </p>
                     <p className="mt-1 text-xs text-ink-muted">
                       {reward.quantity_limit === null
-                        ? "Quantité illimitée"
-                        : `${reward.remaining} restante(s) sur ${reward.quantity_limit}`}
+                        ? t("rewards.unlimited")
+                        : t("rewards.remaining", { remaining: reward.remaining, limit: reward.quantity_limit })}
                     </p>
                   </li>
                 ))}
@@ -426,7 +442,7 @@ function CampaignDetailPage() {
                 <section aria-labelledby="fonds">
                   <WalletCards aria-hidden="true" className="size-6 text-gold-dark" />
                   <h2 id="fonds" className="mt-3 font-heading text-2xl font-bold text-ink">
-                    Utilisation des fonds
+                    {t("fundingPlan")}
                   </h2>
                   <ul className="mt-5 space-y-3">
                     {contentLines(campaign.funding_plan).map((line) => (
@@ -443,7 +459,7 @@ function CampaignDetailPage() {
                 <section aria-labelledby="calendrier">
                   <ListChecks aria-hidden="true" className="size-6 text-gold-dark" />
                   <h2 id="calendrier" className="mt-3 font-heading text-2xl font-bold text-ink">
-                    Calendrier du projet
+                    {t("timeline")}
                   </h2>
                   <ol className="mt-5 space-y-3">
                     {contentLines(campaign.project_timeline).map((line, index) => (
@@ -460,17 +476,15 @@ function CampaignDetailPage() {
 
           <section className="mt-12 border-y border-black/10 py-7" aria-labelledby="verification">
             <h2 id="verification" className="font-heading text-xl font-bold text-ink">
-              Ce qui a été vérifié avant publication
+              {t("verification.title")}
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
-              L’identité du porteur et les informations déclarées dans cette campagne ont
-              été relues par l’équipe de modération. Cette vérification ne constitue pas
-              une garantie de résultat ni un conseil d’investissement.
+              {t("verification.text")}
             </p>
           </section>
 
           <section className="mt-10 rounded-[20px] border border-black/5 bg-surface p-6 shadow-sm" aria-labelledby="porteur-profil">
-            <p className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">Le porteur du projet</p>
+            <p className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">{t("owner.eyebrow")}</p>
             <h2 id="porteur-profil" className="mt-3 font-heading text-2xl font-bold text-ink">{campaign.owner.organization_name || ownerName(campaign.owner)}</h2>
             {campaign.owner.city && <p className="mt-1 text-sm text-ink-muted">{campaign.owner.city}</p>}
             {campaign.owner.bio && <p className="mt-4 leading-relaxed text-ink-secondary">{campaign.owner.bio}</p>}
@@ -479,7 +493,7 @@ function CampaignDetailPage() {
 
           {campaign.recent_contributors.length > 0 && (
             <section className="mt-12" aria-labelledby="contributeurs">
-              <h2 id="contributeurs" className="font-heading text-2xl font-bold text-ink">Contributions récentes</h2>
+              <h2 id="contributeurs" className="font-heading text-2xl font-bold text-ink">{t("contributors")}</h2>
               <ul className="mt-5 divide-y divide-black/5 rounded-[20px] border border-black/5 bg-surface px-5 shadow-sm">
                 {campaign.recent_contributors.map((contribution, index) => (
                   <li key={`${contribution.confirmed_at}-${index}`} className="flex items-center justify-between gap-4 py-4">
@@ -501,7 +515,7 @@ function CampaignDetailPage() {
                 className="flex items-center gap-2 text-xs font-semibold tracking-[4px] text-gold-dark uppercase"
               >
                 <Newspaper aria-hidden="true" className="size-4" />
-                Actualités
+                {t("updates")}
               </h2>
               <ol className="mt-6 space-y-5">
                 {campaign.updates.map((update) => (

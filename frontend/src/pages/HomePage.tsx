@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowDown,
   ArrowRight,
@@ -19,54 +20,54 @@ import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/api";
 import type { CampaignListItem } from "@/lib/types";
 
-const reviewSteps = [
-  {
-    title: "Identité et activité",
-    text: "Le porteur transmet ses justificatifs. L’équipe vérifie le dossier avant toute publication.",
-  },
-  {
-    title: "Projet et besoin financier",
-    text: "Le montant, l’utilisation des fonds, les bénéficiaires et le calendrier sont relus.",
-  },
-  {
-    title: "Publication encadrée",
-    text: "La campagne n’est visible qu’après validation. Un rejet doit être motivé et corrigé.",
-  },
-];
+const reviewStepKeys = ["identity", "project", "publication"] as const;
 
-const journeySteps = [
+const journeyStepKeys = [
   {
+    key: "create",
     icon: FileText,
-    title: "Présenter le projet",
-    text: "Décrivez le besoin, les bénéficiaires, le budget et les étapes prévues.",
     image: "/screenshots/parcours-creation.jpg",
     alt: "Formulaire de création d’une campagne Jappandale",
   },
   {
+    key: "verify",
     icon: ShieldCheck,
-    title: "Faire vérifier le dossier",
-    text: "L’identité, l’activité et les informations de campagne sont relues avant publication.",
     image: "/screenshots/parcours-verification.jpg",
     alt: "Profil Jappandale avec identité vérifiée",
   },
   {
+    key: "mobilize",
     icon: HandCoins,
-    title: "Mobiliser les contributeurs",
-    text: "Partagez la page publique et suivez l’évolution de la collecte en toute clarté.",
     image: "/screenshots/parcours-publication.jpg",
     alt: "Page publique d’une campagne vérifiée",
   },
   {
+    key: "report",
     icon: CheckCircle2,
-    title: "Rendre compte",
-    text: "Pilotez vos collectes et publiez des nouvelles sur les étapes franchies.",
     image: "/screenshots/parcours-suivi.jpg",
     alt: "Tableau de suivi des campagnes d’un porteur",
   },
-];
+] as const;
 
 function HomePage() {
+  const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
+
+  const journeySteps = journeyStepKeys.map(({ key, icon, image, alt }) => ({
+    key,
+    icon,
+    image,
+    alt,
+    title: t(`homepage.steps.${key}.title`),
+    text: t(`homepage.steps.${key}.text`),
+  }));
+  const reviewSteps = reviewStepKeys.map((key) => ({
+    key,
+    title: t(`homepage.verified.steps.${key}.title`),
+    text: t(`homepage.verified.steps.${key}.text`),
+  }));
+  const todayItems = t("homepage.today.items", { returnObjects: true }) as string[];
+
   const [selectedJourneyStep, setSelectedJourneyStep] = useState<
     (typeof journeySteps)[number] | null
   >(null);
@@ -100,15 +101,13 @@ function HomePage() {
         <div className="mx-auto grid max-w-6xl gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-24">
           <div>
             <p className="text-sm font-semibold text-gold-dark">
-              Plateforme de projets sénégalais
+              {t("homepage.hero.eyebrow")}
             </p>
             <h1 className="mt-4 max-w-3xl font-heading text-4xl leading-[1.05] font-bold text-ink sm:text-5xl lg:text-6xl">
-              Financer les projets qui font avancer le Sénégal.
+              {t("homepage.hero.title")}
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-secondary sm:text-lg">
-              Découvrez des projets locaux documentés, portés par des personnes
-              vérifiées, et suivez concrètement l’utilisation prévue des fonds
-              et leur avancement.
+              {t("homepage.hero.intro")}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
@@ -116,7 +115,7 @@ function HomePage() {
                 className="h-12 rounded-full bg-gold px-7 font-semibold text-ink shadow-sm hover:bg-gold-light"
               >
                 <Link to="/campagnes">
-                  Voir les projets publiés
+                  {t("homepage.hero.ctaDiscover")}
                   <ArrowRight aria-hidden="true" className="size-4" />
                 </Link>
               </Button>
@@ -125,19 +124,18 @@ function HomePage() {
                 variant="outline"
                 className="h-12 rounded-full border-black/15 bg-white px-7 font-semibold text-ink hover:border-gold"
               >
-                <Link to="/inscription">Déposer un projet</Link>
+                <Link to="/inscription">{t("homepage.hero.ctaSubmit")}</Link>
               </Button>
             </div>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-ink-muted">
-              Chaque contribution est enregistrée et peut être suivie depuis
-              votre espace personnel.
+              {t("homepage.hero.note")}
             </p>
           </div>
 
           <figure className="relative">
             <img
               src="/photos/porteur.jpg"
-              alt="Tailleur dans son atelier à Dakar"
+              alt={t("homepage.hero.imageAlt")}
               width={1200}
               height={900}
               fetchPriority="high"
@@ -145,7 +143,7 @@ function HomePage() {
             />
             <figcaption className="absolute right-4 bottom-4 left-4 flex items-center gap-2 rounded-xl bg-black/70 px-4 py-3 text-sm text-white backdrop-blur-sm">
               <MapPin aria-hidden="true" className="size-4 text-gold" />
-              Atelier de couture — Médina, Dakar
+              {t("homepage.hero.imageCaption")}
             </figcaption>
           </figure>
         </div>
@@ -155,21 +153,20 @@ function HomePage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-gold-dark">
-              En cours de préparation
+              {t("homepage.published.eyebrow")}
             </p>
             <h2 className="mt-2 font-heading text-3xl font-bold text-ink sm:text-4xl">
-              Les projets publiés
+              {t("homepage.published.title")}
             </h2>
             <p className="mt-3 max-w-2xl text-ink-secondary">
-              Chaque fiche présente le besoin, le lieu, les bénéficiaires et
-              l’usage prévu du financement.
+              {t("homepage.published.intro")}
             </p>
           </div>
           <Link
             to="/campagnes"
             className="inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-gold-dark"
           >
-            Toutes les campagnes
+            {t("homepage.published.seeAll")}
             <ArrowRight aria-hidden="true" className="size-4" />
           </Link>
         </div>
@@ -182,8 +179,7 @@ function HomePage() {
           </div>
         ) : (
           <div className="mt-9 rounded-2xl border border-dashed border-black/15 bg-surface-alt px-6 py-10 text-sm text-ink-secondary">
-            Les campagnes seront affichées ici dès que le service sera
-            disponible.
+            {t("homepage.published.empty")}
           </div>
         )}
       </section>
@@ -195,21 +191,20 @@ function HomePage() {
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-              Comment ça marche
+              {t("homepage.eyebrow")}
             </p>
             <h2 className="mt-4 font-heading text-3xl font-bold text-ink sm:text-4xl">
-              Un parcours clair, de l’idée au suivi
+              {t("homepage.title")}
             </h2>
             <p className="mt-4 leading-relaxed text-ink-secondary">
-              Jappandale accompagne chaque projet à travers quatre étapes
-              simples, avec la transparence comme fil conducteur.
+              {t("homepage.intro")}
             </p>
           </div>
           <ol className="relative mt-12 space-y-12 before:absolute before:top-6 before:bottom-6 before:left-[23px] before:w-px before:bg-gradient-to-b before:from-gold before:via-gold/70 before:to-gold/20 before:content-[''] lg:space-y-16 lg:before:left-1/2">
             {journeySteps.map(
-              ({ icon: Icon, title, text, image, alt }, index) => (
+              ({ key, icon: Icon, title, text, image, alt }, index) => (
                 <li
-                  key={title}
+                  key={key}
                   className="relative pl-16 lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_minmax(0,1fr)] lg:items-center lg:pl-0"
                 >
                   <article
@@ -221,7 +216,7 @@ function HomePage() {
                         setSelectedJourneyStep(journeySteps[index])
                       }
                       className="relative block w-full cursor-zoom-in overflow-hidden border-b border-black/5 bg-surface-alt text-left"
-                      aria-label={`Agrandir la capture : ${title}`}
+                      aria-label={`${t("homepage.expandLabel")} : ${title}`}
                     >
                       <img
                         src={image}
@@ -234,12 +229,12 @@ function HomePage() {
                       <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                       <span className="absolute right-4 bottom-4 flex translate-y-2 items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-ink opacity-0 shadow-lg transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
                         <Maximize2 aria-hidden="true" className="size-4" />
-                        Agrandir
+                        {t("homepage.expandLabel")}
                       </span>
                     </button>
                     <div className="p-6 sm:p-7">
                       <span className="font-heading text-sm font-bold tracking-[0.18em] text-gold-dark">
-                        ÉTAPE 0{index + 1}
+                        {t("homepage.stepLabel", { number: index + 1 })}
                       </span>
                       <h3 className="mt-3 font-heading text-2xl font-bold text-ink">
                         {title}
@@ -269,14 +264,14 @@ function HomePage() {
               asChild
               className="rounded-full bg-gold px-7 font-semibold text-ink hover:bg-gold-light"
             >
-              <Link to="/campagnes">Découvrir les projets</Link>
+              <Link to="/campagnes">{t("homepage.ctaDiscover")}</Link>
             </Button>
             <Button
               asChild
               variant="outline"
               className="rounded-full border-black/15 px-7 font-semibold"
             >
-              <Link to="/inscription?role=PORTEUR">Déposer un projet</Link>
+              <Link to="/inscription?role=PORTEUR">{t("homepage.ctaSubmit")}</Link>
             </Button>
           </div>
         </div>
@@ -286,7 +281,7 @@ function HomePage() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={`Capture agrandie : ${selectedJourneyStep.title}`}
+          aria-label={t("homepage.modal.zoomedLabel", { title: selectedJourneyStep.title })}
           className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 duration-200 sm:p-8"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget)
@@ -297,7 +292,7 @@ function HomePage() {
             <div className="flex items-center justify-between border-b border-black/10 px-5 py-4">
               <div>
                 <p className="text-xs font-semibold tracking-[0.18em] text-gold-dark uppercase">
-                  Aperçu du parcours
+                  {t("homepage.modal.previewLabel")}
                 </p>
                 <h2 className="mt-1 font-heading text-lg font-bold text-ink">
                   {selectedJourneyStep.title}
@@ -308,7 +303,7 @@ function HomePage() {
                 autoFocus
                 onClick={() => setSelectedJourneyStep(null)}
                 className="flex size-11 items-center justify-center rounded-full border border-black/10 text-ink transition-colors hover:bg-surface-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-dark/50"
-                aria-label="Fermer l’aperçu"
+                aria-label={t("homepage.modal.closeLabel")}
               >
                 <X aria-hidden="true" className="size-5" />
               </button>
@@ -331,19 +326,17 @@ function HomePage() {
           <div>
             <ShieldCheck aria-hidden="true" className="size-9 text-gold" />
             <h2 className="mt-5 font-heading text-3xl font-bold sm:text-4xl">
-              Ce que signifie « projet vérifié »
+              {t("homepage.verified.title")}
             </h2>
             <p className="mt-5 leading-relaxed text-white/70">
-              Une validation ne garantit pas la réussite du projet. Elle
-              confirme que le porteur a transmis les pièces demandées et que les
-              informations de la campagne ont été relues avant publication.
+              {t("homepage.verified.intro")}
             </p>
           </div>
 
           <ol className="divide-y divide-white/10 border-y border-white/10">
             {reviewSteps.map((step, index) => (
               <li
-                key={step.title}
+                key={step.key}
                 className="grid grid-cols-[2.5rem_1fr] gap-4 py-6"
               >
                 <span className="font-heading text-2xl font-bold text-gold">
@@ -367,31 +360,29 @@ function HomePage() {
         <article className="border-l-4 border-gold pl-6 sm:pl-8">
           <Check aria-hidden="true" className="size-6 text-gold-dark" />
           <h2 className="mt-4 font-heading text-2xl font-bold text-ink">
-            Disponible aujourd’hui
+            {t("homepage.today.title")}
           </h2>
           <ul className="mt-5 space-y-3 text-sm text-ink-secondary">
-            <li>Création de compte et profil porteur</li>
-            <li>Dépôt et revue manuelle des pièces KYC</li>
-            <li>Création, modération et publication d’une campagne</li>
-            <li>Consultation publique des projets publiés</li>
+            {todayItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </article>
 
         <article className="border-l-4 border-black/15 pl-6 sm:pl-8">
           <FileSearch aria-hidden="true" className="size-6 text-ink-muted" />
           <h2 className="mt-4 font-heading text-2xl font-bold text-ink">
-            Parcours de contribution
+            {t("homepage.contribJourney.title")}
           </h2>
           <p className="mt-5 text-sm leading-relaxed text-ink-secondary">
-            Choisissez un montant, confirmez votre contribution et retrouvez
-            immédiatement son statut dans votre historique personnel.
+            {t("homepage.contribJourney.text")}
           </p>
           <Button
             asChild
             variant="outline"
             className="mt-6 rounded-full border-black/15 px-6 font-semibold"
           >
-            <Link to="/inscription">Créer mon espace</Link>
+            <Link to="/inscription">{t("homepage.contribJourney.cta")}</Link>
           </Button>
         </article>
       </section>

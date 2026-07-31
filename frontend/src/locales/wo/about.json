@@ -1,0 +1,59 @@
+{
+  "hero": {
+    "eyebrow": "Ci mbiru Jappandale",
+    "title": "Wàllaale wóolu ni ñu koy wàllaale xaalis.",
+    "intro": "Jappandale, benn platfor bu Senegaal, day dajale xaalis ak jokkoo xaalis, ngir jegeel porojet yu dëkk bi ak ñi bëgg koo ndimbal.",
+    "discover": "Xool porojet yi",
+    "understand": "Xam naka Jappandale di doxe",
+    "imageAlt": "Log Jappandale — jokkale porojet yi ak jottaayu xaalis"
+  },
+  "why": {
+    "eyebrow": "Lu tax Jappandale",
+    "title": "Ab xalaat bu dëkk bi, ab tontu bu ñépp",
+    "p1": "Ci Senegaal ak ci diggante UEMOA, jotali xaalis moo di ab jafe-jafe bu réy ngir ay sàrtu-liggéey, PME, kooperatiif ak asosiyasion yu bare.",
+    "p2": "Ci melo bi, diaspora bi ak investisër yu ci wet gi dañu wut anam yu gën a jub ngir xam porojet yu dëkk bi, xam seen soxla, te toppatoo seen doxin.",
+    "p3": "Jappandale moo sos bérab bookandoo bi : ab tabax bu ñépp mëna jëfandikoo ngir wone, xool, dokkal, ak toppatoo jëf yu am solo."
+  },
+  "mission": {
+    "eyebrow": "Sunu njëwriñ",
+    "title": "Sos xaalis bu gën a leer, bu gën a jege, te ñu gën koo toppatoo",
+    "commitments": {
+      "connect": {
+        "title": "Jokkale",
+        "text": "Jegeel boroom porojet yu Senegaal, ñiy dokkal, investisër yi ak diaspora bi, ci jottaayu solo."
+      },
+      "evaluate": {
+        "title": "Xool",
+        "text": "Xool identiteb boroom porojet yi ak dëggu dosye yi, laata ñu leen wone ci platfor bi."
+      },
+      "follow": {
+        "title": "Toppatoo",
+        "text": "Wone jubluwaay yi, ni xaalis bi war a jëfandikoo, ak xibaar yu bees yu porojet bu ne."
+      }
+    }
+  },
+  "roots": {
+    "eyebrow": "Sunu jëmm",
+    "title": "Ab platfor bu ñu tabax ngir ekosistem bu Senegaal",
+    "p1": "Jappandale dafay jóge ci dëgg-dëgg yu sàrtu-liggéey, kooperatiif, asosiyasion ak mbokk yi di dundal koom-koom bu dëkk bi bis bu ne.",
+    "p2": "Sunu bëgg-bëgg mooy jëfandikoo tekknolosi ngir am jokkoo xaalis bu gën a yomb diggante jëf yu dëkk bi, diaspora bi ak ñi leen di ndimbal.",
+    "imageAlt": "Liggéeyu koom-koom ci marse bu Senegaal"
+  },
+  "trustSection": {
+    "title": "Wóolu dafay tabax ak firnde",
+    "text": "Kanpaañ bu ñu wóoral du firndeel ne dina yekk. Day wone rekk ne xibaar yi ak xaymawukaay yi ñu laaj, ñu ko xool na, laata ñu ko wone.",
+    "principles": [
+      "Kanpaañ yu ñu xool laata ñu leen wone",
+      "Xibaar yu xaalis yu ñu wone bu leer",
+      "Dogal ak sasa yu ñu mëna toppatoo",
+      "Ab toppatoo bu yomb ngir boroom porojet ak ñiy dokkal"
+    ]
+  },
+  "cta": {
+    "eyebrow": "Bokk",
+    "title": "Am nga porojet ngir yokk walla jëf ngir ndimbal ?",
+    "text": "Bokk ci Jappandale ngir wone sa porojet, xool kanpaañ yi feeñ, te ndimbal seen doxin.",
+    "submit": "Yónnee sa porojet",
+    "see": "Xool kanpaañ yi"
+  }
+}

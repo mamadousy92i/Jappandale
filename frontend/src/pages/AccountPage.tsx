@@ -1,8 +1,10 @@
 import { useState } from "react"
 import type { ChangeEvent, FormEvent, ReactNode } from "react"
-import { Camera, IdCard, LayoutDashboard, LoaderCircle, Pencil, Trash2, UserRound, WalletCards } from "lucide-react"
+import { Camera, IdCard, Landmark, LayoutDashboard, LoaderCircle, Pencil, Trash2, UserRound, WalletCards } from "lucide-react"
 import { Link, useSearchParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
+import { GuichetSection } from "@/components/account/GuichetSection"
 import { KycSection } from "@/components/account/KycSection"
 import { MyContributions } from "@/components/account/MyContributions"
 import { PassportSection } from "@/components/account/PassportSection"
@@ -16,15 +18,15 @@ import { ApiError } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import type { Role } from "@/lib/types"
 
-const roleLabels: Record<Role, string> = {
-  PORTEUR: "Porteur de projet",
-  CONTRIBUTEUR: "Contributeur",
-  ADMIN: "Administrateur",
-}
-
-type TabKey = "apercu" | "profil" | "kyc" | "contributions"
+type TabKey = "apercu" | "profil" | "kyc" | "contributions" | "guichet"
 
 function AccountPage() {
+  const { t } = useTranslation("account")
+  const roleLabels: Record<Role, string> = {
+    PORTEUR: t("main.roles.PORTEUR"),
+    CONTRIBUTEUR: t("main.roles.CONTRIBUTEUR"),
+    ADMIN: t("main.roles.ADMIN"),
+  }
   const { user, authFetch, refreshUser } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -50,7 +52,10 @@ function AccountPage() {
   const defaultTab: TabKey = user.role === "PORTEUR" ? "apercu" : "profil"
   const requestedTab = searchParams.get("onglet")
   const activeTab: TabKey =
-    requestedTab === "apercu" || requestedTab === "kyc" || requestedTab === "contributions"
+    requestedTab === "apercu" ||
+    requestedTab === "kyc" ||
+    requestedTab === "contributions" ||
+    requestedTab === "guichet"
       ? requestedTab
       : requestedTab === "profil"
         ? "profil"
@@ -67,7 +72,7 @@ function AccountPage() {
     setAvatarMessage(null)
     setAvatarError(null)
     if (!file.type.match(/^image\/(jpeg|png|webp)$/) || file.size > 3 * 1024 * 1024) {
-      setAvatarError("Choisissez une image JPG, PNG ou WebP de 3 Mo maximum.")
+      setAvatarError(t("main.avatar.invalidFile"))
       return
     }
     setAvatarBusy(true)
@@ -76,10 +81,10 @@ function AccountPage() {
     try {
       await authFetch("/auth/me/", { method: "PATCH", body: payload })
       await refreshUser()
-      setAvatarMessage("Votre photo de profil a été mise à jour.")
+      setAvatarMessage(t("main.avatar.updated"))
     } catch (err) {
       const details = err instanceof ApiError ? err.details?.avatar : null
-      setAvatarError(details?.join(" ") || "Impossible d’enregistrer cette photo.")
+      setAvatarError(details?.join(" ") || t("main.avatar.saveError"))
     } finally {
       setAvatarBusy(false)
     }
@@ -95,9 +100,9 @@ function AccountPage() {
         body: JSON.stringify({ avatar: null }),
       })
       await refreshUser()
-      setAvatarMessage("La photo a été supprimée.")
+      setAvatarMessage(t("main.avatar.removed"))
     } catch {
-      setAvatarError("Impossible de supprimer cette photo.")
+      setAvatarError(t("main.avatar.removeError"))
     } finally {
       setAvatarBusy(false)
     }
@@ -132,9 +137,9 @@ function AccountPage() {
       setIsEditing(false)
     } catch (err) {
       if (err instanceof ApiError && err.status === 400) {
-        setError("Certaines informations sont invalides. Vérifiez le formulaire.")
+        setError(t("main.form.invalid"))
       } else {
-        setError("Une erreur est survenue. Réessayez.")
+        setError(t("main.form.genericError"))
       }
     } finally {
       setSubmitting(false)
@@ -143,11 +148,14 @@ function AccountPage() {
 
   const tabs: { key: TabKey; label: string; icon: typeof UserRound; alert?: boolean }[] = [
     ...(user.role === "PORTEUR"
-      ? [{ key: "apercu" as const, label: "Vue d'ensemble", icon: LayoutDashboard }]
+      ? [{ key: "apercu" as const, label: t("main.tabs.apercu"), icon: LayoutDashboard }]
       : []),
-    { key: "profil", label: "Informations personnelles", icon: UserRound },
-    { key: "kyc", label: "Vérification d'identité", icon: IdCard, alert: user.kyc_status !== "VALIDE" },
-    { key: "contributions", label: "Contributions", icon: WalletCards },
+    { key: "profil", label: t("main.tabs.profil"), icon: UserRound },
+    { key: "kyc", label: t("main.tabs.kyc"), icon: IdCard, alert: user.kyc_status !== "VALIDE" },
+    { key: "contributions", label: t("main.tabs.contributions"), icon: WalletCards },
+    ...(user.role === "PORTEUR"
+      ? [{ key: "guichet" as const, label: t("main.tabs.guichet"), icon: Landmark }]
+      : []),
   ]
 
   let tabContent: ReactNode
@@ -160,6 +168,8 @@ function AccountPage() {
     )
   } else if (activeTab === "kyc") {
     tabContent = <KycSection status={user.kyc_status} role={user.role} />
+  } else if (activeTab === "guichet") {
+    tabContent = <GuichetSection />
   } else if (activeTab === "contributions") {
     tabContent = (
       <div className="space-y-6">
@@ -172,22 +182,22 @@ function AccountPage() {
       <div className="space-y-6">
         <div className="flex flex-col justify-between gap-4 rounded-[20px] border border-black/5 bg-surface p-5 shadow-sm sm:flex-row sm:items-center">
           <div>
-            <p className="font-semibold text-ink">Photo de profil</p>
-            <p className="mt-1 text-sm text-ink-muted">JPG, PNG ou WebP · 3 Mo maximum.</p>
+            <p className="font-semibold text-ink">{t("main.avatar.title")}</p>
+            <p className="mt-1 text-sm text-ink-muted">{t("main.avatar.hint")}</p>
             {avatarMessage && <p role="status" className="mt-2 text-sm text-emerald-700">{avatarMessage}</p>}
             {avatarError && <p role="alert" className="mt-2 text-sm text-red-700">{avatarError}</p>}
           </div>
           <div className="flex flex-wrap gap-2">
             <label className={`inline-flex h-10 cursor-pointer items-center gap-2 rounded-full bg-gold px-4 text-sm font-semibold text-ink transition hover:bg-gold-light ${avatarBusy ? "pointer-events-none opacity-60" : ""}`}>
               {avatarBusy ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <Camera aria-hidden="true" className="size-4" />}
-              {user.avatar ? "Changer la photo" : "Ajouter une photo"}
+              {user.avatar ? t("main.avatar.change") : t("main.avatar.add")}
               <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void handleAvatarChange(event)} disabled={avatarBusy} className="sr-only" />
             </label>
-            {user.avatar && <Button type="button" variant="outline" disabled={avatarBusy} onClick={() => void removeAvatar()} className="h-10 rounded-full border-red-200 text-red-700 hover:bg-red-50"><Trash2 aria-hidden="true" className="size-4" />Supprimer</Button>}
+            {user.avatar && <Button type="button" variant="outline" disabled={avatarBusy} onClick={() => void removeAvatar()} className="h-10 rounded-full border-red-200 text-red-700 hover:bg-red-50"><Trash2 aria-hidden="true" className="size-4" />{t("main.avatar.remove")}</Button>}
           </div>
         </div>
 
-        {!user.email_verified && <div className="flex flex-col justify-between gap-4 rounded-[20px] border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center"><div><p className="font-semibold text-amber-900">Adresse e-mail non vérifiée</p><p className="mt-1 text-sm text-amber-800">Saisissez le code reçu par e-mail pour sécuriser votre compte.</p></div><Button asChild className="shrink-0 rounded-full bg-ink text-white"><Link to="/verifier-email">Vérifier maintenant</Link></Button></div>}
+        {!user.email_verified && <div className="flex flex-col justify-between gap-4 rounded-[20px] border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center"><div><p className="font-semibold text-amber-900">{t("main.emailNotVerified.title")}</p><p className="mt-1 text-sm text-amber-800">{t("main.emailNotVerified.text")}</p></div><Button asChild className="shrink-0 rounded-full bg-ink text-white"><Link to="/verifier-email">{t("main.emailNotVerified.cta")}</Link></Button></div>}
 
         <form
           data-testid="account-form"
@@ -197,9 +207,9 @@ function AccountPage() {
         >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="font-heading text-xl font-bold text-ink">Informations personnelles</h2>
+              <h2 className="font-heading text-xl font-bold text-ink">{t("main.form.title")}</h2>
               <p className="mt-1 text-sm text-ink-muted">
-                Votre adresse e-mail et votre rôle ne sont pas modifiables.
+                {t("main.form.hint")}
               </p>
             </div>
             {!isEditing && (
@@ -210,7 +220,7 @@ function AccountPage() {
                 className="shrink-0 h-9 rounded-full border-black/15 px-4 text-sm font-semibold text-ink-secondary hover:text-ink"
               >
                 <Pencil aria-hidden="true" className="size-3.5" />
-                Modifier
+                {t("main.form.edit")}
               </Button>
             )}
           </div>
@@ -228,14 +238,14 @@ function AccountPage() {
               role="status"
               className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
             >
-              Vos informations ont été enregistrées.
+              {t("main.form.saved")}
             </p>
           )}
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="firstName" className="text-ink">
-                Prénom
+                {t("main.form.firstName")}
               </Label>
               <Input
                 id="firstName"
@@ -248,7 +258,7 @@ function AccountPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName" className="text-ink">
-                Nom
+                {t("main.form.lastName")}
               </Label>
               <Input
                 id="lastName"
@@ -261,7 +271,7 @@ function AccountPage() {
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="phone" className="text-ink">
-                Téléphone <span className="font-normal text-ink-muted">(facultatif)</span>
+                {t("main.form.phone")} <span className="font-normal text-ink-muted">{t("main.form.optional")}</span>
               </Label>
               <Input
                 id="phone"
@@ -284,11 +294,10 @@ function AccountPage() {
                   className="mt-0.5 size-4 accent-[#d4a900] disabled:opacity-60"
                 />
                 <span>
-                  <span className="font-medium text-ink">Je réside à l’étranger (diaspora)</span>
+                  <span className="font-medium text-ink">{t("main.form.diasporaLabel")}</span>
                   <br />
                   <span className="text-xs text-ink-muted">
-                    Une vérification renforcée (justificatif de résidence et origine des
-                    fonds) sera demandée dans l’onglet Vérification d’identité.
+                    {t("main.form.diasporaHint")}
                   </span>
                 </span>
               </label>
@@ -296,7 +305,7 @@ function AccountPage() {
             {isDiaspora && (
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="country" className="text-ink">
-                  Pays de résidence
+                  {t("main.form.country")}
                 </Label>
                 {isEditing ? (
                   <select
@@ -305,8 +314,8 @@ function AccountPage() {
                     onChange={(e) => setCountry(e.target.value)}
                     className="h-11 w-full rounded-xl border border-input bg-transparent px-3.5 text-sm text-ink outline-none focus:ring-2 focus:ring-gold-dark/30"
                   >
-                    <option value="">— Sélectionnez un pays —</option>
-                    <optgroup label="Afrique de l’Ouest">
+                    <option value="">{t("main.form.countryPlaceholder")}</option>
+                    <optgroup label={t("main.form.regions.westAfrica")}>
                       <option value="Sénégal">Sénégal</option>
                       <option value="Côte d’Ivoire">Côte d’Ivoire</option>
                       <option value="Mali">Mali</option>
@@ -323,7 +332,7 @@ function AccountPage() {
                       <option value="Sierra Leone">Sierra Leone</option>
                       <option value="Liberia">Liberia</option>
                     </optgroup>
-                    <optgroup label="Afrique centrale et du Nord">
+                    <optgroup label={t("main.form.regions.centralNorthAfrica")}>
                       <option value="Maroc">Maroc</option>
                       <option value="Algérie">Algérie</option>
                       <option value="Tunisie">Tunisie</option>
@@ -333,7 +342,7 @@ function AccountPage() {
                       <option value="Congo">Congo</option>
                       <option value="RD Congo">RD Congo</option>
                     </optgroup>
-                    <optgroup label="Europe">
+                    <optgroup label={t("main.form.regions.europe")}>
                       <option value="France">France</option>
                       <option value="Espagne">Espagne</option>
                       <option value="Italie">Italie</option>
@@ -347,16 +356,16 @@ function AccountPage() {
                       <option value="Norvège">Norvège</option>
                       <option value="Autriche">Autriche</option>
                     </optgroup>
-                    <optgroup label="Amérique du Nord">
+                    <optgroup label={t("main.form.regions.northAmerica")}>
                       <option value="États-Unis">États-Unis</option>
                       <option value="Canada">Canada</option>
                     </optgroup>
-                    <optgroup label="Moyen-Orient">
+                    <optgroup label={t("main.form.regions.middleEast")}>
                       <option value="Arabie Saoudite">Arabie Saoudite</option>
                       <option value="Émirats arabes unis">Émirats arabes unis</option>
                       <option value="Qatar">Qatar</option>
                     </optgroup>
-                    <optgroup label="Asie">
+                    <optgroup label={t("main.form.regions.asia")}>
                       <option value="Chine">Chine</option>
                       <option value="Turquie">Turquie</option>
                     </optgroup>
@@ -371,16 +380,16 @@ function AccountPage() {
             {user.role === "PORTEUR" && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="organization">Organisation <span className="font-normal text-ink-muted">(facultatif)</span></Label>
-                  <Input id="organization" readOnly={!isEditing} value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} placeholder={isEditing ? "Nom de l’association ou de l’activité" : "—"} className={`h-11 rounded-xl transition-colors ${!isEditing ? "cursor-default border-transparent bg-black/[0.03] shadow-none focus-visible:ring-0" : ""}`} />
+                  <Label htmlFor="organization">{t("main.form.organization")} <span className="font-normal text-ink-muted">{t("main.form.optional")}</span></Label>
+                  <Input id="organization" readOnly={!isEditing} value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} placeholder={isEditing ? t("main.form.organizationPlaceholder") : "—"} className={`h-11 rounded-xl transition-colors ${!isEditing ? "cursor-default border-transparent bg-black/[0.03] shadow-none focus-visible:ring-0" : ""}`} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city">Ville</Label>
+                  <Label htmlFor="city">{t("main.form.city")}</Label>
                   <Input id="city" readOnly={!isEditing} value={city} onChange={(event) => setCity(event.target.value)} placeholder={isEditing ? "Dakar" : "—"} className={`h-11 rounded-xl transition-colors ${!isEditing ? "cursor-default border-transparent bg-black/[0.03] shadow-none focus-visible:ring-0" : ""}`} />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="bio">Présentation publique</Label>
-                  <textarea id="bio" rows={4} maxLength={700} readOnly={!isEditing} value={bio} onChange={(event) => setBio(event.target.value)} placeholder={isEditing ? "Présentez votre expérience et ce qui vous motive…" : "—"} className={`w-full rounded-xl border px-3 py-3 text-sm text-ink outline-none transition-colors ${isEditing ? "border-input bg-transparent focus:ring-2 focus:ring-gold-dark/30" : "cursor-default border-transparent bg-black/[0.03]"}`} />
+                  <Label htmlFor="bio">{t("main.form.bio")}</Label>
+                  <textarea id="bio" rows={4} maxLength={700} readOnly={!isEditing} value={bio} onChange={(event) => setBio(event.target.value)} placeholder={isEditing ? t("main.form.bioPlaceholder") : "—"} className={`w-full rounded-xl border px-3 py-3 text-sm text-ink outline-none transition-colors ${isEditing ? "border-input bg-transparent focus:ring-2 focus:ring-gold-dark/30" : "cursor-default border-transparent bg-black/[0.03]"}`} />
                   {isEditing && <p className="text-right text-xs text-ink-muted">{bio.length}/700</p>}
                 </div>
               </>
@@ -394,7 +403,7 @@ function AccountPage() {
                 disabled={submitting}
                 className="h-12 rounded-full bg-gold px-8 text-base font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
               >
-                {submitting ? "Enregistrement…" : "Enregistrer les modifications"}
+                {submitting ? t("main.form.saving") : t("main.form.save")}
               </Button>
               <Button
                 type="button"
@@ -403,7 +412,7 @@ function AccountPage() {
                 onClick={cancelEdit}
                 className="h-12 rounded-full px-8 text-base font-semibold"
               >
-                Annuler
+                {t("main.form.cancel")}
               </Button>
             </div>
           )}
@@ -425,10 +434,10 @@ function AccountPage() {
           <UserAvatar user={user} size="lg" className="shadow-md shadow-black/10" />
           <div>
             <span className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase">
-              Mon compte
+              {t("main.eyebrow")}
             </span>
             <h1 className="mt-1 font-heading text-3xl font-bold text-ink sm:text-4xl">
-              Bonjour {user.first_name || "à vous"}
+              {t("main.greeting", { name: user.first_name || t("main.greetingFallback") })}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink-secondary">
               <span className="rounded-full bg-gold/15 px-3 py-0.5 text-xs font-semibold text-gold-dark">
@@ -442,7 +451,7 @@ function AccountPage() {
         {/* Onglets */}
         <div
           role="tablist"
-          aria-label="Sections de mon compte"
+          aria-label={t("main.tabsLabel")}
           className="mt-9 flex gap-2 overflow-x-auto border-b border-black/8 pb-px"
         >
           {tabs.map((tab) => (
@@ -464,7 +473,7 @@ function AccountPage() {
               {tab.label}
               {tab.alert && (
                 <span
-                  aria-label="Action requise"
+                  aria-label={t("main.actionRequired")}
                   className="size-1.5 rounded-full bg-gold-dark"
                 />
               )}

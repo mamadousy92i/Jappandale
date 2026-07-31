@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react"
 import { Flag, Inbox, Send } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth"
 import type { MessageReportReason, MessageThreadListItem, ThreadMessage } from "@/lib/types"
 
-const reasonLabels: Record<MessageReportReason, string> = {
-  SPAM: "Spam ou sollicitation",
-  HARCELEMENT: "Harcèlement",
-  CONTENU_INAPPROPRIE: "Contenu inapproprié",
-  TENTATIVE_CONTOURNEMENT: "Tentative de contournement de la plateforme",
-  AUTRE: "Autre motif",
-}
+const reasonKeys: MessageReportReason[] = [
+  "SPAM",
+  "HARCELEMENT",
+  "CONTENU_INAPPROPRIE",
+  "TENTATIVE_CONTOURNEMENT",
+  "AUTRE",
+]
 
 function formatDateTime(value: string) {
   return new Date(value).toLocaleString("fr-FR", {
@@ -23,6 +24,7 @@ function formatDateTime(value: string) {
 }
 
 function ReportForm({ onSubmit, onCancel }: { onSubmit: (reason: MessageReportReason, details: string) => Promise<void>; onCancel: () => void }) {
+  const { t } = useTranslation("activity")
   const [reason, setReason] = useState<MessageReportReason>("AUTRE")
   const [details, setDetails] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -30,29 +32,29 @@ function ReportForm({ onSubmit, onCancel }: { onSubmit: (reason: MessageReportRe
   return (
     <div className="mt-2 space-y-2 rounded-xl border border-red-200 bg-red-50 p-3">
       <select
-        aria-label="Motif du signalement"
+        aria-label={t("messages.reportReasonLabel")}
         value={reason}
         onChange={(event) => setReason(event.target.value as MessageReportReason)}
         className="w-full rounded-lg border border-black/10 bg-white px-2 py-1.5 text-xs text-ink"
       >
-        {Object.entries(reasonLabels).map(([value, label]) => (
+        {reasonKeys.map((value) => (
           <option key={value} value={value}>
-            {label}
+            {t(`messages.reasons.${value}`)}
           </option>
         ))}
       </select>
       <textarea
-        aria-label="Précisions"
+        aria-label={t("messages.reportDetailsLabel")}
         value={details}
         onChange={(event) => setDetails(event.target.value)}
         rows={2}
         maxLength={1500}
-        placeholder="Précisions (facultatif)"
+        placeholder={t("messages.reportDetailsPlaceholder")}
         className="w-full resize-y rounded-lg border border-black/10 bg-white px-2 py-1.5 text-xs text-ink"
       />
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel} className="h-8 rounded-full px-3 text-xs">
-          Annuler
+          {t("messages.cancel")}
         </Button>
         <Button
           type="button"
@@ -63,7 +65,7 @@ function ReportForm({ onSubmit, onCancel }: { onSubmit: (reason: MessageReportRe
           }}
           className="h-8 rounded-full bg-red-600 px-3 text-xs text-white hover:bg-red-700"
         >
-          Signaler
+          {t("messages.report")}
         </Button>
       </div>
     </div>
@@ -71,6 +73,7 @@ function ReportForm({ onSubmit, onCancel }: { onSubmit: (reason: MessageReportRe
 }
 
 function Conversation({ thread }: { thread: MessageThreadListItem }) {
+  const { t } = useTranslation("activity")
   const { authFetch } = useAuth()
   const [messages, setMessages] = useState<ThreadMessage[]>([])
   const [body, setBody] = useState("")
@@ -136,10 +139,10 @@ function Conversation({ thread }: { thread: MessageThreadListItem }) {
               {!message.is_mine && !reportedIds.includes(message.id) && (
                 <button type="button" onClick={() => setReportingId(message.id)} className="inline-flex items-center gap-1 text-ink-muted hover:text-red-700">
                   <Flag className="size-3" />
-                  Signaler
+                  {t("messages.report")}
                 </button>
               )}
-              {reportedIds.includes(message.id) && <span className="text-emerald-700">Signalé</span>}
+              {reportedIds.includes(message.id) && <span className="text-emerald-700">{t("messages.reported")}</span>}
             </div>
             {reportingId === message.id && (
               <div className="w-full max-w-[80%]">
@@ -153,12 +156,12 @@ function Conversation({ thread }: { thread: MessageThreadListItem }) {
       <div className="flex gap-2 border-t border-black/5 p-3">
         <textarea
           ref={textareaRef}
-          aria-label="Votre message"
+          aria-label={t("messages.messageLabel")}
           value={body}
           onChange={(event) => setBody(event.target.value)}
           rows={1}
           maxLength={3000}
-          placeholder="Écrivez votre message…"
+          placeholder={t("messages.messagePlaceholder")}
           className="flex-1 resize-none rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-ink outline-none focus:ring-2 focus:ring-gold/20"
         />
         <Button type="button" disabled={sending || !body.trim()} onClick={() => void send()} className="h-10 shrink-0 rounded-full bg-gold px-4 text-ink hover:bg-gold-light">
@@ -170,6 +173,7 @@ function Conversation({ thread }: { thread: MessageThreadListItem }) {
 }
 
 export function MessagesSection() {
+  const { t } = useTranslation("activity")
   const { authFetch } = useAuth()
   const [threads, setThreads] = useState<MessageThreadListItem[]>([])
   const [selectedId, setSelectedId] = useState<number | null>(null)
@@ -193,7 +197,7 @@ export function MessagesSection() {
     return (
       <div className="rounded-2xl border border-dashed border-black/10 bg-surface-alt p-8 text-center">
         <Inbox className="mx-auto size-6 text-gold-dark" />
-        <p className="mt-3 text-sm text-ink-secondary">Aucune conversation pour le moment.</p>
+        <p className="mt-3 text-sm text-ink-secondary">{t("messages.empty")}</p>
       </div>
     )
   }
@@ -228,7 +232,7 @@ export function MessagesSection() {
         <Conversation key={selected.id} thread={selected} />
       ) : (
         <div className="flex h-[28rem] items-center justify-center rounded-2xl border border-dashed border-black/10 text-sm text-ink-muted">
-          Sélectionnez une conversation.
+          {t("messages.selectConversation")}
         </div>
       )}
     </div>

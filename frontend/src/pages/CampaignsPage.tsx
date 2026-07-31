@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FolderKanban, Plus, RefreshCw, Search, Sparkles } from "lucide-react";
 
 import { Reveal } from "@/components/Reveal";
@@ -10,15 +11,15 @@ import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { CampaignCategory, CampaignListItem } from "@/lib/types";
 
-const categories: { code: CampaignCategory; label: string }[] = [
-  { code: "ARTISANAT", label: "Artisanat" },
-  { code: "COMMERCE", label: "Commerce" },
-  { code: "AGRICULTURE", label: "Agriculture" },
-  { code: "EDUCATION", label: "Éducation" },
-  { code: "SANTE", label: "Santé" },
-  { code: "TECHNOLOGIE", label: "Technologie" },
-  { code: "CULTURE", label: "Culture" },
-  { code: "AUTRE", label: "Autre" },
+const categoryCodes: CampaignCategory[] = [
+  "ARTISANAT",
+  "COMMERCE",
+  "AGRICULTURE",
+  "EDUCATION",
+  "SANTE",
+  "TECHNOLOGIE",
+  "CULTURE",
+  "AUTRE",
 ];
 
 /** Carte fantôme affichée pendant le chargement de la grille. */
@@ -43,6 +44,11 @@ function CampaignSkeleton() {
 }
 
 function CampaignsPage() {
+  const { t } = useTranslation("campaigns");
+  const categories = categoryCodes.map((code) => ({
+    code,
+    label: t(`categories.${code}`),
+  }));
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const showMine =
@@ -97,17 +103,13 @@ function CampaignsPage() {
         <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold text-gold-dark">
-              {showMine ? "Espace porteur" : "Projets publiés"}
+              {showMine ? t("list.eyebrowMine") : t("list.eyebrowAll")}
             </p>
             <h1 className="mt-3 font-heading text-4xl font-bold text-balance text-ink sm:text-5xl">
-              {showMine
-                ? "Pilotez vos campagnes"
-                : "Des besoins précis, présentés par leurs porteurs"}
+              {showMine ? t("list.titleMine") : t("list.titleAll")}
             </h1>
             <p className="mt-5 max-w-2xl text-ink-secondary sm:text-lg">
-              {showMine
-                ? "Retrouvez vos brouillons, suivez leur validation et publiez les actualités de vos collectes."
-                : "Consultez les objectifs, l’utilisation prévue des fonds et le calendrier de chaque campagne."}
+              {showMine ? t("list.introMine") : t("list.introAll")}
             </p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
@@ -121,7 +123,7 @@ function CampaignsPage() {
                   to={showMine ? "/campagnes" : "/campagnes?vue=mes-campagnes"}
                 >
                   <FolderKanban aria-hidden="true" className="size-4" />
-                  {showMine ? "Découvrir les projets" : "Mes campagnes"}
+                  {showMine ? t("list.discover") : t("list.myCampaigns")}
                 </Link>
               </Button>
             )}
@@ -136,7 +138,7 @@ function CampaignsPage() {
                   }
                 >
                   <Plus aria-hidden="true" className="size-4" />
-                  Créer une campagne
+                  {t("list.createCampaign")}
                 </Link>
               </Button>
             )}
@@ -160,15 +162,15 @@ function CampaignsPage() {
                   type="search"
                   value={searchInput}
                   onChange={(event) => setSearchInput(event.target.value)}
-                  placeholder="Rechercher un projet, un mot-clé…"
-                  aria-label="Rechercher une campagne"
+                  placeholder={t("list.searchPlaceholder")}
+                  aria-label={t("list.searchLabel")}
                   className="h-12 w-full rounded-full border border-black/10 bg-surface pr-5 pl-11 text-sm text-ink shadow-sm transition-all outline-none placeholder:text-ink-muted focus:border-gold/60 focus:ring-2 focus:ring-gold/30"
                 />
               </div>
 
               <div
                 role="group"
-                aria-label="Filtrer par catégorie"
+                aria-label={t("list.filterLabel")}
                 className="mt-6 flex flex-wrap gap-2"
               >
                 <button
@@ -181,7 +183,7 @@ function CampaignsPage() {
                       : "border border-black/10 bg-surface text-ink-secondary hover:border-gold/40 hover:text-ink"
                   }`}
                 >
-                  Toutes
+                  {t("list.all")}
                 </button>
                 {categories.map((item) => (
                   <button
@@ -215,11 +217,10 @@ function CampaignsPage() {
               ) : error ? (
                 <div className="mx-auto flex max-w-md flex-col items-center rounded-[20px] border border-black/5 bg-surface-alt px-8 py-16 text-center">
                   <p className="font-heading text-xl font-bold text-ink">
-                    Impossible de charger les campagnes
+                    {t("list.errorTitle")}
                   </p>
                   <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
-                    Une erreur est survenue. Vérifiez votre connexion puis
-                    réessayez.
+                    {t("list.errorText")}
                   </p>
                   <Button
                     variant="outline"
@@ -227,7 +228,7 @@ function CampaignsPage() {
                     className="mt-7 rounded-full border-black/10 px-6 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"
                   >
                     <RefreshCw aria-hidden="true" className="size-4" />
-                    Réessayer
+                    {t("list.retry")}
                   </Button>
                 </div>
               ) : campaigns.length === 0 ? (
@@ -240,19 +241,19 @@ function CampaignsPage() {
                   </span>
                   <p className="mt-5 font-heading text-xl font-bold text-ink">
                     {hasFilters
-                      ? "Aucune campagne ne correspond"
-                      : "Aucune campagne pour le moment"}
+                      ? t("list.emptyFilteredTitle")
+                      : t("list.emptyTitle")}
                   </p>
                   <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
                     {hasFilters
-                      ? "Essayez un autre mot-clé ou une autre catégorie. Et si le projet qui manque, c'était le vôtre ?"
-                      : "Soyez parmi les premiers : lancez votre projet et ouvrez la voie."}
+                      ? t("list.emptyFilteredText")
+                      : t("list.emptyText")}
                   </p>
                   <Button
                     asChild
                     className="mt-7 h-11 rounded-full bg-gold px-7 font-semibold text-ink shadow-md shadow-gold/25 transition-all hover:bg-gold-light hover:shadow-lg hover:shadow-gold/30"
                   >
-                    <Link to="/inscription">Lancer un projet</Link>
+                    <Link to="/inscription">{t("list.launchProject")}</Link>
                   </Button>
                 </div>
               ) : (

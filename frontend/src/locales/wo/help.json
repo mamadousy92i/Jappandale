@@ -1,0 +1,114 @@
+{
+  "homepage": {
+    "hero": {
+      "eyebrow": "Platfor porojet yu Senegaal",
+      "title": "Jàppale porojet yi di yóbbu Senegaal ci kanam.",
+      "intro": "Xool porojet yu dëkk bi, yu ñu wone bu baax, yu boroom ñu wóoral di yóre, te toppatoo ni xaalis bi di jëfandikoo ak ni porojet bi di jëm ci kanam.",
+      "ctaDiscover": "Xool porojet yi feeñ",
+      "ctaSubmit": "Yónnee sa porojet",
+      "note": "Dokkal bu ne dañu koy denc, te mën nga koy toppatoo ci sa kont.",
+      "imageAlt": "Ab tayeur ci ateliye bi, Dakar",
+      "imageCaption": "Ateliye taaru — Medina, Dakar"
+    },
+    "published": {
+      "eyebrow": "Di waajtu",
+      "title": "Porojet yi feeñ",
+      "intro": "Fiches yu ne wone dañu soxla bi, bérab bi, ñi koy jariñu, ak ni xaalis bi war a jëfandikoo.",
+      "seeAll": "Kanpaañ yépp",
+      "empty": "Kanpaañ yi dinañu feeñ fi bu sarwis bi amee."
+    },
+    "modal": {
+      "previewLabel": "Melokaanu yoon wi",
+      "closeLabel": "Tëj melokaan bi",
+      "zoomedLabel": "Nataal bu yaatu : {{title}}"
+    },
+    "today": {
+      "title": "Am na tey",
+      "items": [
+        "Sos kont ak profil boroom porojet",
+        "Yónnee ak xool ci loxo xaymawukaay yu KYC",
+        "Sos, xool ak génn ci kanam kanpaañ bu bees",
+        "Xool ci anam bu ubbeeku porojet yi feeñ"
+      ]
+    },
+    "contribJourney": {
+      "title": "Yoonu dokkal",
+      "text": "Tànn njëg li, wóorloo sa dokkal, te gis ci saa si sa taariix ci sa kont.",
+      "cta": "Sos sama kont"
+    },
+    "eyebrow": "Naka Jappandale di doxe",
+    "title": "Yoon wu leer, dale ci xalaat ba ci topatoo",
+    "intro": "Jappandale dafay àndal porojet bu ne ci ñeenti tàllim yu yomb, ak leerandaay muy tabax gu mag.",
+    "stepLabel": "Tàllim 0{{number}}",
+    "expandLabel": "Yaatal",
+    "steps": {
+      "create": {
+        "title": "Wone porojet bi",
+        "text": "Wone soxla bi, ñi koy jariñu, xaalis bi war a am, ak tàllim yi war a def."
+      },
+      "verify": {
+        "title": "Wóoral dosye bi",
+        "text": "Identite, liggéey, ak xibaar yu kanpaañ bi ñu ko xool bu baax, laata ñu ko wone ci kanam."
+      },
+      "mobilize": {
+        "title": "Dajale ñi ci war a dokkal",
+        "text": "Wàllaale xam-xam bi ñépp mëna gis, te toppatoo ni kanpaañ bi di jëm ci kanam, ci leer."
+      },
+      "report": {
+        "title": "Wax li xew",
+        "text": "Toppatoo sa kanpaañ yi, te wone xibaar yu bees ci tàllim yi nga jotali."
+      }
+    },
+    "ctaDiscover": "Xool porojet yi",
+    "ctaSubmit": "Yónnee sa porojet",
+    "verified": {
+      "title": "Lu « porojet bu wóor » tekki",
+      "intro": "Wóoral du firndeel ne porojet bi dina yekk. Day wone rekk ne boroom porojet bi jébbal na ay xaymawukaay yu ñu koy laaj, te ñu xool bu baax xibaar yu kanpaañ bi, laata ñu ko wone.",
+      "steps": {
+        "identity": {
+          "title": "Identite ak liggéey",
+          "text": "Boroom porojet bi jébbal ay xaymawukaay. Ekip bi dina xool dosye bi laata mu génn ci kanam."
+        },
+        "project": {
+          "title": "Porojet ak soxla xaalis",
+          "text": "Ñu xool xaalis bi, ni ñu koy jëfandikoo, ñi koy jariñu, ak jaataayu tàllim yi."
+        },
+        "publication": {
+          "title": "Génn ci kanam bu aju ci sart",
+          "text": "Kanpaañ bi du feeñ lu dul bu ñu ko wóoral. Bu ñu ko bàyyi, war na am ab li tax, te boroom bi mëna ko defar."
+        }
+      }
+    }
+  },
+  "trust": {
+    "eyebrow": "Wóolu ak leerandaay",
+    "title": "Lu Jappandale di wóoral — ak lu mu du dig.",
+    "intro": "Wóolu day jóge ci xibaar yu wóor, ci dogal yu ñu mëna toppatoo, ak ci wax dëgg ci li platfor bi mëna te lu mu mëmena.",
+    "principles": {
+      "identity": {
+        "title": "Identite bu ñu xool",
+        "text": "Kanpaañ du génn ci kanam lu dul bu ñu wóoral xaymawukaay yu boroom porojet bi, te ekip bi xool dosye bi ak loxo."
+      },
+      "budget": {
+        "title": "Xaalis bu leer",
+        "text": "Ñi koy jariñu, ni xaalis bi war a jëfandikoo, jaataayu tàllim yi, ak xibaar yu bees, dañu bàyyi ci xarala kanpaañ bi ngir ñépp gis."
+      },
+      "promises": {
+        "title": "Dig yu ñu wax ak farlu",
+        "text": "Wóoral bi day firndeel ne dosye bi dëggu na — du firndeel ne porojet bi dina yekk, walla ne dina indi njariñ ci xaalis."
+      },
+      "contributions": {
+        "title": "Dokkal yu ñu mëna toppatoo",
+        "text": "Dokkal bu ne am na ab nimero, te boroom bi mëna ko gis ci taariixu sa kont."
+      },
+      "reports": {
+        "title": "Yédd yu ñu xool",
+        "text": "Ku ci nekk mëna yónnee ab yédd bu ñu denc ko. Ekip yu liggéey ci back-office bi dañu koy topp te jëfandikoo."
+      }
+    },
+    "transparency": {
+      "title": "Leerandaay ci tàllim bu ne",
+      "text": "Xaalatu kanpaañ yi, wóoral yi, ak dokkal yi dañu bàyyi ci bérab yu ñu leen jëfandikoo, ngir yomb toppatoo bu ne jëfandikoo."
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "categories": {
+    "ARTISANAT": "Artisanat",
+    "COMMERCE": "Commerce",
+    "AGRICULTURE": "Agriculture",
+    "EDUCATION": "Éducation",
+    "SANTE": "Santé",
+    "TECHNOLOGIE": "Technologie",
+    "CULTURE": "Culture",
+    "AUTRE": "Autre"
+  },
+  "card": {
+    "amountOutOf": "sur {{amount}}",
+    "ended": "Terminée",
+    "daysLeft": "J-{{count}}"
+  },
+  "list": {
+    "eyebrowMine": "Espace porteur",
+    "eyebrowAll": "Projets publiés",
+    "titleMine": "Pilotez vos campagnes",
+    "titleAll": "Des besoins précis, présentés par leurs porteurs",
+    "introMine": "Retrouvez vos brouillons, suivez leur validation et publiez les actualités de vos collectes.",
+    "introAll": "Consultez les objectifs, l’utilisation prévue des fonds et le calendrier de chaque campagne.",
+    "discover": "Découvrir les projets",
+    "myCampaigns": "Mes campagnes",
+    "createCampaign": "Créer une campagne",
+    "searchPlaceholder": "Rechercher un projet, un mot-clé…",
+    "searchLabel": "Rechercher une campagne",
+    "filterLabel": "Filtrer par catégorie",
+    "all": "Toutes",
+    "errorTitle": "Impossible de charger les campagnes",
+    "errorText": "Une erreur est survenue. Vérifiez votre connexion puis réessayez.",
+    "retry": "Réessayer",
+    "emptyFilteredTitle": "Aucune campagne ne correspond",
+    "emptyTitle": "Aucune campagne pour le moment",
+    "emptyFilteredText": "Essayez un autre mot-clé ou une autre catégorie. Et si le projet qui manque, c’était le vôtre ?",
+    "emptyText": "Soyez parmi les premiers : lancez votre projet et ouvrez la voie.",
+    "launchProject": "Lancer un projet"
+  }
+}
