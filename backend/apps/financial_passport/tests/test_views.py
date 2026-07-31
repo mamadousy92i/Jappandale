@@ -81,6 +81,11 @@ def test_verification_publique_dun_identifiant_existant():
     client.force_authenticate(porteur)
     export_response = client.post("/api/passeport/mine/export/")
     export = PassportExport.objects.get(porteur=porteur)
+    client.patch(
+        f"/api/passeport/mine/exports/{export.verification_id}/sharing/",
+        {"is_shared": True},
+        format="json",
+    )
 
     public_client = APIClient()
     response = public_client.get(f"/api/passeport/verifier/{export.verification_id}/")
@@ -90,6 +95,43 @@ def test_verification_publique_dun_identifiant_existant():
     assert response.data["porteur"]
     assert "email" not in response.data
     assert export_response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_passeport_prive_ne_peut_pas_etre_verifie_publiquement():
+    porteur = make_porteur("porteur-pp5@test.sn")
+    export = PassportExport.objects.create(porteur=porteur, snapshot={"porteur_name": "Awa"})
+
+    response = APIClient().get(f"/api/passeport/verifier/{export.verification_id}/")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_porteur_peut_lister_et_retirer_le_partage_de_son_passeport():
+    porteur = make_porteur("porteur-pp6@test.sn")
+    export = PassportExport.objects.create(porteur=porteur, snapshot={"porteur_name": "Awa"})
+    client = APIClient()
+    client.force_authenticate(porteur)
+
+    listed = client.get("/api/passeport/mine/exports/")
+    shared = client.patch(
+        f"/api/passeport/mine/exports/{export.verification_id}/sharing/",
+        {"is_shared": True},
+        format="json",
+    )
+    private = client.patch(
+        f"/api/passeport/mine/exports/{export.verification_id}/sharing/",
+        {"is_shared": False},
+        format="json",
+    )
+
+    assert listed.status_code == 200
+    assert listed.data[0]["is_shared"] is False
+    assert shared.data["is_shared"] is True
+    assert shared.data["shared_at"] is not None
+    assert private.data["is_shared"] is False
+    assert private.data["shared_at"] is None
 
 
 @pytest.mark.django_db

@@ -1,6 +1,9 @@
 from io import BytesIO
 from pathlib import Path
 
+from reportlab.graphics import renderPDF
+from reportlab.graphics.barcode.qr import QrCodeWidget
+from reportlab.graphics.shapes import Drawing
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
@@ -19,6 +22,17 @@ LOGO_PATH = Path(__file__).parent / "assets" / "logo-mark.png"
 
 PAGE_WIDTH, PAGE_HEIGHT = A4
 MARGIN = 2 * cm
+
+
+def _draw_qr_code(doc, *, url, x, y, size):
+    """Dessine un QR code pointant vers `url`, coin supérieur gauche en (x, y)."""
+    widget = QrCodeWidget(url)
+    bounds = widget.getBounds()
+    native_width = bounds[2] - bounds[0]
+    native_height = bounds[3] - bounds[1]
+    drawing = Drawing(size, size, transform=[size / native_width, 0, 0, size / native_height, 0, 0])
+    drawing.add(widget)
+    renderPDF.draw(drawing, doc, x, y - size)
 
 
 def _stat_card(doc, x, y, width, height, label, value, value_color=INK):
@@ -81,13 +95,23 @@ def render_passport_pdf(*, snapshot, verification_id, verification_url, generate
     doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y)
     y -= 0.7 * cm
 
+    qr_size = 2.1 * cm
+    _draw_qr_code(doc, url=verification_url, x=PAGE_WIDTH - MARGIN - qr_size, y=y, size=qr_size)
+
     doc.setFillColor(INK_MUTED)
     doc.setFont("Helvetica", 8.5)
     doc.drawString(MARGIN, y, f"Généré le {generated_at:%d/%m/%Y à %H:%M}")
     y -= 0.45 * cm
     doc.drawString(MARGIN, y, f"Identifiant de vérification : {verification_id}")
     y -= 0.45 * cm
-    doc.drawString(MARGIN, y, f"Vérifiable à : {verification_url}")
+    max_url_width = PAGE_WIDTH - 2 * MARGIN - qr_size - 0.6 * cm
+    url_label = f"Vérifiable à : {verification_url}"
+    while doc.stringWidth(url_label, "Helvetica", 8.5) > max_url_width and len(url_label) > 20:
+        url_label = url_label[:-2] + "…"
+    doc.drawString(MARGIN, y, url_label)
+    y -= 0.4 * cm
+    doc.setFont("Helvetica-Oblique", 7.5)
+    doc.drawString(MARGIN, y, "Scannez le QR code pour vérifier ce document.")
     y -= 1 * cm
 
     doc.setFillColor(INK)

@@ -3,7 +3,7 @@ from django.db.models import F, Sum
 from apps.campaigns.models import Campaign
 from apps.contributions.models import Contribution
 from apps.disputes.models import Dispute
-from apps.scoring.services import compute_score
+from apps.scoring import api as scoring_api
 
 
 def build_passport_data(porteur):
@@ -11,7 +11,7 @@ def build_passport_data(porteur):
 
     Fonction pure : ne persiste rien, ne modifie aucun état.
     """
-    score_value, _ = compute_score(porteur)
+    score_value = scoring_api.compute_score_value(porteur)
 
     campaigns = Campaign.objects.filter(owner=porteur)
     campaigns_total = campaigns.count()

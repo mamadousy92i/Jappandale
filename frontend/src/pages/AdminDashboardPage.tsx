@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { BadgeCheck, Banknote, CheckCircle2, Download, ExternalLink, FileText, FolderClock, Gauge, Headphones, LayoutDashboard, Mail, RefreshCw, Search, ShieldAlert, UserCog, Users, X } from "lucide-react"
+import { Archive, BadgeCheck, Banknote, CheckCircle2, Download, ExternalLink, FileText, FolderClock, Gauge, Headphones, Landmark, LayoutDashboard, Mail, Pencil, Plus, RefreshCw, Search, ShieldAlert, UserCog, Users, X } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { Link } from "react-router-dom"
 
@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
+import type { CampaignCategory, FinancingScheme } from "@/lib/types"
 
-type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts" | "message_reports" | "disputes" | "scores"
+type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts" | "message_reports" | "disputes" | "scores" | "guichet"
 type Person = {
   id: number
   name: string
@@ -131,6 +132,7 @@ interface DashboardData {
     is_manual_override: boolean
     computed_at: string | null
   }>
+  scoring_settings: Record<string, string>
 }
 
 interface ManagedUser extends Person {
@@ -191,7 +193,148 @@ const tabItems: Array<{
   { id: "message_reports", label: "Signalements messages", icon: ShieldAlert, count: "open_message_reports" },
   { id: "disputes", label: "Litiges", icon: ShieldAlert, count: "open_disputes" },
   { id: "scores", label: "Scores", icon: Gauge },
+  { id: "guichet", label: "Guichet Unique", icon: Landmark },
 ]
+
+type AdminReferral = {
+  id: number
+  scheme: FinancingScheme
+  scheme_name: string
+  porteur: { id: number; name: string; email: string }
+  status: "INTERET" | "EN_COURS" | "ACCEPTE" | "REFUSE" | "ABANDONNE"
+  status_display: string
+  note: string
+  created_at: string
+  updated_at: string
+}
+
+type GuichetStats = {
+  global: { total_referrals: number; accepted: number; transformation_rate: number | null }
+  published_schemes: number
+  open_referrals: number
+  per_scheme: Array<{
+    scheme_id: number
+    scheme_name: string
+    total_referrals: number
+    accepted: number
+    transformation_rate: number | null
+  }>
+}
+
+const providerTypeOptions = [
+  { value: "FONDS_PUBLIC", label: "Fonds public" },
+  { value: "BAILLEUR", label: "Bailleur" },
+  { value: "BANQUE", label: "Banque partenaire" },
+  { value: "PROGRAMME_APPUI", label: "Programme d'appui" },
+] as const
+
+const diasporaRequirementOptions = [
+  { value: "INDIFFERENT", label: "Indifférent" },
+  { value: "DIASPORA_UNIQUEMENT", label: "Réservé à la diaspora" },
+  { value: "DIASPORA_EXCLUE", label: "Diaspora non éligible" },
+] as const
+
+const guichetCategoryOptions: { code: CampaignCategory; label: string }[] = [
+  { code: "ARTISANAT", label: "Artisanat" },
+  { code: "COMMERCE", label: "Commerce" },
+  { code: "AGRICULTURE", label: "Agriculture" },
+  { code: "EDUCATION", label: "Éducation" },
+  { code: "SANTE", label: "Santé" },
+  { code: "TECHNOLOGIE", label: "Technologie" },
+  { code: "CULTURE", label: "Culture" },
+  { code: "AUTRE", label: "Autre" },
+]
+
+type GuichetFormState = {
+  name: string
+  provider_name: string
+  provider_type: string
+  description: string
+  website_url: string
+  contact_email: string
+  min_score: string
+  requires_kyc_valide: boolean
+  diaspora_requirement: string
+  eligible_categories: CampaignCategory[]
+  eligible_regions: string
+  min_goal_amount: string
+  max_goal_amount: string
+}
+
+const emptyGuichetForm: GuichetFormState = {
+  name: "",
+  provider_name: "",
+  provider_type: "FONDS_PUBLIC",
+  description: "",
+  website_url: "",
+  contact_email: "",
+  min_score: "0",
+  requires_kyc_valide: true,
+  diaspora_requirement: "INDIFFERENT",
+  eligible_categories: [],
+  eligible_regions: "",
+  min_goal_amount: "",
+  max_goal_amount: "",
+}
+
+function schemeToForm(scheme: FinancingScheme): GuichetFormState {
+  return {
+    name: scheme.name,
+    provider_name: scheme.provider_name,
+    provider_type: scheme.provider_type,
+    description: scheme.description,
+    website_url: scheme.website_url,
+    contact_email: scheme.contact_email,
+    min_score: String(scheme.min_score),
+    requires_kyc_valide: scheme.requires_kyc_valide,
+    diaspora_requirement: scheme.diaspora_requirement,
+    eligible_categories: scheme.eligible_categories,
+    eligible_regions: scheme.eligible_regions.join(", "),
+    min_goal_amount: scheme.min_goal_amount != null ? String(scheme.min_goal_amount) : "",
+    max_goal_amount: scheme.max_goal_amount != null ? String(scheme.max_goal_amount) : "",
+  }
+}
+
+function formToPayload(form: GuichetFormState) {
+  return {
+    name: form.name,
+    provider_name: form.provider_name,
+    provider_type: form.provider_type,
+    description: form.description,
+    website_url: form.website_url,
+    contact_email: form.contact_email,
+    min_score: Number(form.min_score) || 0,
+    requires_kyc_valide: form.requires_kyc_valide,
+    diaspora_requirement: form.diaspora_requirement,
+    eligible_categories: form.eligible_categories,
+    eligible_regions: form.eligible_regions
+      .split(",")
+      .map((region) => region.trim())
+      .filter(Boolean),
+    min_goal_amount: form.min_goal_amount ? Number(form.min_goal_amount) : null,
+    max_goal_amount: form.max_goal_amount ? Number(form.max_goal_amount) : null,
+  }
+}
+
+const guichetStatusBadges: Record<string, { label: string; className: string }> = {
+  BROUILLON: { label: "Brouillon", className: "bg-black/[0.06] text-ink-secondary" },
+  PUBLIE: { label: "Publié", className: "bg-emerald-100 text-emerald-700" },
+  ARCHIVE: { label: "Archivé", className: "bg-ink/85 text-surface" },
+}
+
+const scoreSettingFields = [
+  { key: "score_base", label: "Score de base" },
+  { key: "poids_kyc", label: "Bonus KYC validé" },
+  { key: "poids_anciennete_max", label: "Bonus ancienneté maximum" },
+  { key: "poids_activite_max", label: "Bonus activité maximum" },
+  { key: "poids_reussite_max", label: "Bonus réussite maximum" },
+  { key: "poids_montant_max", label: "Bonus montant collecté maximum" },
+  { key: "penalite_litige_max", label: "Pénalité litiges maximum" },
+  { key: "penalite_signalement_unite", label: "Pénalité par signalement" },
+  { key: "penalite_signalement_max", label: "Pénalité signalements maximum" },
+  { key: "penalite_campagne_rejetee_unite", label: "Pénalité par campagne rejetée/suspendue" },
+  { key: "penalite_campagne_rejetee_max", label: "Pénalité campagnes rejetées maximum" },
+] as const
 
 const PAGE_SIZE = 8
 
@@ -354,6 +497,14 @@ export default function AdminDashboardPage() {
   const [userActive, setUserActive] = useState("")
   const [userPage, setUserPage] = useState(1)
   const [users, setUsers] = useState<UserPage | null>(null)
+  const [guichetSchemes, setGuichetSchemes] = useState<FinancingScheme[]>([])
+  const [guichetReferrals, setGuichetReferrals] = useState<AdminReferral[]>([])
+  const [guichetStats, setGuichetStats] = useState<GuichetStats | null>(null)
+  const [guichetBusy, setGuichetBusy] = useState(false)
+  const [guichetError, setGuichetError] = useState<string | null>(null)
+  const [guichetFormOpen, setGuichetFormOpen] = useState(false)
+  const [guichetEditingId, setGuichetEditingId] = useState<number | null>(null)
+  const [guichetForm, setGuichetForm] = useState<GuichetFormState>(emptyGuichetForm)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -379,6 +530,22 @@ export default function AdminDashboardPage() {
     }
   }, [authFetch, search, userActive, userPage, userRole])
 
+  const loadGuichet = useCallback(async () => {
+    setGuichetError(null)
+    try {
+      const [schemes, referrals, stats] = await Promise.all([
+        authFetch("/guichet/admin/dispositifs/"),
+        authFetch("/guichet/admin/orientations/"),
+        authFetch("/guichet/admin/stats/"),
+      ])
+      setGuichetSchemes(schemes as FinancingScheme[])
+      setGuichetReferrals(referrals as AdminReferral[])
+      setGuichetStats(stats as GuichetStats)
+    } catch {
+      setGuichetError("Impossible de charger le Guichet Unique.")
+    }
+  }, [authFetch])
+
   useEffect(() => {
     void load()
   }, [load])
@@ -388,8 +555,71 @@ export default function AdminDashboardPage() {
     return () => window.clearTimeout(timer)
   }, [loadUsers, tab])
   useEffect(() => {
+    if (tab !== "guichet") return
+    void loadGuichet()
+  }, [loadGuichet, tab])
+  useEffect(() => {
     setLocalPage(1)
   }, [search, statusFilter, tab])
+
+  const submitGuichetForm = async () => {
+    setGuichetBusy(true)
+    setGuichetError(null)
+    try {
+      const payload = formToPayload(guichetForm)
+      if (guichetEditingId) {
+        await authFetch(`/guichet/admin/dispositifs/${guichetEditingId}/`, {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        })
+      } else {
+        await authFetch("/guichet/admin/dispositifs/", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        })
+      }
+      setGuichetFormOpen(false)
+      setGuichetEditingId(null)
+      setGuichetForm(emptyGuichetForm)
+      await loadGuichet()
+    } catch {
+      setGuichetError("Certaines informations sont invalides. Vérifiez le formulaire.")
+    } finally {
+      setGuichetBusy(false)
+    }
+  }
+
+  const setSchemeStatus = async (schemeId: number, status: string) => {
+    setGuichetBusy(true)
+    setGuichetError(null)
+    try {
+      await authFetch(`/guichet/admin/dispositifs/${schemeId}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      })
+      await loadGuichet()
+    } catch {
+      setGuichetError("Impossible de mettre à jour ce dispositif.")
+    } finally {
+      setGuichetBusy(false)
+    }
+  }
+
+  const updateReferral = async (referralId: number, patch: { status?: string; note?: string }) => {
+    setGuichetBusy(true)
+    setGuichetError(null)
+    try {
+      await authFetch(`/guichet/admin/orientations/${referralId}/`, {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+      })
+      await loadGuichet()
+    } catch {
+      setGuichetError("Impossible de mettre à jour cette orientation.")
+    } finally {
+      setGuichetBusy(false)
+    }
+  }
 
   const perform = async (path: string, method: "POST" | "PATCH", body: object, message: string, refreshUsers = false) => {
     setBusy(true)
@@ -617,6 +847,7 @@ export default function AdminDashboardPage() {
                     ["contributions", "Contributions"],
                     ["reports", "Signalements"],
                     ["support", "Assistance"],
+                    ["bceao", "Rapport réglementaire (BCEAO)"],
                   ].map(([kind, label]) => (
                     <Button key={kind} variant="outline" onClick={() => void exportCsv(kind)} className="rounded-full">
                       <Download className="size-4" />
@@ -1052,6 +1283,44 @@ export default function AdminDashboardPage() {
               </h2>
               <p className="mt-1 text-sm text-ink-secondary">Porteurs avec une identité vérifiée et leur score courant.</p>
             </div>
+            <details className="rounded-[20px] border border-black/5 bg-white p-5 shadow-sm">
+              <summary className="cursor-pointer font-heading text-lg font-bold text-ink">Règles de calcul du Score</summary>
+              <p className="mt-2 text-sm text-ink-secondary">Ces coefficients s’appliquent aux prochains calculs. Les décisions humaines déjà enregistrées restent tracées dans l’historique.</p>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {scoreSettingFields.map(({ key, label }) => {
+                  const draftKey = `score-setting-${key}`
+                  return (
+                    <label key={key} className="space-y-1.5 text-sm font-medium text-ink">
+                      <span>{label}</span>
+                      <Input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={drafts[draftKey] ?? data.scoring_settings[key]}
+                        onChange={(event) => setDrafts((current) => ({ ...current, [draftKey]: event.target.value }))}
+                        className="h-10 rounded-xl bg-surface"
+                      />
+                    </label>
+                  )
+                })}
+              </div>
+              <div className="mt-5 flex justify-end">
+                <Button
+                  disabled={busy || scoreSettingFields.some(({ key }) => Number.isNaN(Number(drafts[`score-setting-${key}`] ?? data.scoring_settings[key])))}
+                  onClick={() =>
+                    void perform(
+                      "/backoffice/scoring-settings/",
+                      "PATCH",
+                      Object.fromEntries(scoreSettingFields.map(({ key }) => [key, Number(drafts[`score-setting-${key}`] ?? data.scoring_settings[key])])),
+                      "Règles du Score mises à jour.",
+                    )
+                  }
+                  className="rounded-full bg-gold text-ink hover:bg-gold-light"
+                >
+                  Enregistrer les règles
+                </Button>
+              </div>
+            </details>
             {visibleItems.length === 0 ? (
               <EmptyQueue label="porteur" />
             ) : (
@@ -1501,6 +1770,379 @@ export default function AdminDashboardPage() {
               )}
             </div>
             {users && <Pager page={users.page} pages={users.pages} onChange={setUserPage} />}
+          </section>
+        )}
+
+        {tab === "guichet" && (
+          <section className="mt-8 space-y-6" aria-labelledby="guichet-title">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 id="guichet-title" className="font-heading text-2xl font-bold text-ink">
+                  Guichet Unique du Financement
+                </h2>
+                <p className="mt-1 text-sm text-ink-secondary">
+                  Référentiel des dispositifs, orientations et taux de transformation.
+                </p>
+              </div>
+              <Button
+                onClick={() => {
+                  setGuichetEditingId(null)
+                  setGuichetForm(emptyGuichetForm)
+                  setGuichetFormOpen(true)
+                }}
+                className="rounded-full bg-gold text-ink hover:bg-gold-light"
+              >
+                <Plus className="size-4" />
+                Nouveau dispositif
+              </Button>
+            </div>
+
+            {guichetError && (
+              <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {guichetError}
+              </p>
+            )}
+
+            {guichetStats && (
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="rounded-[20px] border border-black/5 bg-white p-5 shadow-sm">
+                  <p className="text-xs text-ink-muted">Dispositifs publiés</p>
+                  <p className="mt-1 font-heading text-2xl font-bold text-ink">{guichetStats.published_schemes}</p>
+                </div>
+                <div className="rounded-[20px] border border-black/5 bg-white p-5 shadow-sm">
+                  <p className="text-xs text-ink-muted">Orientations en cours</p>
+                  <p className="mt-1 font-heading text-2xl font-bold text-ink">{guichetStats.open_referrals}</p>
+                </div>
+                <div className="rounded-[20px] border border-black/5 bg-white p-5 shadow-sm">
+                  <p className="text-xs text-ink-muted">Taux de transformation global</p>
+                  <p className="mt-1 font-heading text-2xl font-bold text-ink">
+                    {guichetStats.global.transformation_rate != null
+                      ? `${Math.round(guichetStats.global.transformation_rate * 100)}%`
+                      : "—"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {guichetFormOpen && (
+              <div className="rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                <h3 className="font-heading text-lg font-bold text-ink">
+                  {guichetEditingId ? "Modifier le dispositif" : "Nouveau dispositif"}
+                </h3>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Nom du dispositif</span>
+                    <Input
+                      value={guichetForm.name}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, name: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Organisme</span>
+                    <Input
+                      value={guichetForm.provider_name}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, provider_name: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Type d'organisme</span>
+                    <select
+                      value={guichetForm.provider_type}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, provider_type: event.target.value }))}
+                      className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm"
+                    >
+                      {providerTypeOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Condition diaspora</span>
+                    <select
+                      value={guichetForm.diaspora_requirement}
+                      onChange={(event) =>
+                        setGuichetForm((form) => ({ ...form, diaspora_requirement: event.target.value }))
+                      }
+                      className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm"
+                    >
+                      {diasporaRequirementOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink sm:col-span-2">
+                    <span>Description</span>
+                    <textarea
+                      rows={3}
+                      value={guichetForm.description}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, description: event.target.value }))}
+                      className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Site web (facultatif)</span>
+                    <Input
+                      value={guichetForm.website_url}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, website_url: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>E-mail de contact (facultatif)</span>
+                    <Input
+                      value={guichetForm.contact_email}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, contact_email: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Score Jappandale minimum</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={guichetForm.min_score}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, min_score: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-medium text-ink">
+                    <input
+                      type="checkbox"
+                      checked={guichetForm.requires_kyc_valide}
+                      onChange={(event) =>
+                        setGuichetForm((form) => ({ ...form, requires_kyc_valide: event.target.checked }))
+                      }
+                      className="size-4 accent-[#d4a900]"
+                    />
+                    <span>Identité vérifiée (KYC) requise</span>
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Objectif minimum (FCFA, facultatif)</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={guichetForm.min_goal_amount}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, min_goal_amount: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Objectif maximum (FCFA, facultatif)</span>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={guichetForm.max_goal_amount}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, max_goal_amount: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink sm:col-span-2">
+                    <span>Villes/régions éligibles (facultatif, séparées par des virgules)</span>
+                    <Input
+                      value={guichetForm.eligible_regions}
+                      onChange={(event) => setGuichetForm((form) => ({ ...form, eligible_regions: event.target.value }))}
+                      placeholder="Dakar, Thiès, Saint-Louis"
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <div className="space-y-1.5 text-sm font-medium text-ink sm:col-span-2">
+                    <span>Catégories de projets éligibles (aucune sélection = toutes)</span>
+                    <div className="flex flex-wrap gap-2">
+                      {guichetCategoryOptions.map((option) => {
+                        const checked = guichetForm.eligible_categories.includes(option.code)
+                        return (
+                          <label
+                            key={option.code}
+                            className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                              checked ? "border-gold bg-gold/15 text-gold-dark" : "border-black/10 text-ink-secondary"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() =>
+                                setGuichetForm((form) => ({
+                                  ...form,
+                                  eligible_categories: checked
+                                    ? form.eligible_categories.filter((code) => code !== option.code)
+                                    : [...form.eligible_categories, option.code],
+                                }))
+                              }
+                              className="sr-only"
+                            />
+                            {option.label}
+                          </label>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-5 flex justify-end gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setGuichetFormOpen(false)
+                      setGuichetEditingId(null)
+                    }}
+                    className="rounded-full"
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    disabled={
+                      guichetBusy ||
+                      !guichetForm.name.trim() ||
+                      !guichetForm.provider_name.trim() ||
+                      !guichetForm.description.trim()
+                    }
+                    onClick={() => void submitGuichetForm()}
+                    className="rounded-full bg-gold text-ink hover:bg-gold-light"
+                  >
+                    {guichetBusy ? "Enregistrement…" : guichetEditingId ? "Enregistrer" : "Créer le dispositif"}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <h3 className="font-heading text-lg font-bold text-ink">Dispositifs référencés</h3>
+              {guichetSchemes.length === 0 ? (
+                <EmptyQueue label="dispositif" />
+              ) : (
+                guichetSchemes.map((scheme) => {
+                  const badge = guichetStatusBadges[scheme.status]
+                  const stats = guichetStats?.per_scheme.find((item) => item.scheme_id === scheme.id)
+                  return (
+                    <article key={scheme.id} className="rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-heading text-lg font-bold text-ink">{scheme.name}</h4>
+                            <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${badge.className}`}>
+                              {badge.label}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm text-ink-secondary">
+                            {scheme.provider_name} · {scheme.provider_type_display}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setGuichetEditingId(scheme.id)
+                              setGuichetForm(schemeToForm(scheme))
+                              setGuichetFormOpen(true)
+                            }}
+                            className="rounded-full"
+                          >
+                            <Pencil className="size-3.5" />
+                            Modifier
+                          </Button>
+                          {scheme.status !== "PUBLIE" && (
+                            <Button
+                              size="sm"
+                              disabled={guichetBusy}
+                              onClick={() => void setSchemeStatus(scheme.id, "PUBLIE")}
+                              className="rounded-full bg-gold text-ink hover:bg-gold-light"
+                            >
+                              Publier
+                            </Button>
+                          )}
+                          {scheme.status !== "ARCHIVE" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={guichetBusy}
+                              onClick={() => void setSchemeStatus(scheme.id, "ARCHIVE")}
+                              className="rounded-full border-black/10"
+                            >
+                              <Archive className="size-3.5" />
+                              Archiver
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      <p className="mt-3 text-sm leading-relaxed text-ink-secondary">{scheme.description}</p>
+                      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
+                        <span>Score minimum : {scheme.min_score}/100</span>
+                        {stats && (
+                          <span>
+                            {stats.total_referrals} orientation(s) ·{" "}
+                            {stats.transformation_rate != null
+                              ? `${Math.round(stats.transformation_rate * 100)}% transformées`
+                              : "aucune clôturée"}
+                          </span>
+                        )}
+                      </div>
+                    </article>
+                  )
+                })
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-heading text-lg font-bold text-ink">Orientations récentes</h3>
+              {guichetReferrals.length === 0 ? (
+                <EmptyQueue label="orientation" />
+              ) : (
+                guichetReferrals.map((referral) => {
+                  const noteKey = `referral-note-${referral.id}`
+                  const note = drafts[noteKey] ?? referral.note
+                  return (
+                    <article key={referral.id} className="rounded-[20px] border border-black/5 bg-white p-5 shadow-sm">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <h4 className="font-semibold text-ink">{referral.porteur.name}</h4>
+                          <p className="mt-1 text-xs text-ink-muted">
+                            {referral.porteur.email} · {referral.scheme_name}
+                          </p>
+                          <p className="mt-1 text-xs text-ink-muted">Orienté le {formatDate(referral.created_at)}</p>
+                        </div>
+                        <select
+                          aria-label={`Statut de l'orientation de ${referral.porteur.name}`}
+                          value={referral.status}
+                          disabled={guichetBusy}
+                          onChange={(event) => void updateReferral(referral.id, { status: event.target.value })}
+                          className="h-10 rounded-xl border border-black/10 bg-white px-3 text-sm"
+                        >
+                          <option value="INTERET">Intérêt manifesté</option>
+                          <option value="EN_COURS">Contact engagé</option>
+                          <option value="ACCEPTE">Financement obtenu</option>
+                          <option value="REFUSE">Refusé</option>
+                          <option value="ABANDONNE">Abandonné</option>
+                        </select>
+                      </div>
+                      <div className="mt-3 flex items-end gap-2">
+                        <NoteField
+                          value={note}
+                          onChange={(value) => setDrafts((current) => ({ ...current, [noteKey]: value }))}
+                          placeholder="Note de suivi"
+                          rows={1}
+                        />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={guichetBusy || note === referral.note}
+                          onClick={() => void updateReferral(referral.id, { note })}
+                          className="rounded-full"
+                        >
+                          Enregistrer
+                        </Button>
+                      </div>
+                    </article>
+                  )
+                })
+              )}
+            </div>
           </section>
         )}
       </div>

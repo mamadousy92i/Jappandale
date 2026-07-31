@@ -13,6 +13,7 @@ const campaign: CampaignListItem = {
   location: "Dakar",
   campaign_type: "DON_LIBRE",
   campaign_type_display: "Don libre",
+  expected_return_rate: null,
   category: "ARTISANAT",
   category_display: "Artisanat",
   goal_amount: 800000,

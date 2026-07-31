@@ -10,6 +10,9 @@ class Campaign(models.Model):
     class CampaignType(models.TextChoices):
         DON_LIBRE = "DON_LIBRE", "Don libre"
         DON_CONTREPARTIE = "DON_CONTREPARTIE", "Don avec contrepartie"
+        INVESTISSEMENT_PARTICIPATIF = (
+            "INVESTISSEMENT_PARTICIPATIF", "Investissement participatif"
+        )
 
     class Category(models.TextChoices):
         ARTISANAT = "ARTISANAT", "Artisanat"
@@ -41,7 +44,7 @@ class Campaign(models.Model):
     description = models.TextField("description")
     campaign_type = models.CharField(
         "type de campagne",
-        max_length=20,
+        max_length=30,
         choices=CampaignType.choices,
         default=CampaignType.DON_LIBRE,
     )
@@ -51,6 +54,13 @@ class Campaign(models.Model):
     project_timeline = models.TextField("calendrier prévisionnel", blank=True)
     category = models.CharField(
         "catégorie", max_length=20, choices=Category.choices, default=Category.AUTRE
+    )
+    expected_return_rate = models.DecimalField(
+        "taux de rendement attendu (%)",
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
     )
     goal_amount = models.PositiveIntegerField("objectif (FCFA)")
     collected_amount = models.PositiveIntegerField("montant collecté (FCFA)", default=0)

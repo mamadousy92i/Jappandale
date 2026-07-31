@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "apps.disputes",
     "apps.scoring",
     "apps.financial_passport",
+    "apps.guichet",
 ]
 
 MIDDLEWARE = [
@@ -167,6 +168,11 @@ EMAIL_LOGO_PATH = env(
 EMAIL_OTP_TTL = env.int("EMAIL_OTP_TTL", default=600)
 ADMIN_MFA_OTP_TTL = env.int("ADMIN_MFA_OTP_TTL", default=600)
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173")
+
+# Clé partagée pour l'API interne du moteur Score Jappandale (apps/scoring).
+# Authentifie les appels service-à-service (hors JWT utilisateur). Vide par
+# défaut : l'endpoint interne refuse alors toute requête (fail closed).
+INTERNAL_API_KEY = env("INTERNAL_API_KEY", default="")
 PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT", default=3600)
 
 LOGGING = {

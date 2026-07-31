@@ -61,7 +61,10 @@ export type CampaignStatus =
   | "SUSPENDUE"
   | "CLOTUREE";
 
-export type CampaignType = "DON_LIBRE" | "DON_CONTREPARTIE";
+export type CampaignType =
+  | "DON_LIBRE"
+  | "DON_CONTREPARTIE"
+  | "INVESTISSEMENT_PARTICIPATIF";
 
 export interface Reward {
   id: number;
@@ -82,6 +85,7 @@ export interface CampaignListItem {
   location: string;
   campaign_type: CampaignType;
   campaign_type_display: string;
+  expected_return_rate: number | null;
   category: CampaignCategory;
   category_display: string;
   goal_amount: number;
@@ -215,6 +219,13 @@ export interface Score {
   computed_at: string;
 }
 
+export interface PassportExport {
+  verification_id: string;
+  generated_at: string;
+  is_shared: boolean;
+  shared_at: string | null;
+}
+
 export interface PassportData {
   porteur_name: string;
   porteur_city: string;
@@ -236,6 +247,60 @@ export interface PassportVerification {
   porteur: string;
   genere_le: string;
   resume: PassportData;
+}
+
+export type FinancingProviderType =
+  | "FONDS_PUBLIC"
+  | "BAILLEUR"
+  | "BANQUE"
+  | "PROGRAMME_APPUI";
+
+export type DiasporaRequirement =
+  | "INDIFFERENT"
+  | "DIASPORA_UNIQUEMENT"
+  | "DIASPORA_EXCLUE";
+
+export interface FinancingScheme {
+  id: number;
+  name: string;
+  provider_name: string;
+  provider_type: FinancingProviderType;
+  provider_type_display: string;
+  description: string;
+  website_url: string;
+  contact_email: string;
+  min_score: number;
+  requires_kyc_valide: boolean;
+  diaspora_requirement: DiasporaRequirement;
+  eligible_categories: CampaignCategory[];
+  eligible_regions: string[];
+  min_goal_amount: number | null;
+  max_goal_amount: number | null;
+  status: "BROUILLON" | "PUBLIE" | "ARCHIVE";
+  published_at: string | null;
+  created_at: string;
+}
+
+export interface EligibleFinancingScheme extends FinancingScheme {
+  eligible: boolean;
+  ineligibility_reasons: string[];
+}
+
+export type SchemeReferralStatus =
+  | "INTERET"
+  | "EN_COURS"
+  | "ACCEPTE"
+  | "REFUSE"
+  | "ABANDONNE";
+
+export interface SchemeReferral {
+  id: number;
+  scheme: FinancingScheme;
+  status: SchemeReferralStatus;
+  status_display: string;
+  note: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Notification {

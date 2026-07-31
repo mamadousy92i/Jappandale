@@ -72,3 +72,20 @@ def test_dashboard_expose_les_scores_des_porteurs():
         item for item in response.data["porteurs_scores"] if item["porteur"]["id"] == porteur.id
     )
     assert entry["effective_value"] == 77
+    assert response.data["scoring_settings"]["score_base"] == "50.00"
+
+
+@pytest.mark.django_db
+def test_admin_peut_modifier_les_reglages_du_score():
+    admin = _admin()
+    client = APIClient()
+    client.force_authenticate(admin)
+
+    response = client.patch(
+        "/api/backoffice/scoring-settings/",
+        {"poids_kyc": "20.00"},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    assert response.data["poids_kyc"] == "20.00"

@@ -27,9 +27,8 @@ from apps.kyc.services import missing_required_documents
 from apps.messaging.models import MessageReport
 from apps.notifications.models import Notification
 from apps.notifications.services import notify_user
-from apps.scoring.models import Score
-from apps.scoring.serializers import ScoreSerializer
-from apps.scoring.services import compute_score
+from apps.scoring import api as scoring_api
+from apps.scoring.serializers import ScoreSerializer, ScoringSettingsSerializer
 
 from .permissions import IsJappandaleAdmin
 from .serializers import (
@@ -62,7 +61,7 @@ def _person(user):
 def _porteurs_scores_payload(porteurs):
     payload = []
     for porteur in porteurs:
-        score = Score.objects.filter(porteur=porteur).first()
+        score = scoring_api.get_latest_score(porteur)
         payload.append(
             {
                 "porteur": _person(porteur),
@@ -283,6 +282,7 @@ class DashboardView(APIView):
                     for dispute in open_disputes
                 ],
                 "porteurs_scores": _porteurs_scores_payload(porteurs),
+                "scoring_settings": ScoringSettingsSerializer(scoring_api.get_scoring_settings()).data,
                 "support": [
                     {
                         "id": support.id,
@@ -532,17 +532,28 @@ class ScoreOverrideView(APIView):
         serializer = ScoreOverrideSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         porteur = get_object_or_404(User, pk=user_id, role=User.Role.PORTEUR)
-        value, breakdown = compute_score(porteur)
-        score = Score.objects.create(
+        score = scoring_api.record_manual_override(
             porteur=porteur,
-            value=value,
-            breakdown=breakdown,
-            is_manual_override=True,
             override_value=serializer.validated_data["override_value"],
-            override_note=serializer.validated_data["note"],
-            override_by=request.user,
+            note=serializer.validated_data["note"],
+            admin_user=request.user,
         )
         return Response(ScoreSerializer(score).data, status=status.HTTP_201_CREATED)
+
+
+class ScoringSettingsView(APIView):
+    permission_classes = [IsJappandaleAdmin]
+
+    def get(self, request):
+        return Response(ScoringSettingsSerializer(scoring_api.get_scoring_settings()).data)
+
+    def patch(self, request):
+        serializer = ScoringSettingsSerializer(
+            scoring_api.get_scoring_settings(), data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class SupportReviewView(APIView):
@@ -834,7 +845,7 @@ class UserManagementView(APIView):
 
 class ExportTicketView(APIView):
     permission_classes = [IsJappandaleAdmin]
-    allowed_kinds = {"users", "campaigns", "contributions", "reports", "support"}
+    allowed_kinds = {"users", "campaigns", "contributions", "reports", "support", "bceao"}
 
     def post(self, request, kind):
         if kind not in self.allowed_kinds:
@@ -879,6 +890,48 @@ class ExportDownloadView(APIView):
             writer.writerow(["Campagne", "Auteur", "Motif", "Statut", "Date"])
             for item in CampaignReport.objects.select_related("campaign", "reporter"):
                 writer.writerow([item.campaign.title, item.reporter.email, item.get_reason_display(), item.get_status_display(), item.created_at.isoformat()])
+        elif kind == "bceao":
+            writer.writerow(
+                [
+                    "Référence de transaction",
+                    "Date de confirmation",
+                    "Campagne",
+                    "Porteur — e-mail",
+                    "Porteur — identité vérifiée (KYC)",
+                    "Porteur — diaspora",
+                    "Porteur — pays de résidence",
+                    "Contributeur — e-mail",
+                    "Contributeur — identité vérifiée (KYC)",
+                    "Montant brut (FCFA)",
+                    "Commission plateforme (FCFA)",
+                    "Montant net (FCFA)",
+                    "Statut du reversement",
+                ]
+            )
+            confirmed = (
+                Contribution.objects.filter(status=Contribution.Status.CONFIRMEE)
+                .select_related("campaign__owner", "contributor")
+                .order_by("-confirmed_at")
+            )
+            for item in confirmed:
+                owner = item.campaign.owner
+                writer.writerow(
+                    [
+                        item.public_reference,
+                        item.confirmed_at.isoformat() if item.confirmed_at else "",
+                        item.campaign.title,
+                        owner.email,
+                        owner.get_kyc_status_display(),
+                        "Oui" if owner.is_diaspora else "Non",
+                        owner.country or "—",
+                        item.contributor.email,
+                        item.contributor.get_kyc_status_display(),
+                        item.amount,
+                        item.commission_amount,
+                        item.net_amount,
+                        item.get_payout_status_display(),
+                    ]
+                )
         else:
             writer.writerow(["Nom", "E-mail", "Objet", "Statut", "Date"])
             for item in SupportRequest.objects.all():

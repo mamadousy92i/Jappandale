@@ -40,3 +40,17 @@ def test_contributeur_ne_peut_pas_consulter_de_score():
     response = client.get("/api/scoring/mine/")
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_porteur_peut_consulter_lhistorique_de_ses_scores():
+    porteur = make_user("porteur-v2@test.sn", User.Role.PORTEUR)
+    client = APIClient()
+    client.force_authenticate(porteur)
+
+    client.get("/api/scoring/mine/")
+    response = client.get("/api/scoring/mine/history/")
+
+    assert response.status_code == 200
+    assert len(response.data) == 1
+    assert response.data[0]["effective_value"] >= 0

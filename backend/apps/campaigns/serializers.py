@@ -76,6 +76,7 @@ class CampaignListSerializer(serializers.ModelSerializer):
             "location",
             "campaign_type",
             "campaign_type_display",
+            "expected_return_rate",
             "category",
             "category_display",
             "goal_amount",
@@ -143,6 +144,7 @@ class CampaignDetailSerializer(serializers.ModelSerializer):
             "project_timeline",
             "campaign_type",
             "campaign_type_display",
+            "expected_return_rate",
             "category",
             "category_display",
             "goal_amount",
@@ -179,6 +181,7 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
             "funding_plan",
             "project_timeline",
             "campaign_type",
+            "expected_return_rate",
             "category",
             "goal_amount",
             "cover_image",
@@ -195,13 +198,40 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
     def validate_campaign_type(self, value):
         if (
             self.instance
-            and value == Campaign.CampaignType.DON_LIBRE
+            and value != Campaign.CampaignType.DON_CONTREPARTIE
             and self.instance.rewards.exists()
         ):
             raise serializers.ValidationError(
-                "Supprimez d'abord les contreparties avant de repasser en don libre."
+                "Supprimez d'abord les contreparties avant de changer ce type de campagne."
             )
         return value
+
+    def validate(self, attrs):
+        campaign_type = attrs.get(
+            "campaign_type",
+            self.instance.campaign_type if self.instance else Campaign.CampaignType.DON_LIBRE,
+        )
+        if "expected_return_rate" in attrs:
+            expected_return_rate = attrs["expected_return_rate"]
+        else:
+            expected_return_rate = self.instance.expected_return_rate if self.instance else None
+
+        if campaign_type == Campaign.CampaignType.INVESTISSEMENT_PARTICIPATIF:
+            if expected_return_rate is None:
+                raise serializers.ValidationError(
+                    {
+                        "expected_return_rate": [
+                            "Indiquez le taux de rendement attendu pour un investissement participatif."
+                        ]
+                    }
+                )
+            if expected_return_rate <= 0:
+                raise serializers.ValidationError(
+                    {"expected_return_rate": ["Le taux de rendement attendu doit être positif."]}
+                )
+        elif expected_return_rate is not None:
+            attrs["expected_return_rate"] = None
+        return attrs
 
     def validate_deadline(self, value):
         if value <= timezone.localdate():

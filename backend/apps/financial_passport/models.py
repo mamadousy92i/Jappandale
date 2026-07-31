@@ -17,6 +17,8 @@ class PassportExport(models.Model):
         "identifiant de vérification", default=uuid.uuid4, unique=True, editable=False
     )
     snapshot = models.JSONField("données figées à l'export")
+    is_shared = models.BooleanField("partage autorisé", default=False)
+    shared_at = models.DateTimeField("partagé le", null=True, blank=True)
     generated_at = models.DateTimeField("généré le", auto_now_add=True)
 
     class Meta:

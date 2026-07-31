@@ -19,6 +19,7 @@ urlpatterns = [
     path("api/litiges/", include("apps.disputes.urls")),
     path("api/scoring/", include("apps.scoring.urls")),
     path("api/passeport/", include("apps.financial_passport.urls")),
+    path("api/guichet/", include("apps.guichet.urls")),
 ]
 
 if settings.DEBUG:
