@@ -1,12 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { Archive, BadgeCheck, Banknote, CheckCircle2, Download, ExternalLink, FileText, FolderClock, Gauge, Headphones, Landmark, LayoutDashboard, Mail, Pencil, Plus, RefreshCw, Search, ShieldAlert, UserCog, Users, X } from "lucide-react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { Archive, ArrowRight, BadgeCheck, Banknote, CheckCircle2, ChevronDown, Download, ExternalLink, FileText, FolderClock, Gauge, Headphones, Landmark, LayoutDashboard, Mail, Pencil, Plus, RefreshCw, Search, ShieldAlert, Trash2, UserCog, UserPlus, Users, X } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { Link } from "react-router-dom"
 
+import { CampaignStatusChart, WorkloadChart } from "@/components/admin/DashboardCharts"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { ApiError } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
+import { confirmAction, notifyError, notifySuccess } from "@/lib/swal"
 import type { CampaignCategory, FinancingScheme } from "@/lib/types"
 
 type Tab = "overview" | "kyc" | "campaigns" | "reports" | "support" | "users" | "payouts" | "message_reports" | "disputes" | "scores" | "guichet"
@@ -136,6 +139,10 @@ interface DashboardData {
 }
 
 interface ManagedUser extends Person {
+  first_name: string
+  last_name: string
+  organization_name: string
+  city: string
   is_active: boolean
   email_verified: boolean
   kyc_status: string
@@ -150,24 +157,14 @@ interface UserPage {
   pages: number
   results: ManagedUser[]
 }
-interface Confirmation {
-  title: string
-  description: string
-  confirmLabel: string
-  danger?: boolean
-  run: () => Promise<void>
-}
 interface DocumentPreview {
   title: string
   url: string
 }
 
-const tabItems: Array<{
-  id: Tab
-  label: string
-  icon: LucideIcon
-  count?: MetricKey
-}> = [
+type TabItem = { id: Tab; label: string; icon: LucideIcon; count?: MetricKey }
+
+const primaryTabItems: TabItem[] = [
   { id: "overview", label: "Vue d’ensemble", icon: LayoutDashboard },
   { id: "kyc", label: "Identités", icon: BadgeCheck, count: "pending_kyc" },
   {
@@ -189,6 +186,9 @@ const tabItems: Array<{
     count: "open_support",
   },
   { id: "users", label: "Utilisateurs", icon: UserCog },
+]
+
+const moreTabItems: TabItem[] = [
   { id: "payouts", label: "Reversements", icon: Banknote },
   { id: "message_reports", label: "Signalements messages", icon: ShieldAlert, count: "open_message_reports" },
   { id: "disputes", label: "Litiges", icon: ShieldAlert, count: "open_disputes" },
@@ -402,36 +402,6 @@ function Pager({ page, pages, onChange }: { page: number; pages: number; onChang
   )
 }
 
-function ConfirmDialog({ confirmation, busy, onCancel, onConfirm }: { confirmation: Confirmation; busy: boolean; onCancel: () => void; onConfirm: () => void }) {
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 p-4" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
-      <div role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-description" className="w-full max-w-md rounded-[22px] bg-white p-7 shadow-2xl">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 id="confirm-title" className="font-heading text-2xl font-bold text-ink">
-              {confirmation.title}
-            </h2>
-            <p id="confirm-description" className="mt-3 text-sm leading-relaxed text-ink-secondary">
-              {confirmation.description}
-            </p>
-          </div>
-          <button type="button" onClick={onCancel} aria-label="Fermer" className="flex size-9 shrink-0 items-center justify-center rounded-full hover:bg-black/5">
-            <X className="size-4" />
-          </button>
-        </div>
-        <div className="mt-7 flex justify-end gap-3">
-          <Button variant="outline" onClick={onCancel} disabled={busy} className="rounded-full">
-            Annuler
-          </Button>
-          <Button onClick={onConfirm} disabled={busy} className={`rounded-full ${confirmation.danger ? "bg-red-600 text-white hover:bg-red-700" : "bg-ink text-white hover:bg-black"}`}>
-            {busy ? "Enregistrement…" : confirmation.confirmLabel}
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function DocumentPreviewDialog({ preview, onClose }: { preview: DocumentPreview; onClose: () => void }) {
   useEffect(() => {
     const documentElement = window.document.documentElement
@@ -485,8 +455,6 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
   const [documentPreview, setDocumentPreview] = useState<DocumentPreview | null>(null)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const [scoreOverrideOpenId, setScoreOverrideOpenId] = useState<number | null>(null)
@@ -497,6 +465,27 @@ export default function AdminDashboardPage() {
   const [userActive, setUserActive] = useState("")
   const [userPage, setUserPage] = useState(1)
   const [users, setUsers] = useState<UserPage | null>(null)
+  const [userFormOpen, setUserFormOpen] = useState(false)
+  const [userForm, setUserForm] = useState({
+    email: "",
+    first_name: "",
+    last_name: "",
+    role: "CONTRIBUTEUR",
+    phone: "",
+  })
+  const [userFormBusy, setUserFormBusy] = useState(false)
+  const [userFormError, setUserFormError] = useState<string | null>(null)
+  const [editingUserId, setEditingUserId] = useState<number | null>(null)
+  const [userEditForm, setUserEditForm] = useState({
+    first_name: "",
+    last_name: "",
+    phone: "",
+    organization_name: "",
+    city: "",
+  })
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set())
+  const [bulkDeleteNote, setBulkDeleteNote] = useState("")
+  const [bulkDeleteBusy, setBulkDeleteBusy] = useState(false)
   const [guichetSchemes, setGuichetSchemes] = useState<FinancingScheme[]>([])
   const [guichetReferrals, setGuichetReferrals] = useState<AdminReferral[]>([])
   const [guichetStats, setGuichetStats] = useState<GuichetStats | null>(null)
@@ -505,6 +494,26 @@ export default function AdminDashboardPage() {
   const [guichetFormOpen, setGuichetFormOpen] = useState(false)
   const [guichetEditingId, setGuichetEditingId] = useState<number | null>(null)
   const [guichetForm, setGuichetForm] = useState<GuichetFormState>(emptyGuichetForm)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!moreOpen) return
+    const onPointerDown = (event: MouseEvent) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+        setMoreOpen(false)
+      }
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMoreOpen(false)
+    }
+    document.addEventListener("mousedown", onPointerDown)
+    document.addEventListener("keydown", onKeyDown)
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown)
+      document.removeEventListener("keydown", onKeyDown)
+    }
+  }, [moreOpen])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -512,7 +521,9 @@ export default function AdminDashboardPage() {
     try {
       setData((await authFetch("/backoffice/dashboard/")) as DashboardData)
     } catch {
-      setError("Impossible de charger l’espace de gestion.")
+      const message = "Impossible de charger l’espace de gestion."
+      setError(message)
+      notifyError(message)
     } finally {
       setLoading(false)
     }
@@ -526,9 +537,98 @@ export default function AdminDashboardPage() {
     try {
       setUsers((await authFetch(`/backoffice/users/?${params}`)) as UserPage)
     } catch {
-      setError("Impossible de charger les utilisateurs.")
+      notifyError("Impossible de charger les utilisateurs.")
     }
   }, [authFetch, search, userActive, userPage, userRole])
+
+  const submitUserForm = async () => {
+    setUserFormBusy(true)
+    setUserFormError(null)
+    try {
+      await authFetch("/backoffice/users/", {
+        method: "POST",
+        body: JSON.stringify(userForm),
+      })
+      setUserFormOpen(false)
+      setUserForm({ email: "", first_name: "", last_name: "", role: "CONTRIBUTEUR", phone: "" })
+      notifySuccess("Utilisateur créé. Un e-mail lui a été envoyé pour choisir son mot de passe.")
+      await loadUsers()
+    } catch (err) {
+      setUserFormError(
+        err instanceof ApiError && err.details?.email
+          ? err.details.email.join(" ")
+          : "Certaines informations sont invalides. Vérifiez le formulaire.",
+      )
+    } finally {
+      setUserFormBusy(false)
+    }
+  }
+
+  const startEditingUser = (member: ManagedUser) => {
+    setEditingUserId(member.id)
+    setUserEditForm({
+      first_name: member.first_name,
+      last_name: member.last_name,
+      phone: member.phone,
+      organization_name: member.organization_name,
+      city: member.city,
+    })
+  }
+
+  const saveUserEdit = (userId: number) =>
+    perform(`/backoffice/users/${userId}/`, "PATCH", userEditForm, "Informations mises à jour.", true).then(
+      () => setEditingUserId(null),
+    )
+
+  const toggleUserSelection = (userId: number) => {
+    setSelectedUserIds((current) => {
+      const next = new Set(current)
+      if (next.has(userId)) next.delete(userId)
+      else next.add(userId)
+      return next
+    })
+  }
+
+  const selectablePageIds = (users?.results ?? [])
+    .map((member) => member.id)
+    .filter((id) => id !== user?.id)
+  const allOnPageSelected = selectablePageIds.length > 0 && selectablePageIds.every((id) => selectedUserIds.has(id))
+
+  const toggleSelectAllOnPage = () => {
+    setSelectedUserIds((current) => {
+      const allSelected = selectablePageIds.length > 0 && selectablePageIds.every((id) => current.has(id))
+      if (allSelected) {
+        const next = new Set(current)
+        selectablePageIds.forEach((id) => next.delete(id))
+        return next
+      }
+      return new Set([...current, ...selectablePageIds])
+    })
+  }
+
+  const bulkDeleteUsers = async () => {
+    setBulkDeleteBusy(true)
+    const ids = Array.from(selectedUserIds)
+    let succeeded = 0
+    let failed = 0
+    for (const id of ids) {
+      try {
+        await authFetch(`/backoffice/users/${id}/`, { method: "DELETE", body: JSON.stringify({ note: bulkDeleteNote }) })
+        succeeded += 1
+      } catch {
+        failed += 1
+      }
+    }
+    if (failed === 0) {
+      notifySuccess(`${succeeded} compte(s) supprimé(s).`)
+    } else {
+      notifyError(`${succeeded} compte(s) supprimé(s), ${failed} échec(s) (motif manquant ou compte protégé).`)
+    }
+    setSelectedUserIds(new Set())
+    setBulkDeleteNote("")
+    setBulkDeleteBusy(false)
+    await loadUsers()
+  }
 
   const loadGuichet = useCallback(async () => {
     setGuichetError(null)
@@ -561,6 +661,10 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     setLocalPage(1)
   }, [search, statusFilter, tab])
+  useEffect(() => {
+    setSelectedUserIds(new Set())
+    setBulkDeleteNote("")
+  }, [userPage, userRole, userActive, tab])
 
   const submitGuichetForm = async () => {
     setGuichetBusy(true)
@@ -621,24 +725,29 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const perform = async (path: string, method: "POST" | "PATCH", body: object, message: string, refreshUsers = false) => {
+  const perform = async (path: string, method: "POST" | "PATCH" | "DELETE", body: object, message: string, refreshUsers = false) => {
     setBusy(true)
-    setError(null)
-    setSuccess(null)
     try {
       await authFetch(path, { method, body: JSON.stringify(body) })
-      setSuccess(message)
+      notifySuccess(message)
       await load()
       if (refreshUsers) await loadUsers()
     } catch {
-      setError("L’action n’a pas été enregistrée. Vérifiez les informations saisies.")
+      notifyError("L’action n’a pas été enregistrée. Vérifiez les informations saisies.")
     } finally {
       setBusy(false)
-      setConfirmation(null)
     }
   }
 
-  const ask = (title: string, description: string, confirmLabel: string, run: () => Promise<void>, danger = false) => setConfirmation({ title, description, confirmLabel, run, danger })
+  const ask = (title: string, description: string, confirmLabel: string, run: () => Promise<void>, danger = false) =>
+    void confirmAction({ title, description, confirmLabel, danger, run })
+  const askWithNote = (note: string, title: string, description: string, confirmLabel: string, run: () => Promise<void>) => {
+    if (!note.trim()) {
+      notifyError("Indiquez un motif avant de continuer.")
+      return
+    }
+    ask(title, description, confirmLabel, run, true)
+  }
   const assign = (kind: string, objectId: number, adminId: number | null) => void perform("/backoffice/assign/", "POST", { kind, object_id: objectId, admin_id: adminId }, "Responsable mis à jour.")
   const exportCsv = async (kind: string) => {
     try {
@@ -647,7 +756,7 @@ export default function AdminDashboardPage() {
       })) as { url: string }
       window.location.assign(ticket.url)
     } catch {
-      setError("L’export n’a pas pu être préparé.")
+      notifyError("L’export n’a pas pu être préparé.")
     }
   }
 
@@ -681,12 +790,9 @@ export default function AdminDashboardPage() {
       </section>
     )
 
-  const metrics: Array<{
-    label: string
-    value: string | number
-    icon: LucideIcon
-    target?: Tab
-  }> = [
+  type Metric = { label: string; value: string | number; icon: LucideIcon; target?: Tab }
+
+  const queueMetrics: Metric[] = [
     {
       label: "Identités à vérifier",
       value: data.metrics.pending_kyc,
@@ -711,6 +817,9 @@ export default function AdminDashboardPage() {
       icon: Headphones,
       target: "support",
     },
+  ]
+
+  const summaryMetrics: Metric[] = [
     {
       label: "Montant des contributions confirmées",
       value: formatFcfa(data.metrics.confirmed_amount),
@@ -784,60 +893,162 @@ export default function AdminDashboardPage() {
           </Button>
         </header>
 
-        {error && (
-          <p role="alert" className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </p>
-        )}
-        {success && (
-          <p role="status" className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-            {success}
-          </p>
-        )}
 
-        <nav aria-label="Sections de gestion" className="mt-8 overflow-x-auto">
-          <div className="flex min-w-max gap-2 rounded-2xl border border-black/5 bg-white p-2 shadow-sm">
-            {tabItems.map(({ id, label, icon: Icon, count }) => (
+        <nav aria-label="Sections de gestion" className="mt-8">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/5 bg-white p-2 shadow-sm">
+            {primaryTabItems.map(({ id, label, icon: Icon, count }) => (
               <button key={id} type="button" onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined} className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold ${tab === id ? "bg-ink text-white" : "text-ink-secondary hover:bg-surface-alt hover:text-ink"}`}>
                 <Icon className="size-4" />
                 {label}
                 {count && data.metrics[count] > 0 && <span className={`rounded-full px-2 py-0.5 text-[11px] ${tab === id ? "bg-gold text-ink" : "bg-gold/20 text-gold-dark"}`}>{data.metrics[count]}</span>}
               </button>
             ))}
+
+            <div className="relative" ref={moreMenuRef}>
+              <button
+                type="button"
+                onClick={() => setMoreOpen((open) => !open)}
+                aria-expanded={moreOpen}
+                aria-haspopup="menu"
+                aria-current={moreTabItems.some((item) => item.id === tab) ? "page" : undefined}
+                className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold ${
+                  moreTabItems.some((item) => item.id === tab) ? "bg-ink text-white" : "text-ink-secondary hover:bg-surface-alt hover:text-ink"
+                }`}
+              >
+                Plus
+                {moreTabItems.some(
+                  (item) => item.count && data.metrics[item.count] > 0,
+                ) && (
+                  <span className="size-1.5 rounded-full bg-gold-dark" aria-hidden="true" />
+                )}
+                <ChevronDown className={`size-3.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+              </button>
+              {moreOpen && (
+                <div role="menu" className="absolute top-full left-0 z-20 mt-1 w-64 rounded-xl border border-black/5 bg-white p-1.5 shadow-lg">
+                  {moreTabItems.map(({ id, label, icon: Icon, count }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setTab(id)
+                        setMoreOpen(false)
+                      }}
+                      aria-current={tab === id ? "page" : undefined}
+                      className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-semibold ${tab === id ? "bg-surface-alt text-ink" : "text-ink-secondary hover:bg-surface-alt hover:text-ink"}`}
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <span className="flex-1">{label}</span>
+                      {count && data.metrics[count] > 0 && <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[11px] text-gold-dark">{data.metrics[count]}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </nav>
 
         {tab === "overview" && (
-          <section className="mt-8" aria-labelledby="overview-title">
+          <section className="mt-8 space-y-10" aria-labelledby="overview-title">
             <h2 id="overview-title" className="sr-only">
               Vue d’ensemble
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {metrics.map(({ label, value, icon: Icon, target }) => {
-                const content = (
-                  <>
-                    <span className="flex size-10 items-center justify-center rounded-xl bg-gold/15 text-gold-dark">
-                      <Icon className="size-5" />
-                    </span>
+
+            <section aria-labelledby="overview-queues-title">
+              <div className="flex items-baseline justify-between gap-3">
+                <p id="overview-queues-title" className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">
+                  À traiter
+                </p>
+                <p className="text-xs text-ink-muted">Cliquez une carte pour ouvrir la file correspondante</p>
+              </div>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {queueMetrics.map(({ label, value, icon: Icon, target }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => target && setTab(target)}
+                    className="group cursor-pointer rounded-[20px] border border-black/5 bg-white p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gold/50 hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between">
+                      <span className="flex size-10 items-center justify-center rounded-xl bg-gold/15 text-gold-dark">
+                        <Icon className="size-5" />
+                      </span>
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="size-4 shrink-0 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-gold-dark"
+                      />
+                    </div>
                     <strong className="mt-5 block font-heading text-3xl text-ink">{value}</strong>
                     <span className="mt-1 block text-sm text-ink-secondary">{label}</span>
-                  </>
-                )
-                return target ? (
-                  <button key={label} type="button" onClick={() => setTab(target)} className="rounded-[20px] border border-black/5 bg-white p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gold/50 hover:shadow-md">
-                    {content}
                   </button>
-                ) : (
-                  <article key={label} className="rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
-                    {content}
-                  </article>
-                )
-              })}
-            </div>
-            <section className="mt-8 rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                ))}
+              </div>
+
+              <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                <WorkloadChart
+                  onSelect={(target) => setTab(target as Tab)}
+                  items={[
+                    { key: "kyc", label: "Identités à vérifier", value: data.metrics.pending_kyc, target: "kyc" },
+                    { key: "campaigns", label: "Campagnes à décider", value: data.metrics.pending_campaigns, target: "campaigns" },
+                    { key: "reports", label: "Signalements de campagnes", value: data.metrics.open_reports, target: "reports" },
+                    { key: "message_reports", label: "Signalements de messages", value: data.metrics.open_message_reports, target: "message_reports" },
+                    { key: "support", label: "Demandes d’assistance", value: data.metrics.open_support, target: "support" },
+                    { key: "disputes", label: "Litiges ouverts", value: data.metrics.open_disputes, target: "disputes" },
+                  ]}
+                />
+                <CampaignStatusChart
+                  onSelect={(target) => setTab(target as Tab)}
+                  segments={[
+                    { key: "moderation", label: "En modération", value: data.metrics.pending_campaigns, colorClass: "bg-gold-dark", target: "campaigns" },
+                    { key: "publiees", label: "Publiées", value: data.metrics.published_campaigns, colorClass: "bg-emerald-500", target: "campaigns" },
+                    { key: "suspendues", label: "Suspendues", value: data.metrics.suspended_campaigns, colorClass: "bg-red-500", target: "campaigns" },
+                  ]}
+                />
+              </div>
+            </section>
+
+            <section aria-labelledby="overview-summary-title">
+              <p id="overview-summary-title" className="text-xs font-semibold tracking-[3px] text-gold-dark uppercase">
+                Activité et finances
+              </p>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {summaryMetrics.map(({ label, value, icon: Icon, target }) => {
+                  const content = (
+                    <>
+                      <div className="flex items-start justify-between">
+                        <span className="flex size-10 items-center justify-center rounded-xl bg-gold/15 text-gold-dark">
+                          <Icon className="size-5" />
+                        </span>
+                        {target && (
+                          <ArrowRight
+                            aria-hidden="true"
+                            className="size-4 shrink-0 text-ink-muted transition-transform group-hover:translate-x-0.5 group-hover:text-gold-dark"
+                          />
+                        )}
+                      </div>
+                      <strong className="mt-5 block font-heading text-3xl text-ink">{value}</strong>
+                      <span className="mt-1 block text-sm text-ink-secondary">{label}</span>
+                    </>
+                  )
+                  return target ? (
+                    <button key={label} type="button" onClick={() => setTab(target)} className="group cursor-pointer rounded-[20px] border border-black/5 bg-white p-6 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gold/50 hover:shadow-md">
+                      {content}
+                    </button>
+                  ) : (
+                    <article key={label} className="rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                      {content}
+                    </article>
+                  )
+                })}
+              </div>
+            </section>
+
+            <section aria-labelledby="overview-exports-title" className="rounded-[20px] border border-black/5 bg-surface-alt/60 p-6">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
-                  <h2 className="font-heading text-2xl font-bold text-ink">Exports de gestion</h2>
+                  <p id="overview-exports-title" className="text-xs font-semibold tracking-[3px] text-ink-muted uppercase">
+                    Exports de gestion
+                  </p>
                   <p className="mt-1 text-sm text-ink-muted">Fichiers CSV temporaires, réservés aux administrateurs.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -849,7 +1060,7 @@ export default function AdminDashboardPage() {
                     ["support", "Assistance"],
                     ["bceao", "Rapport réglementaire (BCEAO)"],
                   ].map(([kind, label]) => (
-                    <Button key={kind} variant="outline" onClick={() => void exportCsv(kind)} className="rounded-full">
+                    <Button key={kind} variant="outline" onClick={() => void exportCsv(kind)} className="rounded-full bg-white">
                       <Download className="size-4" />
                       {label}
                     </Button>
@@ -1635,12 +1846,98 @@ export default function AdminDashboardPage() {
 
         {tab === "users" && (
           <section className="mt-8" aria-labelledby="users-title">
-            <div>
-              <h2 id="users-title" className="font-heading text-2xl font-bold text-ink">
-                Utilisateurs
-              </h2>
-              <p className="mt-1 text-sm text-ink-secondary">Recherchez un compte, contrôlez son statut et gérez ses droits.</p>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 id="users-title" className="font-heading text-2xl font-bold text-ink">
+                  Utilisateurs
+                </h2>
+                <p className="mt-1 text-sm text-ink-secondary">Recherchez un compte, contrôlez son statut et gérez ses droits.</p>
+              </div>
+              <Button
+                onClick={() => {
+                  setUserFormError(null)
+                  setUserFormOpen((open) => !open)
+                }}
+                className="rounded-full bg-gold text-ink hover:bg-gold-light"
+              >
+                <UserPlus className="size-4" />
+                Ajouter un utilisateur
+              </Button>
             </div>
+
+            {userFormOpen && (
+              <div className="mt-5 rounded-[20px] border border-black/5 bg-white p-6 shadow-sm">
+                <h3 className="font-heading text-lg font-bold text-ink">Nouvel utilisateur</h3>
+                <p className="mt-1 text-sm text-ink-muted">
+                  Un e-mail lui sera envoyé pour choisir son mot de passe.
+                </p>
+                {userFormError && (
+                  <p role="alert" className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {userFormError}
+                  </p>
+                )}
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Prénom</span>
+                    <Input
+                      value={userForm.first_name}
+                      onChange={(event) => setUserForm((form) => ({ ...form, first_name: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Nom</span>
+                    <Input
+                      value={userForm.last_name}
+                      onChange={(event) => setUserForm((form) => ({ ...form, last_name: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink sm:col-span-2">
+                    <span>Adresse e-mail</span>
+                    <Input
+                      type="email"
+                      value={userForm.email}
+                      onChange={(event) => setUserForm((form) => ({ ...form, email: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Rôle</span>
+                    <select
+                      value={userForm.role}
+                      onChange={(event) => setUserForm((form) => ({ ...form, role: event.target.value }))}
+                      className="h-10 w-full rounded-xl border border-black/10 bg-white px-3 text-sm"
+                    >
+                      <option value="CONTRIBUTEUR">Contributeur</option>
+                      <option value="PORTEUR">Porteur</option>
+                      <option value="ADMIN">Administrateur</option>
+                    </select>
+                  </label>
+                  <label className="space-y-1.5 text-sm font-medium text-ink">
+                    <span>Téléphone <span className="font-normal text-ink-muted">(facultatif)</span></span>
+                    <Input
+                      value={userForm.phone}
+                      onChange={(event) => setUserForm((form) => ({ ...form, phone: event.target.value }))}
+                      className="h-10 rounded-xl"
+                    />
+                  </label>
+                </div>
+                <div className="mt-5 flex justify-end gap-3">
+                  <Button variant="outline" onClick={() => setUserFormOpen(false)} className="rounded-full">
+                    Annuler
+                  </Button>
+                  <Button
+                    disabled={userFormBusy || !userForm.email.trim() || !userForm.first_name.trim() || !userForm.last_name.trim()}
+                    onClick={() => void submitUserForm()}
+                    className="rounded-full bg-gold text-ink hover:bg-gold-light"
+                  >
+                    {userFormBusy ? "Création…" : "Créer le compte"}
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
               <div className="relative">
                 <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-muted" />
@@ -1683,7 +1980,50 @@ export default function AdminDashboardPage() {
                 <option value="false">Désactivés</option>
               </select>
             </div>
-            <div className="mt-5 overflow-hidden rounded-[20px] border border-black/5 bg-white shadow-sm">
+
+            {users && users.results.length > 0 && (
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-black/10 bg-surface-alt px-4 py-3">
+                <label className="flex items-center gap-2 text-sm font-medium text-ink">
+                  <input
+                    type="checkbox"
+                    checked={allOnPageSelected}
+                    onChange={toggleSelectAllOnPage}
+                    className="size-4 accent-[#c99a00]"
+                  />
+                  Tout sélectionner sur cette page
+                </label>
+                {selectedUserIds.size > 0 && (
+                  <div className="flex flex-1 flex-wrap items-center justify-end gap-2">
+                    <span className="text-sm font-semibold text-ink">{selectedUserIds.size} sélectionné(s)</span>
+                    <NoteField
+                      value={bulkDeleteNote}
+                      onChange={setBulkDeleteNote}
+                      placeholder="Motif requis pour supprimer la sélection"
+                      rows={1}
+                    />
+                    <Button
+                      variant="outline"
+                      disabled={bulkDeleteBusy}
+                      onClick={() =>
+                        askWithNote(
+                          bulkDeleteNote,
+                          `Supprimer ${selectedUserIds.size} compte(s) ?`,
+                          "Cette action est irréversible : les informations personnelles de chaque compte seront anonymisées et la connexion définitivement bloquée. L'historique (campagnes, contributions) est conservé.",
+                          "Supprimer la sélection",
+                          bulkDeleteUsers,
+                        )
+                      }
+                      className="rounded-full border-red-200 text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="size-3.5" />
+                      Supprimer la sélection
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-4 overflow-hidden rounded-[20px] border border-black/5 bg-white shadow-sm">
               {!users ? (
                 <p className="p-8 text-center text-ink-muted">Chargement…</p>
               ) : users.results.length === 0 ? (
@@ -1693,76 +2033,149 @@ export default function AdminDashboardPage() {
                   {users.results.map((member) => {
                     const key = `user-${member.id}`
                     const note = drafts[key] ?? ""
+                    const isSelf = member.id === user?.id
                     return (
-                    <article key={member.id} className="flex flex-col justify-between gap-4 p-5 lg:flex-row lg:items-center">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold text-ink">{member.name}</h3>
-                          <StatusPill
-                            status={member.account_status === "VALIDE" ? "PUBLIEE" : member.account_status === "EN_ATTENTE" ? "EN_MODERATION" : "SUSPENDUE"}
-                            label={member.account_status_display}
+                    <article key={member.id} className="flex flex-col gap-4 p-5">
+                      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedUserIds.has(member.id)}
+                            onChange={() => toggleUserSelection(member.id)}
+                            disabled={isSelf}
+                            aria-label={`Sélectionner ${member.name}`}
+                            title={isSelf ? "Vous ne pouvez pas sélectionner votre propre compte." : undefined}
+                            className="mt-1 size-4 shrink-0 accent-[#c99a00] disabled:opacity-30"
                           />
-                          {!member.email_verified && <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">E-mail non vérifié</span>}
+                          <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-semibold text-ink">{member.name}</h3>
+                            <StatusPill
+                              status={member.account_status === "VALIDE" ? "PUBLIEE" : member.account_status === "EN_ATTENTE" ? "EN_MODERATION" : "SUSPENDUE"}
+                              label={member.account_status_display}
+                            />
+                            {!member.email_verified && <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">E-mail non vérifié</span>}
+                          </div>
+                          <p className="mt-1 text-sm text-ink-secondary">
+                            {member.email}
+                            {member.phone ? ` · ${member.phone}` : ""}
+                          </p>
+                          <p className="mt-1 text-xs text-ink-muted">
+                            Inscrit le {formatDate(member.date_joined)} · KYC {member.kyc_status.replaceAll("_", " ")}
+                          </p>
+                          </div>
                         </div>
-                        <p className="mt-1 text-sm text-ink-secondary">
-                          {member.email}
-                          {member.phone ? ` · ${member.phone}` : ""}
-                        </p>
-                        <p className="mt-1 text-xs text-ink-muted">
-                          Inscrit le {formatDate(member.date_joined)} · KYC {member.kyc_status.replaceAll("_", " ")}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <select aria-label={`Rôle de ${member.name}`} value={member.role} onChange={(event) => ask("Modifier le rôle ?", `${member.name} recevra les droits correspondant au nouveau rôle.`, "Modifier", () => perform(`/backoffice/users/${member.id}/`, "PATCH", { role: event.target.value }, "Rôle mis à jour.", true), member.role === "ADMIN")} className="h-10 rounded-xl border border-black/10 bg-white px-3 text-sm">
-                            <option value="CONTRIBUTEUR">Contributeur</option>
-                            <option value="PORTEUR">Porteur</option>
-                            <option value="ADMIN">Administrateur</option>
-                          </select>
-                          {member.account_status !== "VALIDE" && (
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <select aria-label={`Rôle de ${member.name}`} value={member.role} onChange={(event) => ask("Modifier le rôle ?", `${member.name} recevra les droits correspondant au nouveau rôle.`, "Modifier", () => perform(`/backoffice/users/${member.id}/`, "PATCH", { role: event.target.value }, "Rôle mis à jour.", true), member.role === "ADMIN")} className="h-10 rounded-xl border border-black/10 bg-white px-3 text-sm">
+                              <option value="CONTRIBUTEUR">Contributeur</option>
+                              <option value="PORTEUR">Porteur</option>
+                              <option value="ADMIN">Administrateur</option>
+                            </select>
                             <Button
                               variant="outline"
-                              onClick={() =>
-                                ask("Valider ce compte ?", "Le membre pourra de nouveau se connecter normalement.", "Valider", () =>
-                                  perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "VALIDE" }, "Compte validé.", true),
-                                )
-                              }
-                              className="rounded-full border-emerald-200 text-emerald-700"
+                              onClick={() => (editingUserId === member.id ? setEditingUserId(null) : startEditingUser(member))}
+                              className="rounded-full"
                             >
-                              Valider
+                              <Pencil className="size-3.5" />
+                              {editingUserId === member.id ? "Fermer" : "Modifier"}
                             </Button>
-                          )}
-                          {member.account_status !== "SUSPENDU" && (
+                            {member.account_status !== "VALIDE" && (
+                              <Button
+                                variant="outline"
+                                onClick={() =>
+                                  ask("Réactiver ce compte ?", "Le membre pourra de nouveau se connecter normalement.", "Réactiver", () =>
+                                    perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "VALIDE" }, "Compte réactivé.", true),
+                                  )
+                                }
+                                className="rounded-full border-emerald-200 text-emerald-700"
+                              >
+                                Réactiver
+                              </Button>
+                            )}
+                            {member.account_status !== "SUSPENDU" && (
+                              <Button
+                                variant="outline"
+                                onClick={() =>
+                                  askWithNote(note, "Suspendre ce compte ?", "La connexion sera bloquée jusqu’à réactivation.", "Suspendre", () =>
+                                    perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "SUSPENDU", note }, "Compte suspendu.", true),
+                                  )
+                                }
+                                className="rounded-full border-amber-200 text-amber-800"
+                              >
+                                Suspendre
+                              </Button>
+                            )}
+                            {member.account_status !== "REJETE" && (
+                              <Button
+                                variant="outline"
+                                onClick={() =>
+                                  askWithNote(note, "Rejeter ce compte ?", "La connexion sera bloquée définitivement, sauf nouvelle décision.", "Rejeter", () =>
+                                    perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "REJETE", note }, "Compte rejeté.", true),
+                                  )
+                                }
+                                className="rounded-full border-red-200 text-red-700"
+                              >
+                                Rejeter
+                              </Button>
+                            )}
                             <Button
                               variant="outline"
-                              disabled={!note.trim()}
+                              disabled={isSelf}
+                              title={isSelf ? "Vous ne pouvez pas supprimer votre propre compte." : undefined}
                               onClick={() =>
-                                ask("Suspendre ce compte ?", "La connexion sera bloquée jusqu’à réactivation.", "Suspendre", () =>
-                                  perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "SUSPENDU", note }, "Compte suspendu.", true),
+                                askWithNote(
+                                  note,
+                                  "Supprimer ce compte ?",
+                                  "Cette action est irréversible : les informations personnelles du compte seront anonymisées et la connexion définitivement bloquée. L'historique (campagnes, contributions) est conservé.",
+                                  "Supprimer",
+                                  () => perform(`/backoffice/users/${member.id}/`, "DELETE", { note }, "Compte supprimé.", true),
                                 )
                               }
-                              className="rounded-full border-amber-200 text-amber-800"
+                              className="rounded-full border-red-200 text-red-700 hover:bg-red-50"
                             >
-                              Suspendre
+                              <Trash2 className="size-3.5" />
+                              Supprimer
                             </Button>
-                          )}
-                          {member.account_status !== "REJETE" && (
-                            <Button
-                              variant="outline"
-                              disabled={!note.trim()}
-                              onClick={() =>
-                                ask("Rejeter ce compte ?", "La connexion sera bloquée définitivement, sauf nouvelle décision.", "Rejeter", () =>
-                                  perform(`/backoffice/users/${member.id}/`, "PATCH", { account_status: "REJETE", note }, "Compte rejeté.", true),
-                                )
-                              }
-                              className="rounded-full border-red-200 text-red-700"
-                            >
-                              Rejeter
-                            </Button>
-                          )}
+                          </div>
+                          <NoteField value={note} onChange={(value) => setDrafts((current) => ({ ...current, [key]: value }))} placeholder="Motif requis pour suspendre, rejeter ou supprimer" rows={1} />
                         </div>
-                        <NoteField value={note} onChange={(value) => setDrafts((current) => ({ ...current, [key]: value }))} placeholder="Motif requis pour suspendre ou rejeter" rows={1} />
                       </div>
+
+                      {editingUserId === member.id && (
+                        <div className="rounded-xl border border-black/10 bg-surface-alt p-4">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <label className="space-y-1 text-xs font-medium text-ink-secondary">
+                              <span>Prénom</span>
+                              <Input value={userEditForm.first_name} onChange={(event) => setUserEditForm((form) => ({ ...form, first_name: event.target.value }))} className="h-9 rounded-lg bg-white text-sm" />
+                            </label>
+                            <label className="space-y-1 text-xs font-medium text-ink-secondary">
+                              <span>Nom</span>
+                              <Input value={userEditForm.last_name} onChange={(event) => setUserEditForm((form) => ({ ...form, last_name: event.target.value }))} className="h-9 rounded-lg bg-white text-sm" />
+                            </label>
+                            <label className="space-y-1 text-xs font-medium text-ink-secondary">
+                              <span>Téléphone</span>
+                              <Input value={userEditForm.phone} onChange={(event) => setUserEditForm((form) => ({ ...form, phone: event.target.value }))} className="h-9 rounded-lg bg-white text-sm" />
+                            </label>
+                            <label className="space-y-1 text-xs font-medium text-ink-secondary">
+                              <span>Organisation</span>
+                              <Input value={userEditForm.organization_name} onChange={(event) => setUserEditForm((form) => ({ ...form, organization_name: event.target.value }))} className="h-9 rounded-lg bg-white text-sm" />
+                            </label>
+                            <label className="space-y-1 text-xs font-medium text-ink-secondary">
+                              <span>Ville</span>
+                              <Input value={userEditForm.city} onChange={(event) => setUserEditForm((form) => ({ ...form, city: event.target.value }))} className="h-9 rounded-lg bg-white text-sm" />
+                            </label>
+                          </div>
+                          <div className="mt-3 flex justify-end gap-2">
+                            <Button variant="outline" size="sm" onClick={() => setEditingUserId(null)} className="rounded-full">
+                              Annuler
+                            </Button>
+                            <Button size="sm" disabled={busy} onClick={() => void saveUserEdit(member.id)} className="rounded-full bg-gold text-ink hover:bg-gold-light">
+                              Enregistrer
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </article>
                     )
                   })}
@@ -2146,7 +2559,6 @@ export default function AdminDashboardPage() {
           </section>
         )}
       </div>
-      {confirmation && <ConfirmDialog confirmation={confirmation} busy={busy} onCancel={() => !busy && setConfirmation(null)} onConfirm={() => void confirmation.run()} />}
       {documentPreview && <DocumentPreviewDialog preview={documentPreview} onClose={() => setDocumentPreview(null)} />}
     </div>
   )

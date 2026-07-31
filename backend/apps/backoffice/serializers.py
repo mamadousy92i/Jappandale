@@ -79,10 +79,30 @@ class SupportReplySerializer(serializers.Serializer):
     message = serializers.CharField(max_length=5000)
 
 
+class UserCreateSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+    role = serializers.ChoiceField(choices=User.Role.choices, default=User.Role.CONTRIBUTEUR)
+    phone = serializers.CharField(required=False, allow_blank=True, max_length=20)
+    organization_name = serializers.CharField(required=False, allow_blank=True, max_length=160)
+    city = serializers.CharField(required=False, allow_blank=True, max_length=120)
+
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Un compte existe déjà avec cette adresse e-mail.")
+        return value
+
+
 class UserManagementSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=User.Role.choices, required=False)
     is_active = serializers.BooleanField(required=False)
     account_status = serializers.ChoiceField(choices=User.AccountStatus.choices, required=False)
+    first_name = serializers.CharField(required=False, max_length=150)
+    last_name = serializers.CharField(required=False, max_length=150)
+    phone = serializers.CharField(required=False, allow_blank=True, max_length=20)
+    organization_name = serializers.CharField(required=False, allow_blank=True, max_length=160)
+    city = serializers.CharField(required=False, allow_blank=True, max_length=120)
     note = serializers.CharField(required=False, allow_blank=True, max_length=1500)
 
     def validate(self, attrs):
@@ -92,3 +112,12 @@ class UserManagementSerializer(serializers.Serializer):
         ) and not attrs.get("note", "").strip():
             raise serializers.ValidationError({"note": "Un motif est obligatoire pour cette décision."})
         return attrs
+
+
+class UserDeleteSerializer(serializers.Serializer):
+    note = serializers.CharField(max_length=1500)
+
+    def validate_note(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Un motif est obligatoire pour supprimer ce compte.")
+        return value

@@ -1,7 +1,9 @@
 import mimetypes
 import csv
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.core import signing
 from django.db import transaction
 from django.db.models import Sum
@@ -9,6 +11,8 @@ from django.db.models import Q
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -41,6 +45,8 @@ from .serializers import (
     ScoreOverrideSerializer,
     SupportReplySerializer,
     SupportReviewSerializer,
+    UserCreateSerializer,
+    UserDeleteSerializer,
     UserManagementSerializer,
     WorkAssignmentSerializer,
 )
@@ -715,8 +721,72 @@ class SupportReplyView(APIView):
         return Response({"id": reply.id, "detail": "Réponse envoyée et enregistrée."})
 
 
+def _user_summary(user):
+    return {
+        **_person(user),
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "organization_name": user.organization_name,
+        "city": user.city,
+        "is_active": user.is_active,
+        "email_verified": user.is_email_verified,
+        "kyc_status": user.kyc_status,
+        "account_status": user.account_status,
+        "account_status_display": user.get_account_status_display(),
+        "date_joined": user.date_joined,
+        "last_login": user.last_login,
+    }
+
+
 class UserListView(APIView):
     permission_classes = [IsJappandaleAdmin]
+
+    @transaction.atomic
+    def post(self, request):
+        serializer = UserCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        user = User.objects.create_user(
+            email=data["email"],
+            password=None,
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            role=data["role"],
+            phone=data.get("phone", ""),
+            organization_name=data.get("organization_name", ""),
+            city=data.get("city", ""),
+            email_verified_at=timezone.now(),
+            account_status=User.AccountStatus.VALIDE,
+        )
+        UserAuditLog.objects.create(
+            user=user,
+            actor=request.user,
+            action=UserAuditLog.Action.CREATED,
+            previous_value="",
+            new_value=user.role,
+            note=f"Compte créé depuis le back-office par {request.user.email}.",
+        )
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        reset_url = f"{settings.FRONTEND_URL.rstrip('/')}/mot-de-passe/reinitialiser/{uid}/{token}"
+        send_branded_email(
+            subject="Votre compte Jappandale a été créé",
+            message=(
+                "Un compte Jappandale vient d’être créé pour vous par l’équipe d’administration.\n\n"
+                "Choisissez votre mot de passe pour y accéder."
+            ),
+            plain_message=(
+                "Un compte Jappandale vient d’être créé pour vous par l’équipe d’administration.\n\n"
+                f"Choisissez votre mot de passe : {reset_url}"
+            ),
+            recipient_list=[user.email],
+            action_url=reset_url,
+            action_label="Choisir mon mot de passe",
+            headline="Bienvenue sur Jappandale",
+            eyebrow="COMPTE CRÉÉ",
+            fail_silently=True,
+        )
+        return Response(_user_summary(user), status=status.HTTP_201_CREATED)
 
     def get(self, request):
         queryset = User.objects.all().order_by("-date_joined")
@@ -747,19 +817,7 @@ class UserListView(APIView):
                 "count": count,
                 "page": page,
                 "pages": max((count + page_size - 1) // page_size, 1),
-                "results": [
-                    {
-                        **_person(user),
-                        "is_active": user.is_active,
-                        "email_verified": user.is_email_verified,
-                        "kyc_status": user.kyc_status,
-                        "account_status": user.account_status,
-                        "account_status_display": user.get_account_status_display(),
-                        "date_joined": user.date_joined,
-                        "last_login": user.last_login,
-                    }
-                    for user in results
-                ],
+                "results": [_user_summary(user) for user in results],
             }
         )
 
@@ -797,6 +855,25 @@ class UserManagementView(APIView):
 
         note = serializer.validated_data.get("note", "").strip()
         fields = []
+        info_fields = ["first_name", "last_name", "phone", "organization_name", "city"]
+        changed_info = [
+            field
+            for field in info_fields
+            if field in serializer.validated_data and getattr(user, field) != serializer.validated_data[field]
+        ]
+        for field in info_fields:
+            if field in serializer.validated_data:
+                setattr(user, field, serializer.validated_data[field])
+                fields.append(field)
+        if changed_info:
+            UserAuditLog.objects.create(
+                user=user,
+                actor=request.user,
+                action=UserAuditLog.Action.INFO_UPDATED,
+                previous_value="",
+                new_value="",
+                note=note or f"Champs modifiés : {', '.join(changed_info)}.",
+            )
         if "role" in serializer.validated_data:
             new_role = serializer.validated_data["role"]
             if new_role != user.role:
@@ -840,7 +917,67 @@ class UserManagementView(APIView):
             ]
         if fields:
             user.save(update_fields=list(dict.fromkeys(fields)))
-        return Response({"detail": "Compte utilisateur mis à jour."})
+        return Response(_user_summary(user))
+
+    @transaction.atomic
+    def delete(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        if user == request.user:
+            return Response(
+                {"detail": ["Vous ne pouvez pas supprimer votre propre compte."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer = UserDeleteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        note = serializer.validated_data["note"].strip()
+
+        previous_email = user.email[:50]
+        if user.avatar:
+            user.avatar.delete(save=False)
+        user.email = f"compte-supprime-{user.id}@jappandale.invalid"
+        user.first_name = "Compte"
+        user.last_name = "supprimé"
+        user.phone = ""
+        user.organization_name = ""
+        user.city = ""
+        user.bio = ""
+        user.country = ""
+        user.is_diaspora = False
+        user.set_unusable_password()
+        user.is_active = False
+        user.account_status = User.AccountStatus.REJETE
+        user.account_status_note = note
+        user.account_status_changed_at = timezone.now()
+        user.account_status_changed_by = request.user
+        user.save(
+            update_fields=[
+                "email",
+                "first_name",
+                "last_name",
+                "phone",
+                "organization_name",
+                "city",
+                "bio",
+                "country",
+                "is_diaspora",
+                "avatar",
+                "password",
+                "is_active",
+                "account_status",
+                "account_status_note",
+                "account_status_changed_at",
+                "account_status_changed_by",
+            ]
+        )
+        UserAuditLog.objects.create(
+            user=user,
+            actor=request.user,
+            action=UserAuditLog.Action.DELETED,
+            previous_value=previous_email,
+            new_value="SUPPRIME",
+            note=note,
+        )
+        return Response({"detail": "Compte supprimé et anonymisé."})
 
 
 class ExportTicketView(APIView):

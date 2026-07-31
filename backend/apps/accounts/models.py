@@ -205,8 +205,11 @@ class UserAuditLog(models.Model):
     """Journal append-only des actions administratives sur un compte utilisateur."""
 
     class Action(models.TextChoices):
+        CREATED = "CREATED", "Compte créé par un administrateur"
         ROLE_CHANGED = "ROLE_CHANGED", "Rôle modifié"
         ACCOUNT_STATUS_CHANGED = "ACCOUNT_STATUS_CHANGED", "Statut de compte modifié"
+        INFO_UPDATED = "INFO_UPDATED", "Informations modifiées"
+        DELETED = "DELETED", "Compte supprimé (anonymisé)"
 
     user = models.ForeignKey(
         "accounts.User",

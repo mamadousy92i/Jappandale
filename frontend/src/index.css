@@ -202,3 +202,76 @@ h1, h2, h3, h4, h5 {
     @apply font-sans;
   }
 }
+
+/* SweetAlert2 — thème Jappandale (back-office) */
+.jpd-swal-popup {
+  border-radius: 22px !important;
+  padding: 1.75rem !important;
+  font-family: var(--font-body);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35) !important;
+}
+.jpd-swal-title {
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  color: var(--color-ink) !important;
+  font-size: 1.5rem !important;
+  padding-top: 0 !important;
+}
+.jpd-swal-text {
+  color: var(--color-ink-secondary) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6 !important;
+}
+.jpd-swal-actions {
+  gap: 0.75rem !important;
+  margin-top: 1.25rem !important;
+}
+.jpd-swal-confirm,
+.jpd-swal-cancel {
+  border-radius: 999px !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.65rem 1.5rem !important;
+  box-shadow: none !important;
+  transition: opacity 0.15s ease;
+}
+.jpd-swal-confirm {
+  background: var(--color-ink) !important;
+  color: #fff !important;
+}
+.jpd-swal-confirm:hover {
+  opacity: 0.85;
+}
+.jpd-swal-confirm--danger {
+  background: #dc2626 !important;
+}
+.jpd-swal-cancel {
+  background: transparent !important;
+  color: var(--color-ink-secondary) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+.jpd-swal-cancel:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+.jpd-swal-icon.swal2-icon-question {
+  border-color: var(--color-gold-dark) !important;
+  color: var(--color-gold-dark) !important;
+}
+
+.jpd-swal-toast {
+  border-radius: 14px !important;
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.25) !important;
+  font-family: var(--font-body);
+}
+.jpd-swal-toast .swal2-title {
+  font-family: var(--font-body) !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: var(--color-ink) !important;
+}
+.jpd-swal-toast--success {
+  border-left: 4px solid #059669 !important;
+}
+.jpd-swal-toast--error {
+  border-left: 4px solid #dc2626 !important;
+}
