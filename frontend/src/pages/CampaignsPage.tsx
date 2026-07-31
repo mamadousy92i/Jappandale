@@ -130,7 +130,8 @@ function CampaignsPage() {
             {((user?.role === "PORTEUR" && !showMine) || !user) && (
               <Button
                 asChild
-                className="h-11 rounded-full bg-gold px-5 font-semibold text-ink shadow-md shadow-gold/25 hover:bg-gold-light"
+                variant="outline"
+                className="h-11 rounded-full border-gold/50 px-5 font-semibold text-ink hover:border-gold hover:bg-gold/10"
               >
                 <Link
                   to={

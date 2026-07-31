@@ -62,8 +62,10 @@ export function CampaignCard({ campaign }: { campaign: CampaignListItem }) {
             className="size-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (
-          <div className="flex size-full items-center justify-center bg-gradient-to-br from-gold/20 to-surface-alt">
-            <Icon aria-hidden="true" className="size-10 text-gold-dark/70" />
+          <div className="flex size-full items-center justify-center bg-gradient-to-br from-gold/15 to-surface-alt bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-[length:16px_16px]">
+            <span className="flex size-12 items-center justify-center rounded-full border border-gold/20 bg-white/70 shadow-sm backdrop-blur-sm">
+              <Icon aria-hidden="true" className="size-5 text-gold-dark/80" />
+            </span>
           </div>
         )}
         <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-ink-secondary shadow-sm backdrop-blur">

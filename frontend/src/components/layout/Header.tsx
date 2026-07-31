@@ -103,7 +103,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-surface/95 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:h-[4.5rem] sm:px-6">
+      <div className="relative z-50 mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:h-[4.5rem] sm:px-6">
         <Link
           to="/"
           onClick={closeMenus}
@@ -302,10 +302,18 @@ export function Header() {
       </div>
 
       {menuOpen && (
+        <div
+          aria-hidden="true"
+          onClick={closeMenus}
+          className="fixed top-16 right-0 bottom-0 left-0 z-30 bg-ink/40 backdrop-blur-[1px] sm:top-[4.5rem] md:hidden"
+        />
+      )}
+
+      {menuOpen && (
         <nav
           id="mobile-navigation"
           aria-label={t("nav.mobileLabel")}
-          className="border-t border-black/5 bg-surface px-4 py-4 shadow-lg md:hidden"
+          className="relative z-50 border-t border-black/5 bg-surface px-4 py-4 shadow-lg md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-2">
             <div className="mb-1 flex justify-start">

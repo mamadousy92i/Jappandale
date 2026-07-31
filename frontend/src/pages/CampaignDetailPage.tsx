@@ -345,8 +345,10 @@ function CampaignDetailPage() {
             className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]"
           />
         ) : (
-          <div className="flex aspect-[16/9] w-full items-center justify-center bg-gradient-to-br from-gold/20 to-surface-alt sm:aspect-[21/9]">
-            <Icon aria-hidden="true" className="size-16 text-gold-dark/70" />
+          <div className="flex h-48 w-full items-center justify-center bg-gradient-to-br from-gold/15 to-surface-alt bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-[length:18px_18px] sm:h-64">
+            <span className="flex size-20 items-center justify-center rounded-full border border-gold/20 bg-white/70 shadow-sm backdrop-blur-sm">
+              <Icon aria-hidden="true" className="size-8 text-gold-dark/80" />
+            </span>
           </div>
         )}
         <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-ink-secondary shadow-sm backdrop-blur">
