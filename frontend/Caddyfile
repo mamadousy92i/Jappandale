@@ -1,0 +1,44 @@
+{
+	# En local (DOMAIN=localhost), Caddy sert en HTTP simple. Avec un vrai nom
+	# de domaine public, il obtient et renouvelle automatiquement le certificat
+	# HTTPS (Let's Encrypt) — aucune configuration TLS manuelle n'est nécessaire.
+	email {$CADDY_ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# API, back-office Django, admin technique : tout part vers gunicorn.
+	@backend path /api/* /admin /admin/*
+	handle @backend {
+		reverse_proxy backend:8000
+	}
+
+	# Fichiers statiques Django (CSS/JS de l'admin), collectés par collectstatic.
+	@static path /static/*
+	handle @static {
+		root * /srv
+		file_server
+	}
+
+	# Seuls les fichiers publics (avatars, images de campagne) sont servis
+	# directement. Les documents KYC (media/kyc/...) ne sont JAMAIS exposés
+	# ici : ils ne sont accessibles que via un lien signé et temporaire généré
+	# par le back-office (voir apps/backoffice/views.py — KycDocumentFileView).
+	# Toute autre URL sous /media/ tombe dans la règle "handle" par défaut
+	# ci-dessous et sert l'application (donc ne fuite jamais le fichier).
+	@publicMedia path /media/avatars/* /media/campaigns/*
+	handle @publicMedia {
+		root * /srv
+		file_server
+	}
+
+	# Application React (SPA) : tout le reste, avec repli sur index.html
+	# pour que les routes côté client (ex: /campagnes/mon-slug) fonctionnent
+	# après un rechargement de page.
+	handle {
+		root * /srv/app
+		try_files {path} /index.html
+		file_server
+	}
+}

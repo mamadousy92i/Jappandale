@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+!.env.production.example
+**/.venv
+**/__pycache__
+**/*.pyc
+backend/media
+backend/staticfiles
+frontend/node_modules
+frontend/dist
+.claude
+.superpowers
+docs
+*.docx
