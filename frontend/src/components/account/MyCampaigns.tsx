@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -18,31 +19,22 @@ import { useAuth } from "@/lib/auth";
 import { formatFcfa } from "@/lib/format";
 import type { CampaignListItem, CampaignStatus } from "@/lib/types";
 
-const statusBadges: Record<
-  CampaignStatus,
-  { label: string; className: string }
-> = {
-  BROUILLON: {
-    label: "Brouillon",
-    className: "bg-black/[0.06] text-ink-secondary",
-  },
-  EN_MODERATION: {
-    label: "En modération",
-    className: "bg-gold/15 text-gold-dark",
-  },
-  PUBLIEE: { label: "Publiée", className: "bg-emerald-100 text-emerald-700" },
-  REJETEE: { label: "Rejetée", className: "bg-red-100 text-red-700" },
-  SUSPENDUE: { label: "Suspendue", className: "bg-red-100 text-red-700" },
-  CLOTUREE: { label: "Clôturée", className: "bg-ink/85 text-surface" },
+const statusBadgeClasses: Record<CampaignStatus, string> = {
+  BROUILLON: "bg-black/[0.06] text-ink-secondary",
+  EN_MODERATION: "bg-gold/15 text-gold-dark",
+  PUBLIEE: "bg-emerald-100 text-emerald-700",
+  REJETEE: "bg-red-100 text-red-700",
+  SUSPENDUE: "bg-red-100 text-red-700",
+  CLOTUREE: "bg-ink/85 text-surface",
 };
 
 function StatusBadge({ status }: { status: CampaignStatus }) {
-  const badge = statusBadges[status];
+  const { t } = useTranslation("account");
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${badge.className}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${statusBadgeClasses[status]}`}
     >
-      {badge.label}
+      {t(`myCampaigns.status.${status}`)}
     </span>
   );
 }
@@ -54,6 +46,7 @@ function CampaignRow({
   campaign: CampaignListItem;
   onReload: () => void;
 }) {
+  const { t } = useTranslation("account");
   const { authFetch } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
@@ -120,7 +113,7 @@ function CampaignRow({
                   {formatFcfa(campaign.collected_amount)}
                 </span>{" "}
                 <span className="text-xs text-ink-muted">
-                  sur {formatFcfa(campaign.goal_amount)}
+                  {t("myCampaigns.goalOf", { amount: formatFcfa(campaign.goal_amount) })}
                 </span>
               </span>
               <span className="font-semibold text-gold-dark">
@@ -134,8 +127,8 @@ function CampaignRow({
               <p className="flex items-center gap-2 font-semibold">
                 <AlertTriangle aria-hidden="true" className="size-4 shrink-0" />
                 {campaign.status === "REJETEE"
-                  ? "Motif du rejet"
-                  : "Motif de la suspension"}
+                  ? t("myCampaigns.rejectionReason")
+                  : t("myCampaigns.suspensionReason")}
               </p>
               <p className="mt-1.5 leading-relaxed">{decisionReason}</p>
             </div>
@@ -143,7 +136,7 @@ function CampaignRow({
 
           {error && (
             <p role="alert" className="mt-3 text-sm text-red-600">
-              La soumission a échoué. Réessayez.
+              {t("myCampaigns.submitError")}
             </p>
           )}
 
@@ -157,7 +150,7 @@ function CampaignRow({
               >
                 <Link to={`/campagnes/${campaign.slug}/modifier`}>
                   <Pencil aria-hidden="true" className="size-3.5" />
-                  Modifier
+                  {t("myCampaigns.edit")}
                 </Link>
               </Button>
             )}
@@ -170,7 +163,7 @@ function CampaignRow({
               >
                 <Link to={`/campagnes/${campaign.slug}/contreparties`}>
                   <Gift aria-hidden="true" className="size-3.5" />
-                  Contreparties
+                  {t("myCampaigns.rewards")}
                 </Link>
               </Button>
             )}
@@ -183,7 +176,7 @@ function CampaignRow({
                   className="rounded-full border-black/10 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"
                 >
                   <Link to={`/campagnes/${campaign.slug}`}>
-                    Voir la page
+                    {t("myCampaigns.viewPage")}
                     <ArrowUpRight aria-hidden="true" className="size-3.5" />
                   </Link>
                 </Button>
@@ -195,7 +188,7 @@ function CampaignRow({
                 >
                   <Link to={`/campagnes/${campaign.slug}/actualites/nouvelle`}>
                     <Newspaper aria-hidden="true" className="size-3.5" />
-                    Publier une actualité
+                    {t("myCampaigns.publishUpdate")}
                   </Link>
                 </Button>
               </>
@@ -209,10 +202,10 @@ function CampaignRow({
               >
                 <Send aria-hidden="true" className="size-3.5" />
                 {submitting
-                  ? "Envoi…"
+                  ? t("myCampaigns.submitting")
                   : campaign.status === "BROUILLON"
-                    ? "Soumettre à validation"
-                    : "Renvoyer en validation"}
+                    ? t("myCampaigns.submitDraft")
+                    : t("myCampaigns.resubmit")}
               </Button>
             )}
           </div>
@@ -223,6 +216,7 @@ function CampaignRow({
 }
 
 export function MyCampaigns() {
+  const { t } = useTranslation("account");
   const { authFetch } = useAuth();
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -251,10 +245,10 @@ export function MyCampaigns() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-heading text-xl font-bold text-ink">
-            Mes campagnes
+            {t("myCampaigns.title")}
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
-            Suivez vos collectes et soumettez vos brouillons à validation.
+            {t("myCampaigns.subtitle")}
           </p>
         </div>
         <Button
@@ -263,7 +257,7 @@ export function MyCampaigns() {
         >
           <Link to="/campagnes/nouvelle">
             <Plus aria-hidden="true" className="size-4" />
-            Créer une campagne
+            {t("myCampaigns.create")}
           </Link>
         </Button>
       </div>
@@ -281,8 +275,7 @@ export function MyCampaigns() {
         ) : error ? (
           <div className="flex flex-col items-start gap-4 rounded-2xl border border-black/5 bg-surface-alt p-6">
             <p className="text-sm leading-relaxed text-ink-secondary">
-              Impossible de charger vos campagnes. Vérifiez votre connexion puis
-              réessayez.
+              {t("myCampaigns.loadError")}
             </p>
             <Button
               variant="outline"
@@ -291,7 +284,7 @@ export function MyCampaigns() {
               className="rounded-full border-black/10 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"
             >
               <RefreshCw aria-hidden="true" className="size-3.5" />
-              Réessayer
+              {t("myCampaigns.retry")}
             </Button>
           </div>
         ) : campaigns.length === 0 ? (
@@ -303,11 +296,10 @@ export function MyCampaigns() {
               <FolderOpen className="size-6" />
             </span>
             <p className="mt-4 font-heading text-lg font-bold text-ink">
-              Aucune campagne pour le moment
+              {t("myCampaigns.empty.title")}
             </p>
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-ink-secondary">
-              Votre première campagne est à quelques clics : présentez votre
-              projet et lancez la collecte.
+              {t("myCampaigns.empty.text")}
             </p>
           </div>
         ) : (

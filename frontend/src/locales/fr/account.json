@@ -125,5 +125,73 @@
     "referralPrefix": "Orientation : {{status}}",
     "eligibilityLostError": "Vous ne remplissez plus les critères d’éligibilité de ce dispositif.",
     "genericError": "Impossible d’enregistrer votre intérêt pour le moment."
+  },
+  "myContributions": {
+    "title": "Mes contributions",
+    "subtitle": "Historique de vos contributions réalisées sur Jappandale.",
+    "loadError": "Impossible de charger vos contributions.",
+    "empty": "Vous n’avez pas encore contribué à une campagne.",
+    "anonymous": "Contribution anonyme",
+    "nameVisible": "Nom visible",
+    "status": {
+      "INITIEE": "En attente",
+      "CONFIRMEE": "Confirmée",
+      "ECHOUEE": "Échouée",
+      "REMBOURSEE": "Remboursée"
+    },
+    "disputeStatusPrefix": "Litige : {{status}}",
+    "openDispute": "Ouvrir un litige",
+    "disputeForm": {
+      "reasonLabel": "Motif du litige",
+      "reasons": {
+        "PROJET_NON_CONFORME": "Projet non conforme / fonds mal utilisés",
+        "PORTEUR_INJOIGNABLE": "Porteur injoignable",
+        "ERREUR_CONTRIBUTION": "Contribution non voulue / erreur",
+        "AUTRE": "Autre motif"
+      },
+      "detailsLabel": "Détails du litige",
+      "detailsPlaceholder": "Décrivez le problème rencontré…",
+      "cancel": "Annuler",
+      "submit": "Ouvrir le litige",
+      "missingDetails": "Décrivez le problème rencontré.",
+      "submitError": "Impossible d’ouvrir ce litige. Réessayez."
+    }
+  },
+  "receivedContributions": {
+    "title": "Contributions reçues",
+    "subtitle": "Suivi des tentatives et confirmations sur vos campagnes.",
+    "loadError": "Impossible de charger les contributions reçues.",
+    "empty": "Aucune contribution reçue pour le moment.",
+    "net": "net {{amount}}"
+  },
+  "myCampaigns": {
+    "title": "Mes campagnes",
+    "subtitle": "Suivez vos collectes et soumettez vos brouillons à validation.",
+    "create": "Créer une campagne",
+    "loadError": "Impossible de charger vos campagnes. Vérifiez votre connexion puis réessayez.",
+    "retry": "Réessayer",
+    "empty": {
+      "title": "Aucune campagne pour le moment",
+      "text": "Votre première campagne est à quelques clics : présentez votre projet et lancez la collecte."
+    },
+    "status": {
+      "BROUILLON": "Brouillon",
+      "EN_MODERATION": "En modération",
+      "PUBLIEE": "Publiée",
+      "REJETEE": "Rejetée",
+      "SUSPENDUE": "Suspendue",
+      "CLOTUREE": "Clôturée"
+    },
+    "goalOf": "sur {{amount}}",
+    "rejectionReason": "Motif du rejet",
+    "suspensionReason": "Motif de la suspension",
+    "submitError": "La soumission a échoué. Réessayez.",
+    "edit": "Modifier",
+    "rewards": "Contreparties",
+    "viewPage": "Voir la page",
+    "publishUpdate": "Publier une actualité",
+    "submitDraft": "Soumettre à validation",
+    "resubmit": "Renvoyer en validation",
+    "submitting": "Envoi…"
   }
 }

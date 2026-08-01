@@ -21,6 +21,10 @@ import activityFr from "@/locales/fr/activity.json"
 import activityWo from "@/locales/wo/activity.json"
 import createCampaignFr from "@/locales/fr/createCampaign.json"
 import createCampaignWo from "@/locales/wo/createCampaign.json"
+import reportCampaignFr from "@/locales/fr/reportCampaign.json"
+import reportCampaignWo from "@/locales/wo/reportCampaign.json"
+import passportVerificationFr from "@/locales/fr/passportVerification.json"
+import passportVerificationWo from "@/locales/wo/passportVerification.json"
 
 export const SUPPORTED_LANGUAGES = ["fr", "wo"] as const
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]
@@ -41,11 +45,11 @@ void i18n
   .init({
     lng: storedLanguage(),
     fallbackLng: "fr",
-    ns: ["help", "common", "campaigns", "about", "contact", "campaignDetail", "auth", "account", "activity", "createCampaign"],
+    ns: ["help", "common", "campaigns", "about", "contact", "campaignDetail", "auth", "account", "activity", "createCampaign", "reportCampaign", "passportVerification"],
     defaultNS: "help",
     resources: {
-      fr: { help: helpFr, common: commonFr, campaigns: campaignsFr, about: aboutFr, contact: contactFr, campaignDetail: campaignDetailFr, auth: authFr, account: accountFr, activity: activityFr, createCampaign: createCampaignFr },
-      wo: { help: helpWo, common: commonWo, campaigns: campaignsWo, about: aboutWo, contact: contactWo, campaignDetail: campaignDetailWo, auth: authWo, account: accountWo, activity: activityWo, createCampaign: createCampaignWo },
+      fr: { help: helpFr, common: commonFr, campaigns: campaignsFr, about: aboutFr, contact: contactFr, campaignDetail: campaignDetailFr, auth: authFr, account: accountFr, activity: activityFr, createCampaign: createCampaignFr, reportCampaign: reportCampaignFr, passportVerification: passportVerificationFr },
+      wo: { help: helpWo, common: commonWo, campaigns: campaignsWo, about: aboutWo, contact: contactWo, campaignDetail: campaignDetailWo, auth: authWo, account: accountWo, activity: activityWo, createCampaign: createCampaignWo, reportCampaign: reportCampaignWo, passportVerification: passportVerificationWo },
     },
     interpolation: { escapeValue: false },
   })

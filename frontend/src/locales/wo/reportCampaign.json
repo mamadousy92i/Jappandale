@@ -1,0 +1,23 @@
+{
+  "eyebrow": "Wóolu ak kaaraange",
+  "title": "Yédd kanpaañ bii",
+  "intro": "Wax rekk dëgg yu wér. Yédd bu nekk dafay indi xool, waaye du feexal kanpaañ bi ci sa boppam.",
+  "reasonLabel": "Li tax",
+  "reasons": {
+    "FRAUDE": "Xalaat ci ab fraawd",
+    "INFORMATION_TROMPEUSE": "Xibaar yu dul dëgg",
+    "CONTENU_INAPPROPRIE": "Mbir bu bon",
+    "USURPATION": "Sukkandiku ci keneen",
+    "AUTRE": "Beneen li tax"
+  },
+  "detailsLabel": "Njort",
+  "detailsPlaceholder": "Wax li war a wóoral ak li nga gis…",
+  "submitError": "Yédd bi manul a yónnee. Xéy-na ñu ko jot a yónnee.",
+  "submit": "Yónnee yédd bi",
+  "submitting": "Di yónnee…",
+  "sent": {
+    "title": "Yédd bi jot na",
+    "text": "Ekip bi dina xool xibaar yi ñu yónnee. Ngir aar ñi ci lëkkalool, topatoo bi dina des ci biir.",
+    "back": "Dellu ci kanpaañ bi"
+  }
+}

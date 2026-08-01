@@ -125,5 +125,73 @@
     "referralPrefix": "Yóbbu : {{status}}",
     "eligibilityLostError": "Doo fi am sart yi ngir am dispositif bii.",
     "genericError": "Manunu denc sa xalaat tey."
+  },
+  "myContributions": {
+    "title": "Sama dokkal yi",
+    "subtitle": "Taariixu dokkal yi nga def ci Jappandale.",
+    "loadError": "Manunu yóbbu sa dokkal yi.",
+    "empty": "Doo dokkalewu benn kanpaañ.",
+    "anonymous": "Dokkal bu sutura",
+    "nameVisible": "Tur feeñ na",
+    "status": {
+      "INITIEE": "Di xaar",
+      "CONFIRMEE": "Wóor na",
+      "ECHOUEE": "Baaxul",
+      "REMBOURSEE": "Delloosi nañu ko"
+    },
+    "disputeStatusPrefix": "Jumtukaay : {{status}}",
+    "openDispute": "Ubbi ab jumtukaay",
+    "disputeForm": {
+      "reasonLabel": "Li tax jumtukaay bi",
+      "reasons": {
+        "PROJET_NON_CONFORME": "Porojet bu dul aju ci sart / xaalis bu jëfandikoo bu baaxul",
+        "PORTEUR_INJOIGNABLE": "Boroom porojet bi mënuñu koo jokkoo",
+        "ERREUR_CONTRIBUTION": "Dokkal bu ñu bëggul / njuumte",
+        "AUTRE": "Beneen li tax"
+      },
+      "detailsLabel": "Njortu jumtukaay bi",
+      "detailsPlaceholder": "Wax jafe-jafe bi nga jot…",
+      "cancel": "Bàyyi",
+      "submit": "Ubbi jumtukaay bi",
+      "missingDetails": "Wax jafe-jafe bi nga jot.",
+      "submitError": "Manunu ubbi jumtukaay bi. Jéema beneen yoon."
+    }
+  },
+  "receivedContributions": {
+    "title": "Dokkal yu ñu am",
+    "subtitle": "Toppatoo dokkal yi ñu jéem ak yi wóor ci say kanpaañ.",
+    "loadError": "Manunu yóbbu dokkal yi ñu am.",
+    "empty": "Amagul benn dokkal tey.",
+    "net": "net {{amount}}"
+  },
+  "myCampaigns": {
+    "title": "Sama kanpaañ yi",
+    "subtitle": "Toppatoo say dajale te yónnee say brouyon ngir ñu ko wóoral.",
+    "create": "Sos kanpaañ",
+    "loadError": "Manunu yóbbu say kanpaañ. Xool sa lëkkalekaay te jéema beneen yoon.",
+    "retry": "Jéema beneen yoon",
+    "empty": {
+      "title": "Amul kanpaañ tey",
+      "text": "Sa kanpaañ bu jëkk, ay clic rekk : wone sa porojet te tambali dajale bi."
+    },
+    "status": {
+      "BROUILLON": "Brouyon",
+      "EN_MODERATION": "Di xool",
+      "PUBLIEE": "Feeñ na",
+      "REJETEE": "Bàyyi nañu ko",
+      "SUSPENDUE": "Taxaw na",
+      "CLOTUREE": "Jeex na"
+    },
+    "goalOf": "ci {{amount}}",
+    "rejectionReason": "Li tax ñu bàyyi ko",
+    "suspensionReason": "Li tax mu taxaw",
+    "submitError": "Yónnee bi baaxul. Jéema beneen yoon.",
+    "edit": "Soppi",
+    "rewards": "Contrepartie yi",
+    "viewPage": "Xool xët bi",
+    "publishUpdate": "Yónnee xibaar bu bees",
+    "submitDraft": "Yónnee ngir wóoral",
+    "resubmit": "Yónneeat ngir wóoral",
+    "submitting": "Di yónnee…"
   }
 }

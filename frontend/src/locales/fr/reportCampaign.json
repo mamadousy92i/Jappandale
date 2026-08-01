@@ -1,0 +1,23 @@
+{
+  "eyebrow": "Confiance et sécurité",
+  "title": "Signaler cette campagne",
+  "intro": "Décrivez uniquement des faits précis. Un signalement déclenche une revue mais ne supprime pas automatiquement la campagne.",
+  "reasonLabel": "Motif",
+  "reasons": {
+    "FRAUDE": "Suspicion de fraude",
+    "INFORMATION_TROMPEUSE": "Informations trompeuses",
+    "CONTENU_INAPPROPRIE": "Contenu inapproprié",
+    "USURPATION": "Usurpation d’identité",
+    "AUTRE": "Autre motif"
+  },
+  "detailsLabel": "Précisions",
+  "detailsPlaceholder": "Expliquez ce qui doit être vérifié et indiquez les éléments observés…",
+  "submitError": "Le signalement n’a pas pu être envoyé. Il a peut-être déjà été transmis.",
+  "submit": "Envoyer le signalement",
+  "submitting": "Envoi…",
+  "sent": {
+    "title": "Signalement reçu",
+    "text": "Notre équipe examinera les informations transmises. Pour protéger les personnes concernées, le suivi reste confidentiel.",
+    "back": "Revenir à la campagne"
+  }
+}

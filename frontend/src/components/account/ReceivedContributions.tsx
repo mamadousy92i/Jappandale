@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react"
 import { Inbox } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
 import type { ReceivedContribution } from "@/lib/types"
 
 export function ReceivedContributions() {
+  const { t } = useTranslation("account")
   const { authFetch } = useAuth()
   const [items, setItems] = useState<ReceivedContribution[]>([])
   const [loading, setLoading] = useState(true)
@@ -20,16 +22,16 @@ export function ReceivedContributions() {
 
   return (
     <section className="rounded-[20px] border border-black/5 bg-surface p-8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.08)] sm:p-10">
-      <h2 className="font-heading text-xl font-bold text-ink">Contributions reçues</h2>
-      <p className="mt-1 text-sm text-ink-muted">Suivi des tentatives et confirmations sur vos campagnes.</p>
+      <h2 className="font-heading text-xl font-bold text-ink">{t("receivedContributions.title")}</h2>
+      <p className="mt-1 text-sm text-ink-muted">{t("receivedContributions.subtitle")}</p>
       {loading ? (
         <div className="mt-6 h-24 animate-pulse rounded-2xl bg-black/[0.05]" />
       ) : error ? (
-        <p className="mt-6 text-sm text-red-600">Impossible de charger les contributions reçues.</p>
+        <p className="mt-6 text-sm text-red-600">{t("receivedContributions.loadError")}</p>
       ) : items.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-black/10 bg-surface-alt p-8 text-center">
           <Inbox className="mx-auto size-6 text-gold-dark" />
-          <p className="mt-3 text-sm text-ink-secondary">Aucune contribution reçue pour le moment.</p>
+          <p className="mt-3 text-sm text-ink-secondary">{t("receivedContributions.empty")}</p>
         </div>
       ) : (
         <ul className="mt-6 space-y-3">
@@ -44,7 +46,7 @@ export function ReceivedContributions() {
                   <span className="font-heading font-bold text-ink">{formatFcfa(item.amount)}</span>
                   {item.status === "CONFIRMEE" && (
                     <p className={`mt-1 text-xs font-semibold ${item.payout_status === "REVERSEE" ? "text-emerald-700" : "text-gold-dark"}`}>
-                      {item.payout_status_display} · net {formatFcfa(item.net_amount)}
+                      {item.payout_status_display} · {t("receivedContributions.net", { amount: formatFcfa(item.net_amount) })}
                     </p>
                   )}
                 </div>

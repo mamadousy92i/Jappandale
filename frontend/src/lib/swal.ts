@@ -42,8 +42,11 @@ export async function confirmAction({
   run: () => Promise<void>
 }): Promise<void> {
   await Swal.fire({
+    // `text` (pas `html`) : plusieurs appelants interpolent des données saisies par
+    // l'utilisateur (nom, e-mail…) dans `description` — `html` les interpréterait
+    // comme du HTML brut et ouvrirait une XSS stockée dans le navigateur de l'admin.
     title,
-    html: description,
+    text: description,
     icon: danger ? "warning" : "question",
     showCancelButton: true,
     confirmButtonText: confirmLabel,

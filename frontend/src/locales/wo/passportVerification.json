@@ -1,0 +1,19 @@
+{
+  "notFound": {
+    "title": "Dokimaan bi gisiwul",
+    "unknown": "Nimero bii du feeñal benn Paspoor Yu Xaalis Jappandale.",
+    "generic": "Manunu wóoral dokimaan bi tey.",
+    "backHome": "Dellu ci kër gi"
+  },
+  "authentic": {
+    "title": "Dokimaan bu wóor",
+    "text": "Paspoor Yu Xaalis bii, Jappandale moo ko génne ci {{date}}."
+  },
+  "score": "Score Jappandale® : {{score}} / 100",
+  "stats": {
+    "campaignsTotal": "Kanpaañ yu sos",
+    "campaignsSuccess": "Yu jeex ci ndam",
+    "totalCollected": "Xaalis bu dajaale",
+    "distinctContributors": "Way-dokkal yu wuute"
+  }
+}

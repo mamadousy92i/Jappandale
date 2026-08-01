@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { BadgeCheck, ScrollText, ShieldAlert } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { ApiError, apiFetch } from "@/lib/api"
 import { formatFcfa } from "@/lib/format"
 import type { PassportVerification } from "@/lib/types"
 
 export default function PassportVerificationPage() {
+  const { t } = useTranslation("passportVerification")
   const { verificationId } = useParams<{ verificationId: string }>()
   const [verification, setVerification] = useState<PassportVerification | null>(null)
   const [loading, setLoading] = useState(true)
@@ -35,14 +37,12 @@ export default function PassportVerificationPage() {
         <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
           <ShieldAlert className="size-6" />
         </span>
-        <h1 className="mt-5 font-heading text-2xl font-bold text-ink">Document introuvable</h1>
+        <h1 className="mt-5 font-heading text-2xl font-bold text-ink">{t("notFound.title")}</h1>
         <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
-          {notFound
-            ? "Cet identifiant de vérification ne correspond à aucun Passeport Financier Jappandale."
-            : "Impossible de vérifier ce document pour le moment."}
+          {notFound ? t("notFound.unknown") : t("notFound.generic")}
         </p>
         <Link to="/" className="mt-8 font-semibold text-gold-dark hover:underline">
-          Retour à l'accueil
+          {t("notFound.backHome")}
         </Link>
       </div>
     )
@@ -55,15 +55,15 @@ export default function PassportVerificationPage() {
       <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
         <BadgeCheck className="size-6 shrink-0 text-emerald-600" />
         <div>
-          <p className="font-heading text-lg font-bold text-ink">Document authentique</p>
+          <p className="font-heading text-lg font-bold text-ink">{t("authentic.title")}</p>
           <p className="text-sm text-emerald-800">
-            Ce Passeport Financier a été émis par Jappandale le{" "}
-            {new Date(verification.genere_le).toLocaleDateString("fr-FR", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
+            {t("authentic.text", {
+              date: new Date(verification.genere_le).toLocaleDateString("fr-FR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }),
             })}
-            .
           </p>
         </div>
       </div>
@@ -75,24 +75,24 @@ export default function PassportVerificationPage() {
           </span>
           <div>
             <p className="font-heading text-lg font-bold text-ink">{verification.porteur}</p>
-            <p className="text-sm text-ink-muted">Score Jappandale® : {resume.score} / 100</p>
+            <p className="text-sm text-ink-muted">{t("score", { score: resume.score })}</p>
           </div>
         </div>
         <dl className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div>
-            <dt className="text-xs text-ink-muted">Campagnes créées</dt>
+            <dt className="text-xs text-ink-muted">{t("stats.campaignsTotal")}</dt>
             <dd className="font-heading text-xl font-bold text-ink">{resume.campaigns_total}</dd>
           </div>
           <div>
-            <dt className="text-xs text-ink-muted">Clôturées avec succès</dt>
+            <dt className="text-xs text-ink-muted">{t("stats.campaignsSuccess")}</dt>
             <dd className="font-heading text-xl font-bold text-ink">{resume.campaigns_closed_success}</dd>
           </div>
           <div>
-            <dt className="text-xs text-ink-muted">Montant collecté</dt>
+            <dt className="text-xs text-ink-muted">{t("stats.totalCollected")}</dt>
             <dd className="font-heading text-xl font-bold text-ink">{formatFcfa(resume.total_collected)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-ink-muted">Financeurs distincts</dt>
+            <dt className="text-xs text-ink-muted">{t("stats.distinctContributors")}</dt>
             <dd className="font-heading text-xl font-bold text-ink">{resume.distinct_contributors}</dd>
           </div>
         </dl>

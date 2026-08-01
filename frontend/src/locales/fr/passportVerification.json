@@ -1,0 +1,19 @@
+{
+  "notFound": {
+    "title": "Document introuvable",
+    "unknown": "Cet identifiant de vérification ne correspond à aucun Passeport Financier Jappandale.",
+    "generic": "Impossible de vérifier ce document pour le moment.",
+    "backHome": "Retour à l'accueil"
+  },
+  "authentic": {
+    "title": "Document authentique",
+    "text": "Ce Passeport Financier a été émis par Jappandale le {{date}}."
+  },
+  "score": "Score Jappandale® : {{score}} / 100",
+  "stats": {
+    "campaignsTotal": "Campagnes créées",
+    "campaignsSuccess": "Clôturées avec succès",
+    "totalCollected": "Montant collecté",
+    "distinctContributors": "Financeurs distincts"
+  }
+}

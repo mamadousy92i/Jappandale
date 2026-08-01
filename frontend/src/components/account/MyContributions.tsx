@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { ArrowUpRight, HandCoins } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
 import type { Contribution, ContributionStatus, Dispute, DisputeReason } from "@/lib/types"
 
-const statusLabels: Record<ContributionStatus, string> = {
-  INITIEE: "En attente",
-  CONFIRMEE: "Confirmée",
-  ECHOUEE: "Échouée",
-  REMBOURSEE: "Remboursée",
-}
-
-const disputeReasonLabels: Record<DisputeReason, string> = {
-  PROJET_NON_CONFORME: "Projet non conforme / fonds mal utilisés",
-  PORTEUR_INJOIGNABLE: "Porteur injoignable",
-  ERREUR_CONTRIBUTION: "Contribution non voulue / erreur",
-  AUTRE: "Autre motif",
-}
+const disputeReasonKeys: DisputeReason[] = [
+  "PROJET_NON_CONFORME",
+  "PORTEUR_INJOIGNABLE",
+  "ERREUR_CONTRIBUTION",
+  "AUTRE",
+]
 
 function DisputeForm({
   onSubmit,
@@ -28,6 +22,7 @@ function DisputeForm({
   onSubmit: (reason: DisputeReason, details: string) => Promise<void>
   onCancel: () => void
 }) {
+  const { t } = useTranslation("account")
   const [reason, setReason] = useState<DisputeReason>("AUTRE")
   const [details, setDetails] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -35,7 +30,7 @@ function DisputeForm({
 
   const submit = async () => {
     if (!details.trim()) {
-      setError("Décrivez le problème rencontré.")
+      setError(t("myContributions.disputeForm.missingDetails"))
       return
     }
     setSubmitting(true)
@@ -43,7 +38,7 @@ function DisputeForm({
     try {
       await onSubmit(reason, details)
     } catch {
-      setError("Impossible d’ouvrir ce litige. Réessayez.")
+      setError(t("myContributions.disputeForm.submitError"))
       setSubmitting(false)
     }
   }
@@ -52,32 +47,32 @@ function DisputeForm({
     <div className="mt-3 space-y-2 rounded-xl border border-red-200 bg-red-50 p-3">
       {error && <p className="text-xs text-red-700">{error}</p>}
       <select
-        aria-label="Motif du litige"
+        aria-label={t("myContributions.disputeForm.reasonLabel")}
         value={reason}
         onChange={(event) => setReason(event.target.value as DisputeReason)}
         className="w-full rounded-lg border border-black/10 bg-white px-2 py-1.5 text-xs text-ink"
       >
-        {Object.entries(disputeReasonLabels).map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
+        {disputeReasonKeys.map((key) => (
+          <option key={key} value={key}>
+            {t(`myContributions.disputeForm.reasons.${key}`)}
           </option>
         ))}
       </select>
       <textarea
-        aria-label="Détails du litige"
+        aria-label={t("myContributions.disputeForm.detailsLabel")}
         value={details}
         onChange={(event) => setDetails(event.target.value)}
         rows={2}
         maxLength={1500}
-        placeholder="Décrivez le problème rencontré…"
+        placeholder={t("myContributions.disputeForm.detailsPlaceholder")}
         className="w-full resize-y rounded-lg border border-black/10 bg-white px-2 py-1.5 text-xs text-ink"
       />
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel} disabled={submitting} className="h-8 rounded-full px-3 text-xs">
-          Annuler
+          {t("myContributions.disputeForm.cancel")}
         </Button>
         <Button type="button" disabled={submitting} onClick={() => void submit()} className="h-8 rounded-full bg-red-600 px-3 text-xs text-white hover:bg-red-700">
-          Ouvrir le litige
+          {t("myContributions.disputeForm.submit")}
         </Button>
       </div>
     </div>
@@ -85,12 +80,20 @@ function DisputeForm({
 }
 
 export function MyContributions() {
+  const { t } = useTranslation("account")
   const { authFetch } = useAuth()
   const [items, setItems] = useState<Contribution[]>([])
   const [disputes, setDisputes] = useState<Dispute[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [openingId, setOpeningId] = useState<string | null>(null)
+
+  const statusLabels: Record<ContributionStatus, string> = {
+    INITIEE: t("myContributions.status.INITIEE"),
+    CONFIRMEE: t("myContributions.status.CONFIRMEE"),
+    ECHOUEE: t("myContributions.status.ECHOUEE"),
+    REMBOURSEE: t("myContributions.status.REMBOURSEE"),
+  }
 
   useEffect(() => {
     Promise.all([
@@ -123,16 +126,16 @@ export function MyContributions() {
 
   return (
     <section className="rounded-[20px] border border-black/5 bg-surface p-8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.08)] sm:p-10">
-      <h2 className="font-heading text-xl font-bold text-ink">Mes contributions</h2>
-      <p className="mt-1 text-sm text-ink-muted">Historique de vos contributions réalisées sur Jappandale.</p>
+      <h2 className="font-heading text-xl font-bold text-ink">{t("myContributions.title")}</h2>
+      <p className="mt-1 text-sm text-ink-muted">{t("myContributions.subtitle")}</p>
       {loading ? (
         <div className="mt-6 h-24 animate-pulse rounded-2xl bg-black/[0.05]" />
       ) : error ? (
-        <p className="mt-6 text-sm text-red-600">Impossible de charger vos contributions.</p>
+        <p className="mt-6 text-sm text-red-600">{t("myContributions.loadError")}</p>
       ) : items.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-black/10 bg-surface-alt p-8 text-center">
           <HandCoins className="mx-auto size-6 text-gold-dark" />
-          <p className="mt-3 text-sm text-ink-secondary">Vous n’avez pas encore contribué à une campagne.</p>
+          <p className="mt-3 text-sm text-ink-secondary">{t("myContributions.empty")}</p>
         </div>
       ) : (
         <ul className="mt-6 divide-y divide-black/5">
@@ -145,13 +148,17 @@ export function MyContributions() {
                     <Link className="font-semibold text-ink hover:text-gold-dark" to={`/campagnes/${item.campaign.slug}`}>
                       {item.campaign.title} <ArrowUpRight className="inline size-3.5" />
                     </Link>
-                    <p className="mt-1 text-xs text-ink-muted">{item.anonymous ? "Contribution anonyme" : "Nom visible"} · {statusLabels[item.status]}</p>
+                    <p className="mt-1 text-xs text-ink-muted">
+                      {item.anonymous ? t("myContributions.anonymous") : t("myContributions.nameVisible")} · {statusLabels[item.status]}
+                    </p>
                   </div>
                   <span className="font-heading font-bold text-ink">{formatFcfa(item.amount)}</span>
                 </div>
                 {item.status === "CONFIRMEE" && (
                   active ? (
-                    <p className="text-xs font-semibold text-ink-secondary">Litige : {active.status_display}</p>
+                    <p className="text-xs font-semibold text-ink-secondary">
+                      {t("myContributions.disputeStatusPrefix", { status: active.status_display })}
+                    </p>
                   ) : openingId === item.public_reference ? (
                     <DisputeForm
                       onSubmit={(reason, details) => openDispute(item.public_reference, reason, details)}
@@ -163,7 +170,7 @@ export function MyContributions() {
                       onClick={() => setOpeningId(item.public_reference)}
                       className="w-fit text-xs font-semibold text-red-700 hover:underline"
                     >
-                      Ouvrir un litige
+                      {t("myContributions.openDispute")}
                     </button>
                   )
                 )}
