@@ -198,6 +198,12 @@ class LogoutView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        raw_refresh = request.COOKIES.get(settings.AUTH_COOKIE_REFRESH_NAME)
+        if raw_refresh:
+            try:
+                RefreshToken(raw_refresh).blacklist()
+            except TokenError:
+                pass
         response = Response(status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie(
             settings.AUTH_COOKIE_ACCESS_NAME,

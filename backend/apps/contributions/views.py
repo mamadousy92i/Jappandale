@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -55,6 +56,15 @@ class ConfirmContributionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, reference):
+        # SimulatedPaymentProvider laisse l'appelant déclarer lui-même le résultat du
+        # paiement (outcome). Tant qu'un vrai prestataire (Wave, Orange Money…) n'est
+        # pas branché, ce comportement doit rester strictement limité au développement
+        # local : en production, cet endpoint créditerait une campagne sans paiement réel.
+        if not settings.SIMULATED_PAYMENTS_ENABLED:
+            return Response(
+                {"detail": "La confirmation de paiement n'est pas disponible : aucun prestataire de paiement réel n'est configuré."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         serializer = PaymentConfirmationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:

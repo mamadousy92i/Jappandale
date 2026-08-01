@@ -844,12 +844,10 @@ class UserManagementView(APIView):
                 {"account_status": ["Vous ne pouvez pas suspendre ou rejeter votre propre compte."]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if user == request.user and serializer.validated_data.get("role") not in (
-            None,
-            User.Role.ADMIN,
-        ):
+        new_role = serializer.validated_data.get("role")
+        if user == request.user and new_role is not None and new_role != user.role:
             return Response(
-                {"role": ["Vous ne pouvez pas retirer vos propres droits administrateur."]},
+                {"role": ["Vous ne pouvez pas modifier votre propre rôle."]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

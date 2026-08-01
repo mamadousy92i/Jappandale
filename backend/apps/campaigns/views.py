@@ -41,8 +41,18 @@ class CampaignViewSet(viewsets.ModelViewSet):
         base = Campaign.objects.select_related("owner")
         if self.action == "mine":
             return base.filter(owner=self.request.user)
-        if self.action == "retrieve":
+        if self.action in (
+            "retrieve",
+            "submit",
+            "add_update",
+            "create_reward",
+            "reward_detail",
+            "report",
+        ):
             # Campagnes publiques, plus celles du porteur connecté (pour édition).
+            # Les actions ci-dessus vérifient ensuite la propriété/le statut elles-mêmes,
+            # mais ce filtre évite qu'un slug de campagne non publique (brouillon,
+            # rejetée, suspendue…) d'un tiers ne serve d'oracle d'existence.
             visible = Q(status__in=PUBLIC_STATUSES)
             if self.request.user.is_authenticated:
                 visible |= Q(owner=self.request.user)

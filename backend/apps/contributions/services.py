@@ -49,6 +49,9 @@ def process_simulated_payment(*, contribution, outcome):
     if locked.status != Contribution.Status.INITIEE:
         return locked
 
+    if campaign.status != Campaign.Status.PUBLIEE or campaign.deadline < timezone.now().date():
+        outcome = SimulatedPaymentProvider.FAILURE
+
     reward = None
     if locked.reward_id:
         reward = Reward.objects.select_for_update().get(pk=locked.reward_id)

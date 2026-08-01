@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     # Tierces
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "drf_spectacular",
     # Apps Jappandale
@@ -173,6 +174,12 @@ FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173")
 # Authentifie les appels service-à-service (hors JWT utilisateur). Vide par
 # défaut : l'endpoint interne refuse alors toute requête (fail closed).
 INTERNAL_API_KEY = env("INTERNAL_API_KEY", default="")
+
+# Le module de paiement n'est pas encore relié à un prestataire réel (Wave, Orange
+# Money…) : la confirmation d'une contribution est aujourd'hui déclarée par l'appelant
+# lui-même (voir apps/contributions/providers.SimulatedPaymentProvider). Ce comportement
+# ne doit jamais être actif en production tant qu'un vrai prestataire n'est pas branché.
+SIMULATED_PAYMENTS_ENABLED = env.bool("SIMULATED_PAYMENTS_ENABLED", default=DEBUG)
 PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT", default=3600)
 
 LOGGING = {
