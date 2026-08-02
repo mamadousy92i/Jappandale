@@ -57,5 +57,9 @@ Après validation du certificat et du proxy :
 ## Point de sécurité restant
 
 Les jetons JWT sont conservés dans des cookies `HttpOnly` et les opérations du
-navigateur sont protégées par CSRF. Avant une exposition publique importante,
-ajouter une politique CSP stricte et faire réaliser un test d’intrusion ciblé.
+navigateur sont protégées par CSRF. Un audit de sécurité et test d’intrusion
+ciblé a été réalisé le 1er août 2026 (voir `docs/PROGRESSION_PROJET.md`, §5
+bis) : les failles critiques trouvées ont été corrigées et re-vérifiées.
+Avant une exposition publique importante, ajouter en plus une politique CSP
+stricte et prévoir un nouveau passage une fois le paiement réel branché
+(webhooks du prestataire).

@@ -1,16 +1,18 @@
 # Jappandale — État d’avancement du projet
 
-**Dernière mise à jour :** 22 juillet 2026  
-**Périmètre :** MVP web, hors déploiement et hors branchement d’un prestataire de paiement réel  
+**Dernière mise à jour :** 1er août 2026  
+**Périmètre :** MVP web, hors branchement d’un prestataire de paiement réel  
 **Référence fonctionnelle :** `Jappandale_Cahier_des_Charges.docx` et conception MVP du 20 juillet 2026
 
 ## 1. Résumé exécutif
 
-Le MVP Jappandale est fonctionnel sur l’ensemble de son parcours principal : création de compte, vérification de l’adresse e-mail, profil et avatar, dépôt et revue KYC, création et modération des campagnes, contribution, notifications et pilotage depuis un tableau de bord administrateur adapté à un utilisateur non technique.
+Le MVP Jappandale est fonctionnel sur l’ensemble de son parcours principal : création de compte, vérification de l’adresse e-mail, profil et avatar, dépôt et revue KYC, création et modération des campagnes, contribution, notifications et pilotage depuis un tableau de bord administrateur adapté à un utilisateur non technique. L’interface publique et le parcours compte sont désormais disponibles en français et en wolof.
 
 Le site dispose maintenant d’une identité visuelle cohérente, d’un parcours responsive, d’une page À propos, d’une présentation illustrée du fonctionnement, de pages légales et de confiance, ainsi que des principaux états vides, chargements et messages d’erreur attendus sur un produit professionnel.
 
-Le principal bloc fonctionnel restant avant une mise en production réelle est l’intégration du paiement. **PayDunya est l’option recommandée**, car il permet de centraliser plusieurs moyens de paiement derrière une seule intégration. Tant que le client ne fournit pas un compte marchand validé et les accès API, la plateforme ne peut pas encaisser de fonds réels.
+Un audit de sécurité et test d’intrusion a été réalisé le 1er août 2026 (voir §5 bis) : deux failles critiques ont été trouvées, exploitées en conditions réelles pour preuve, puis corrigées et re-vérifiées. La préparation du déploiement (Docker Compose, HTTPS automatique, guide pas à pas) est terminée et testée en local (voir §5 ter) ; il ne reste que l’achat du VPS et le pointage du nom de domaine pour déployer réellement.
+
+Le principal bloc fonctionnel restant avant une mise en production réelle est l’intégration du paiement. **PayDunya est l’option recommandée**, car il permet de centraliser plusieurs moyens de paiement derrière une seule intégration. Tant que le client ne fournit pas un compte marchand validé et les accès API, la plateforme ne peut pas encaisser de fonds réels — un garde-fou (`SIMULATED_PAYMENTS_ENABLED=False`) empêche désormais explicitement que le simulateur de paiement de développement tourne en production.
 
 ## 2. Fonctionnalités terminées
 
@@ -123,9 +125,12 @@ Le prestataire actuellement présent dans le code sert uniquement au développem
 | Notifications e-mail | Terminé | SMTP configurable et templates de marque |
 | Sécurité de base du MVP | Terminé | Cookies HttpOnly, CSRF, MFA admin, throttling, audits |
 | Paiement Wave/Orange Money/carte | Bloqué par accès externe | À fournir via PayDunya ou contrats directs opérateurs |
-| Déploiement et exploitation | Hors lot actuel | Volontairement reporté |
+| Audit de sécurité / test d’intrusion | Terminé | 2 failles critiques trouvées, exploitées et corrigées ; voir §5 bis |
+| Déploiement et exploitation | Préparé, non exécuté | Configuration Docker + guide prêts ; VPS et domaine à acheter, voir §5 ter |
 
-Les fonctions Score Jappandale®, Passeport Financier®, Guichet Unique du Financement, wallet/séquestre, messagerie interne, application mobile, notifications SMS/push, KYC biométrique et contenus wolof restent dans la phase 2, conformément au périmètre retenu.
+Les fonctions Score Jappandale®, Passeport Financier®, Guichet Unique du Financement, wallet/séquestre, messagerie interne, application mobile, notifications SMS/push et KYC biométrique restent dans la phase 2, conformément au périmètre retenu.
+
+Le contenu wolof a en revanche été ajouté par anticipation sur les pages fonctionnelles principales (accueil, campagnes, compte, contributions, litiges, vérification du passeport) ; seules les pages légales restent en français uniquement, une traduction contractuelle demandant une relecture juridique professionnelle plutôt qu’une traduction automatisée.
 
 ## 4. Paiement — éléments à obtenir du client
 
@@ -145,9 +150,9 @@ Les clés devront être transmises par un canal sécurisé et placées uniquemen
 
 Si PayDunya n’est pas retenu, il faudra obtenir séparément auprès de Wave et d’Orange Money un contrat marchand, les identifiants API de test et de production, la documentation d’intégration, les paramètres de webhook, les règles de reversement et les coordonnées d’un support technique.
 
-## 5. Validations techniques au 22 juillet 2026
+## 5. Validations techniques au 1er août 2026
 
-- backend : **75 tests réussis** ;
+- backend : **228 tests réussis** (pytest) ;
 - Django : `manage.py check` sans erreur ;
 - migrations : aucune migration manquante ;
 - frontend : **6 tests réussis** avec Vitest et Testing Library ;
@@ -156,6 +161,29 @@ Si PayDunya n’est pas retenu, il faudra obtenir séparément auprès de Wave e
 - vérification Git des espaces et conflits de patch : réussie.
 
 Les tests frontend ajoutés couvrent le client API avec cookies/CSRF, le cycle de session, la confirmation MFA administrateur et l’affichage essentiel des cartes de campagne.
+
+## 5 bis. Audit de sécurité et test d’intrusion — 1er août 2026
+
+Revue de code complète (authentification/back-office, paiements/KYC, campagnes/social, frontend) suivie d’une vérification par exploitation réelle sur environnement local pour chaque piste sérieuse, avant correction.
+
+**Failles critiques trouvées, exploitées puis corrigées :**
+
+- confirmation de paiement falsifiable côté client (aucun prestataire réel branché) — désormais bloquée hors développement via `SIMULATED_PAYMENTS_ENABLED` ;
+- auto-promotion administrateur possible pour tout compte marqué `is_staff` sans le rôle métier `ADMIN` — l’accès au back-office ne dépend plus que du rôle métier, et un compte ne peut plus modifier son propre rôle.
+
+**Corrigés également :** déconnexion qui ne révoquait pas le jeton de session côté serveur (liste de révocation activée) ; une campagne non publiée pouvait être « signalée » par devinette de son adresse (fuite d’existence, impact mineur).
+
+**Zones vérifiées sans faille exploitable trouvée :** messagerie, litiges, notifications, guichet unique, upload et accès aux pièces KYC, passeport financier, API interne du score, frontend (aucun usage dangereux de `dangerouslySetInnerHTML` ou de rendu HTML non échappé en dehors d’une faille XSS trouvée et corrigée séparément dans les boîtes de confirmation SweetAlert2 du back-office).
+
+**Reste ouvert, hors périmètre d’un correctif de code :** l’intégration d’un vrai prestataire de paiement (voir §4) est la condition pour réactiver la confirmation de paiement en production.
+
+## 5 ter. Préparation du déploiement — 1er août 2026
+
+Configuration Docker Compose complète (backend Django/gunicorn, PostgreSQL, tâche planifiée de clôture des campagnes, frontend + HTTPS automatique via Caddy), testée de bout en bout en local : build des images, démarrage, migrations automatiques, fichiers statiques, HTTPS local, et vérification que les documents KYC ne sont jamais exposés en accès direct par le serveur web.
+
+Guide de déploiement pas à pas pour un VPS dans `docs/deploiement-vps.md`, modèle de configuration production dans `.env.production.example`.
+
+**Reste à faire :** acheter le VPS, pointer un nom de domaine réel, et vérifier l’obtention du certificat HTTPS Let’s Encrypt (seule étape qui ne peut pas être testée sans serveur réel).
 
 ## 6. Suite recommandée
 
@@ -175,17 +203,16 @@ Les tests frontend ajoutés couvrent le client API avec cookies/CSRF, le cycle d
 - remplacer les mentions légales provisoires par les informations officielles ;
 - valider la politique de confidentialité, les conditions d’utilisation et la gestion des remboursements avec un conseil juridique compétent.
 
-### Priorité 3 — Préparation à la mise en ligne
+### Priorité 3 — Mise en ligne effective
 
-- créer un environnement de staging proche de la production ;
-- utiliser PostgreSQL et un stockage média sauvegardé ;
+- acheter le VPS et pointer le nom de domaine (voir `docs/deploiement-vps.md`) ;
+- exécuter le déploiement et vérifier l’obtention du certificat HTTPS réel ;
+- configurer les sauvegardes automatiques (base de données et fichiers médias) hors du serveur lui-même ;
 - ajouter une politique CSP stricte ;
-- exécuter `manage.py check --deploy` avec les paramètres HTTPS réels ;
-- configurer sauvegardes, restauration, supervision, journaux et alertes ;
-- réaliser un test d’intrusion ciblé, particulièrement sur l’authentification, le KYC, l’administration et les webhooks de paiement ;
+- mettre en place la supervision (disponibilité, journaux, alertes) — non couverte par la préparation actuelle ;
 - effectuer les tests responsive et multi-navigateurs sur appareils réels.
 
-Le déploiement ne doit commencer qu’après la recette PayDunya et la validation des informations légales.
+Le test d’intrusion ciblé (authentification, KYC, administration) a été réalisé le 1er août 2026 (§5 bis) ; un nouveau passage sera nécessaire une fois les webhooks de paiement réel branchés. Le déploiement ne doit s’ouvrir au public qu’après la recette PayDunya et la validation des informations légales.
 
 ## 7. Décisions actées
 
@@ -194,8 +221,9 @@ Le déploiement ne doit commencer qu’après la recette PayDunya et la validati
 - Wave et Orange Money directs restent une alternative si le client obtient leurs accès ;
 - le client utilise le tableau de bord web, pas Django Admin ;
 - aucun wording public ne présente le produit comme une démonstration ;
-- le déploiement est volontairement exclu de la phase de travail actuelle ;
-- les accès, mots de passe SMTP et clés de paiement ne doivent jamais être versionnés.
+- la préparation du déploiement (Docker, guide VPS) est terminée ; le déploiement effectif attend l’achat du serveur et du domaine ;
+- les accès, mots de passe SMTP et clés de paiement ne doivent jamais être versionnés ;
+- le simulateur de paiement de développement ne doit jamais tourner en production (`SIMULATED_PAYMENTS_ENABLED=False`).
 
 ## 8. Documents de référence
 
@@ -203,4 +231,6 @@ Le déploiement ne doit commencer qu’après la recette PayDunya et la validati
 - `charte-graphique.md` : identité visuelle ;
 - `docs/superpowers/specs/2026-07-20-jappandale-mvp-design.md` : conception du MVP ;
 - `docs/staging-readiness.md` : prérequis avant mise en ligne ;
+- `docs/deploiement-vps.md` : guide pas à pas du déploiement sur VPS (Docker) ;
+- `.env.production.example` : modèle de configuration production ;
 - `README.md` : commandes de lancement local.

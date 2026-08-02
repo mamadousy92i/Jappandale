@@ -60,11 +60,27 @@ cd backend
 python manage.py cloturer_campagnes
 ```
 
-Exemple d'entrée crontab (une fois par jour à 2h du matin) :
+En déploiement Docker (voir ci-dessous), cette tâche tourne déjà
+automatiquement une fois par jour dans le service `cron` — rien à configurer
+manuellement. Exemple d'entrée crontab pour un déploiement hors Docker (une
+fois par jour à 2h du matin) :
 
 ```cron
 0 2 * * * cd /chemin/vers/backend && /chemin/vers/.venv/bin/python manage.py cloturer_campagnes >> /var/log/jappandale/cloture_campagnes.log 2>&1
 ```
+
+## Déploiement
+
+La plateforme se déploie via Docker Compose (backend, PostgreSQL, tâche
+planifiée, frontend + HTTPS automatique) :
+
+```bash
+cp .env.production.example .env   # puis renseigner les valeurs réelles
+docker compose up -d --build
+```
+
+Guide complet, pas à pas, pour un VPS : `docs/deploiement-vps.md`.
+Checklist de bascule HTTPS/cookies stricts avant ouverture : `docs/staging-readiness.md`.
 
 ## Documentation
 
