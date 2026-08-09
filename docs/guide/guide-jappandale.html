@@ -1,0 +1,1514 @@
+<title>Jappandale — Guide complet de la plateforme</title>
+<style>
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16140e;
+      --surface: #1d1b15;
+      --surface-alt: #26231a;
+      --ink: #f2efe4;
+      --ink-secondary: #c9c3b0;
+      --ink-muted: #948d78;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      --gold: #f0b912;
+      --gold-ink: #16140e;
+      --ok-bg: rgba(52, 211, 153, 0.16);
+      --ok-fg: #4ee0ab;
+      --pending-bg: rgba(240, 185, 18, 0.16);
+      --pending-fg: #f0b912;
+      --bad-bg: rgba(248, 113, 113, 0.16);
+      --bad-fg: #fb9c9c;
+      --info-bg: rgba(125, 179, 235, 0.16);
+      --info-fg: #9dc4ef;
+      --neutral-bg: rgba(255, 255, 255, 0.08);
+      --neutral-fg: #c9c3b0;
+    }
+  }
+
+  :root {
+    --bg: #faf9f4;
+    --surface: #ffffff;
+    --surface-alt: #f3f0e6;
+    --ink: #1a1812;
+    --ink-secondary: #55503f;
+    --ink-muted: #8c8570;
+    --border: rgba(26, 24, 18, 0.1);
+    --border-strong: rgba(26, 24, 18, 0.16);
+    --gold: #c99a00;
+    --gold-ink: #241c00;
+    --ok-bg: #e3f6ee;
+    --ok-fg: #067a55;
+    --pending-bg: #fbf0d9;
+    --pending-fg: #8a5a00;
+    --bad-bg: #fceaea;
+    --bad-fg: #a4242a;
+    --info-bg: #e9f1fb;
+    --info-fg: #2a5d99;
+    --neutral-bg: rgba(26, 24, 18, 0.06);
+    --neutral-fg: #55503f;
+
+    --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    color-scheme: light dark;
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #16140e;
+    --surface: #1d1b15;
+    --surface-alt: #26231a;
+    --ink: #f2efe4;
+    --ink-secondary: #c9c3b0;
+    --ink-muted: #948d78;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --gold: #f0b912;
+    --gold-ink: #16140e;
+    --ok-bg: rgba(52, 211, 153, 0.16);
+    --ok-fg: #4ee0ab;
+    --pending-bg: rgba(240, 185, 18, 0.16);
+    --pending-fg: #f0b912;
+    --bad-bg: rgba(248, 113, 113, 0.16);
+    --bad-fg: #fb9c9c;
+    --info-bg: rgba(125, 179, 235, 0.16);
+    --info-fg: #9dc4ef;
+    --neutral-bg: rgba(255, 255, 255, 0.08);
+    --neutral-fg: #c9c3b0;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #faf9f4;
+    --surface: #ffffff;
+    --surface-alt: #f3f0e6;
+    --ink: #1a1812;
+    --ink-secondary: #55503f;
+    --ink-muted: #8c8570;
+    --border: rgba(26, 24, 18, 0.1);
+    --border-strong: rgba(26, 24, 18, 0.16);
+    --gold: #c99a00;
+    --gold-ink: #241c00;
+    --ok-bg: #e3f6ee;
+    --ok-fg: #067a55;
+    --pending-bg: #fbf0d9;
+    --pending-fg: #8a5a00;
+    --bad-bg: #fceaea;
+    --bad-fg: #a4242a;
+    --info-bg: #e9f1fb;
+    --info-fg: #2a5d99;
+    --neutral-bg: rgba(26, 24, 18, 0.06);
+    --neutral-fg: #55503f;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--gold-fg, var(--gold)); }
+  a { color: color-mix(in srgb, var(--gold) 80%, var(--ink) 20%); }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--surface);
+    color: var(--ink);
+    padding: 0.75rem 1rem;
+    z-index: 100;
+  }
+  .skip-link:focus { left: 1rem; top: 1rem; }
+
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 3.5rem;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    border-bottom: 1px solid var(--border);
+    padding: 3rem 0 2.25rem;
+  }
+  .masthead-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 1.5rem;
+    height: 1px;
+    background: var(--gold);
+  }
+  h1.title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.1rem, 4.2vw, 3rem);
+    line-height: 1.08;
+    margin: 0.75rem 0 0.9rem;
+    text-wrap: balance;
+    max-width: 22ch;
+  }
+  .lede {
+    font-size: 1.08rem;
+    color: var(--ink-secondary);
+    max-width: 58ch;
+    margin: 0 0 1.5rem;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+  }
+  .meta-row strong { color: var(--ink-secondary); font-weight: 600; }
+
+  /* ---------- Layout body ---------- */
+  main { padding: 2.75rem 0 6rem; min-width: 0; }
+
+  /* ---------- Sidebar / TOC ---------- */
+  aside.toc {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+    padding-top: 2.75rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+  }
+  .toc-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: 0 0 0.9rem;
+  }
+  .toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--border);
+  }
+  .toc li { margin: 0; }
+  .toc a {
+    display: block;
+    padding: 0.4rem 0 0.4rem 0.9rem;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    font-size: 0.86rem;
+    color: var(--ink-secondary);
+    text-decoration: none;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .toc a:hover { color: var(--ink); border-left-color: var(--border-strong); }
+  .toc .num {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-muted);
+    margin-right: 0.5rem;
+  }
+
+  .toc-mobile { display: none; }
+
+  /* ---------- Sections ---------- */
+  section.module {
+    padding-top: 3.25rem;
+    margin-top: 3.25rem;
+    border-top: 1px solid var(--border);
+    scroll-margin-top: 1.5rem;
+  }
+  section.module:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .module-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.85rem;
+    margin-bottom: 1.1rem;
+  }
+  .module-num {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  h2.module-title {
+    font-family: var(--font-display);
+    font-size: 1.62rem;
+    font-weight: 700;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .module-standfirst {
+    font-size: 1.02rem;
+    color: var(--ink-secondary);
+    max-width: 62ch;
+    margin: 0 0 1.4rem;
+  }
+
+  .prose { max-width: 66ch; }
+  .prose p { margin: 0 0 1rem; }
+  .prose ul, .prose ol { margin: 0 0 1rem; padding-left: 1.3rem; }
+  .prose li { margin-bottom: 0.4rem; }
+  .prose h3 {
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    margin: 1.75rem 0 0.6rem;
+  }
+  .prose strong { color: var(--ink); }
+
+  /* ---------- Callouts ---------- */
+  .callout {
+    border: 1px solid var(--border-strong);
+    background: var(--surface-alt);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    margin: 1.25rem 0;
+    max-width: 62ch;
+    font-size: 0.94rem;
+  }
+  .callout-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.35rem;
+  }
+  .callout code, .prose code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.05em 0.35em;
+  }
+
+  /* ---------- Role / definition cards ---------- */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 2rem;
+    max-width: 780px;
+  }
+  .role-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+  }
+  .role-card h4 {
+    margin: 0 0 0.4rem;
+    font-size: 1rem;
+    font-family: var(--font-display);
+  }
+  .role-card p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ink-secondary);
+  }
+
+  /* ---------- Status tables ---------- */
+  .status-table {
+    max-width: 780px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.25rem 0 2rem;
+    background: var(--surface);
+  }
+  .status-row {
+    display: grid;
+    grid-template-columns: 172px minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0.85rem 1.1rem;
+    align-items: baseline;
+  }
+  .status-row + .status-row { border-top: 1px solid var(--border); }
+  .status-row p { margin: 0; font-size: 0.89rem; color: var(--ink-secondary); }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.22rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    white-space: nowrap;
+    width: fit-content;
+  }
+  .pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .pill--ok { background: var(--ok-bg); color: var(--ok-fg); }
+  .pill--pending { background: var(--pending-bg); color: var(--pending-fg); }
+  .pill--bad { background: var(--bad-bg); color: var(--bad-fg); }
+  .pill--info { background: var(--info-bg); color: var(--info-fg); }
+  .pill--neutral { background: var(--neutral-bg); color: var(--neutral-fg); }
+
+  /* ---------- Flow steps (campaign lifecycle) ---------- */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 1.4rem 0 1.75rem;
+    max-width: 780px;
+  }
+  .flow-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink-secondary);
+    background: var(--surface);
+  }
+  .flow-arrow { color: var(--ink-muted); font-size: 0.9rem; }
+  .flow-branch {
+    width: 100%;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    padding-left: 0.2rem;
+    margin-top: -0.15rem;
+  }
+
+  /* ---------- Score breakdown ---------- */
+  .score-list {
+    max-width: 620px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 1.25rem 0 1.75rem;
+    background: var(--surface);
+  }
+  .score-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1.1rem;
+    font-size: 0.9rem;
+  }
+  .score-item + .score-item { border-top: 1px solid var(--border); }
+  .score-item .amt {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .amt.plus { color: var(--ok-fg); }
+  .amt.minus { color: var(--bad-fg); }
+  .amt.base { color: var(--ink-muted); }
+
+  /* ---------- Footer ---------- */
+  footer.colophon {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 0 4rem;
+    color: var(--ink-muted);
+    font-size: 0.85rem;
+  }
+  footer.colophon .shell { display: block; }
+  footer.colophon p { max-width: 62ch; margin: 0 0 0.5rem; }
+
+  ::selection { background: var(--gold); color: var(--gold-ink); }
+
+  @media (max-width: 880px) {
+    .shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    aside.toc { display: none; }
+    .toc-mobile {
+      display: block;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.7rem 0;
+      margin: 0 -1.5rem 2rem;
+    }
+    .toc-mobile-scroll {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0 1.5rem;
+    }
+    .toc-mobile a {
+      flex: 0 0 auto;
+      font-size: 0.78rem;
+      color: var(--ink-secondary);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .status-row { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+
+<a href="#main" class="skip-link">Aller au contenu</a>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <span class="eyebrow">Documentation Jappandale</span>
+    <h1 class="title">Comment fonctionne la plateforme, module par module</h1>
+    <p class="lede">
+      Ce guide explique, sans jargon technique, ce que fait chaque partie de Jappandale, qui peut faire quoi,
+      et — pour chaque processus — tous les états possibles (statuts) qu'une campagne, un compte, une
+      contribution ou un dossier peut prendre.
+    </p>
+    <div class="meta-row">
+      <span><strong>17</strong> modules couverts</span>
+      <span><strong>3</strong> types de comptes</span>
+      <span><strong>Public</strong> visé : équipe YAMB, sans prérequis technique</span>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="toc" aria-label="Sommaire">
+    <p class="toc-label">Sommaire</p>
+    <ol>
+      <li><a href="#demo"><span class="num">★</span>Tester la démo en ligne</a></li>
+      <li><a href="#comptes"><span class="num">01</span>Comptes et rôles</a></li>
+      <li><a href="#inscription"><span class="num">02</span>Inscription et connexion</a></li>
+      <li><a href="#kyc"><span class="num">03</span>Vérification d'identité</a></li>
+      <li><a href="#score"><span class="num">04</span>Score Jappandale®</a></li>
+      <li><a href="#passeport"><span class="num">05</span>Passeport Financier</a></li>
+      <li><a href="#campagnes"><span class="num">06</span>Les campagnes</a></li>
+      <li><a href="#contributions"><span class="num">07</span>Contribuer</a></li>
+      <li><a href="#guichet"><span class="num">08</span>Guichet Unique</a></li>
+      <li><a href="#messagerie"><span class="num">09</span>Messagerie</a></li>
+      <li><a href="#notifications"><span class="num">10</span>Notifications</a></li>
+      <li><a href="#litiges"><span class="num">11</span>Litiges</a></li>
+      <li><a href="#backoffice"><span class="num">12</span>Back-office admin</a></li>
+      <li><a href="#langue"><span class="num">13</span>Langue : français et wolof</a></li>
+      <li><a href="#securite"><span class="num">14</span>Sécurité</a></li>
+      <li><a href="#audit"><span class="num">15</span>Audit de sécurité</a></li>
+      <li><a href="#deploiement"><span class="num">16</span>Déploiement</a></li>
+      <li><a href="#roadmap"><span class="num">17</span>Ce qui reste à faire</a></li>
+    </ol>
+  </aside>
+
+  <main id="main">
+    <nav class="toc-mobile" aria-label="Sommaire">
+      <div class="toc-mobile-scroll">
+        <a href="#demo">Démo</a>
+        <a href="#comptes">Comptes</a>
+        <a href="#inscription">Inscription</a>
+        <a href="#kyc">Identité</a>
+        <a href="#score">Score</a>
+        <a href="#passeport">Passeport</a>
+        <a href="#campagnes">Campagnes</a>
+        <a href="#contributions">Contribuer</a>
+        <a href="#guichet">Guichet Unique</a>
+        <a href="#messagerie">Messagerie</a>
+        <a href="#notifications">Notifications</a>
+        <a href="#litiges">Litiges</a>
+        <a href="#backoffice">Back-office</a>
+        <a href="#langue">Langue</a>
+        <a href="#securite">Sécurité</a>
+        <a href="#audit">Audit</a>
+        <a href="#deploiement">Déploiement</a>
+        <a href="#roadmap">Roadmap</a>
+      </div>
+    </nav>
+
+    <!-- DEMO -->
+    <section class="module" id="demo">
+      <div class="module-head">
+        <span class="module-num">★</span>
+        <h2 class="module-title">Tester la démo en ligne</h2>
+      </div>
+      <p class="module-standfirst">
+        Une instance de démonstration est en ligne, avec des données de test. Cette section donne les comptes à
+        utiliser et, pour chacun, le parcours complet à dérouler pour tout vérifier.
+      </p>
+
+      <div class="callout">
+        <span class="callout-label">Adresse de la démo</span>
+        <a href="https://152-228-141-27.sslip.io"><strong>https://152-228-141-27.sslip.io</strong></a><br>
+        Environnement de <strong>test</strong> : les données sont fictives, aucun paiement réel n'a lieu, et le
+        contenu peut être réinitialisé à tout moment. Ne pas y déposer de vraies pièces d'identité.
+      </div>
+
+      <div class="prose">
+        <h3>Comptes de démonstration</h3>
+        <p>Mot de passe identique pour tous : <code>JappandaleDemo2026!</code></p>
+      </div>
+
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--ok">Porteur · KYC validé</span>
+          <p><code>porteur.test@jappandale.sn</code><br>
+            Le compte le plus complet : peut créer et publier des campagnes, voir son Score, son Passeport
+            Financier et le Guichet Unique.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">Porteur · KYC en attente</span>
+          <p><code>cheikh.diop@jappandale.sn</code><br>
+            Sert à tester le blocage tant que l'identité n'est pas validée, et le parcours de validation vu du
+            côté administrateur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--bad">Porteur · KYC rejeté</span>
+          <p><code>ndeye.gueye@jappandale.sn</code><br>
+            Sert à voir comment un refus est présenté à l'utilisateur, avec son motif.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Contributeur · KYC validé</span>
+          <p><code>financeur.test@jappandale.sn</code><br>
+            Peut contribuer, ouvrir un litige, envoyer un message à un porteur et signaler une campagne.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Contributeur · 2<sup>e</sup> compte</span>
+          <p><code>mariama.fall@jappandale.sn</code><br>
+            Utile pour tester à deux en parallèle, ou vérifier ce que voit un autre contributeur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--info">Administrateur</span>
+          <p><code>92mamadousy@gmail.com</code><br>
+            Accès complet au back-office <code>/administration</code>. <strong>Étape supplémentaire :</strong> un
+            code de sécurité à six chiffres est envoyé par e-mail à cette adresse à chaque connexion (voir module
+            02) — il faut donc avoir accès à cette boîte mail pour se connecter.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">Tester à plusieurs</span>
+        Comme le code administrateur arrive sur une seule boîte mail, il est plus pratique que la personne qui
+        détient cette adresse pilote elle-même la partie back-office (parcours n° 3), pendant que le client
+        déroule les parcours n° 1, 2 et 4 de son côté. Les deux se complètent : une campagne soumise par le
+        client apparaît immédiatement dans la file de modération de l'administrateur.
+      </div>
+
+      <div class="prose">
+        <h3>Parcours n° 1 — Contributeur (le plus rapide, ~5 min)</h3>
+        <p>Connexion avec <code>financeur.test@jappandale.sn</code>.</p>
+        <ol>
+          <li>Parcourir les campagnes depuis l'accueil, utiliser la recherche et les filtres par catégorie.</li>
+          <li>Ouvrir une campagne publiée : progression, échéance, informations du porteur, actualités,
+            contributeurs.</li>
+          <li>Cliquer « Contribuer », saisir un montant, choisir ou non l'anonymat, valider le récapitulatif.</li>
+          <li>Retrouver l'opération dans <em>Mon compte → Contributions</em>, avec son statut.</li>
+          <li>Depuis cette même liste, ouvrir un litige sur la contribution (motif + description).</li>
+          <li>Envoyer un message au porteur depuis la page de la campagne.</li>
+          <li>Signaler une campagne (bouton en bas de la page campagne) et vérifier qu'un second signalement est
+            refusé.</li>
+          <li>Basculer l'interface en wolof depuis le menu, puis revenir en français.</li>
+        </ol>
+
+        <h3>Parcours n° 2 — Porteur de projet (~10 min)</h3>
+        <p>Connexion avec <code>porteur.test@jappandale.sn</code>.</p>
+        <ol>
+          <li>Créer une campagne : titre, description, catégorie, type (don libre, don avec contrepartie,
+            investissement), objectif et échéance. Elle démarre en <strong>brouillon</strong>.</li>
+          <li>Si le type choisi est « don avec contrepartie », ajouter deux paliers de récompense, dont un à
+            quantité limitée.</li>
+          <li>Soumettre à validation : le formulaire exige la localisation, les bénéficiaires, l'utilisation des
+            fonds et le calendrier. La campagne passe <strong>en modération</strong> (un administrateur doit
+            ensuite la traiter — parcours n° 3).</li>
+          <li>Consulter <em>Mon compte → Score Jappandale®</em> : détail du calcul, facteur par facteur, et
+            historique.</li>
+          <li>Consulter le <em>Passeport Financier</em>, l'exporter en PDF, puis activer le lien de vérification
+            publique et l'ouvrir dans une fenêtre privée.</li>
+          <li>Ouvrir le <em>Guichet Unique</em> : voir les dispositifs éligibles, et pour les autres, la raison
+            précise du refus. Manifester son intérêt sur un dispositif éligible.</li>
+          <li>Sur une campagne déjà publiée, publier une actualité.</li>
+          <li>Consulter <em>Contributions reçues</em> : montants bruts, commission, net, statut du reversement.</li>
+        </ol>
+        <p>
+          Pour voir l'autre face du KYC, se connecter ensuite avec <code>cheikh.diop@jappandale.sn</code> (en
+          attente) puis <code>ndeye.gueye@jappandale.sn</code> (rejeté, avec son motif affiché).
+        </p>
+
+        <h3>Parcours n° 3 — Administrateur (~15 min)</h3>
+        <p>Connexion, puis saisie du code reçu par e-mail. Le back-office est à l'adresse
+          <code>/administration</code>.</p>
+        <ol>
+          <li><strong>Vue d'ensemble</strong> : files d'attente à traiter (identités, campagnes, signalements,
+            assistance), indicateurs financiers et graphiques.</li>
+          <li><strong>Identités</strong> : ouvrir un dossier KYC en attente, s'attribuer le dossier, consulter
+            une pièce (lien temporaire), puis valider ou rejeter avec motif obligatoire.</li>
+          <li><strong>Campagnes</strong> : traiter la campagne soumise au parcours n° 2 — la publier, ou la
+            rejeter avec motif. Tester aussi suspension puis réactivation d'une campagne publiée.</li>
+          <li><strong>Signalements</strong> : traiter celui créé au parcours n° 1 (en examen → résolu ou classé
+            sans suite).</li>
+          <li><strong>Litiges</strong> : traiter celui créé au parcours n° 1. En l'acceptant, la contribution est
+            remboursée automatiquement et le montant collecté de la campagne recalculé.</li>
+          <li><strong>Reversements</strong> : sur une campagne clôturée sans litige en cours, déclencher le
+            reversement et vérifier commission et montant net.</li>
+          <li><strong>Utilisateurs</strong> : créer un compte, modifier ses informations, changer son rôle,
+            suspendre puis réactiver. Vérifier qu'on ne peut ni se suspendre ni modifier son propre rôle.</li>
+          <li><strong>Exports</strong> : télécharger les exports tableur, dont le rapport réglementaire
+            (BCEAO).</li>
+          <li><strong>Score</strong> : imposer manuellement une valeur à un porteur, avec justification
+            obligatoire, et vérifier qu'elle prévaut sur le calcul automatique.</li>
+          <li><strong>Guichet Unique</strong> : créer un dispositif, le publier, et suivre l'orientation créée au
+            parcours n° 2.</li>
+        </ol>
+
+        <h3>Parcours n° 4 — Nouveau visiteur (inscription complète)</h3>
+        <ol>
+          <li>Créer un compte depuis la page d'inscription, avec une <strong>vraie adresse e-mail</strong> (le
+            code de vérification y sera envoyé).</li>
+          <li>Saisir le code reçu : le compte passe automatiquement de « en attente » à « validé ».</li>
+          <li>Compléter son profil, ajouter une photo, cocher éventuellement « je réside à l'étranger » pour voir
+            la vérification renforcée.</li>
+          <li>Déposer des pièces d'identité (utiliser des images factices, pas de vrais documents) et suivre le
+            passage du dossier en « en attente ».</li>
+          <li>Tester « mot de passe oublié » et le lien de réinitialisation.</li>
+        </ol>
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">La démo est prête — vérifié de bout en bout</span>
+        Les e-mails partent réellement (code d'inscription, code administrateur, notifications), le simulateur de
+        paiement est actif — une contribution peut donc être confirmée et créditer la campagne — et l'accès
+        administrateur fonctionne.
+        <br><br>
+        <strong>Un seul point de vigilance :</strong> le simulateur de paiement, activé ici pour permettre les
+        tests, permet à n'importe qui de valider une contribution sans payer. C'est acceptable sur une démo à
+        données fictives, mais il devra impérativement être désactivé
+        (<code>SIMULATED_PAYMENTS_ENABLED=False</code>) sur la future production réelle, où un vrai prestataire de
+        paiement prendra le relais.
+      </div>
+
+      <div class="prose">
+        <h3>Limites connues de cette démo</h3>
+        <ul>
+          <li><strong>Aucun paiement réel</strong> — le prestataire (Wave, Orange Money…) n'est pas encore
+            intégré ; les contributions sont simulées (voir modules 15 et 17).</li>
+          <li><strong>Les pièces d'identité n'ont pas été copiées</strong> depuis l'environnement local : ce sont
+            des documents personnels réels, délibérément laissés hors d'un serveur de démonstration. Les dossiers
+            KYC existent mais leurs fichiers s'afficheront comme manquants.</li>
+          <li><strong>Le wolof n'a pas été relu</strong> par un traducteur professionnel (voir module 13).</li>
+          <li><strong>Les pages légales sont provisoires</strong> et doivent être validées juridiquement avant
+            toute ouverture au public.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 01 -->
+    <section class="module" id="comptes">
+      <div class="module-head">
+        <span class="module-num">01</span>
+        <h2 class="module-title">Comptes et rôles</h2>
+      </div>
+      <p class="module-standfirst">
+        Trois types de comptes cohabitent sur Jappandale. Le rôle est choisi à l'inscription (sauf administrateur,
+        qui est toujours créé en interne) et détermine ce que la personne peut voir et faire.
+      </p>
+
+      <div class="card-grid">
+        <div class="role-card">
+          <h4>Porteur de projet</h4>
+          <p>Crée des campagnes de collecte, suit son Score, consulte son Passeport Financier, accède au Guichet
+            Unique du Financement.</p>
+        </div>
+        <div class="role-card">
+          <h4>Contributeur</h4>
+          <p>Soutient des campagnes par un don ou un investissement, suit ses contributions, peut signaler un
+            contenu problématique.</p>
+        </div>
+        <div class="role-card">
+          <h4>Administrateur</h4>
+          <p>Équipe Jappandale : modère, valide, supervise l'ensemble de la plateforme depuis le back-office.</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>Le cas particulier de la diaspora</h3>
+        <p>
+          « Diaspora » n'est pas un rôle séparé : c'est une case que coche un porteur de projet qui réside à
+          l'étranger, avec son pays de résidence. Cela déclenche deux conséquences concrètes : une vérification
+          d'identité renforcée (des justificatifs supplémentaires sont exigés, voir module 03) et un accès
+          possiblement différent à certains dispositifs du Guichet Unique, dont certains sont réservés à la
+          diaspora et d'autres lui sont fermés.
+        </p>
+        <h3>Le statut du compte</h3>
+        <p>
+          Indépendamment du rôle, chaque compte a un statut administratif qui détermine s'il peut se connecter :
+        </p>
+      </div>
+
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--pending">En attente de validation</span>
+          <p>Statut par défaut à l'inscription. La connexion reste possible.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Validé</span>
+          <p>Compte pleinement actif. Bascule automatiquement ici dès que l'adresse e-mail est vérifiée.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--bad">Suspendu</span>
+          <p>Connexion bloquée temporairement par un administrateur, avec un motif obligatoire, jusqu'à
+            réactivation.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--bad">Rejeté</span>
+          <p>Connexion bloquée, sauf nouvelle décision administrative.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">Garde-fou</span>
+        Un administrateur ne peut jamais se suspendre, se rejeter, ni se retirer ses propres droits
+        d'administrateur — ces actions ne peuvent être faites que par un autre administrateur.
+      </div>
+    </section>
+
+    <!-- 02 -->
+    <section class="module" id="inscription">
+      <div class="module-head">
+        <span class="module-num">02</span>
+        <h2 class="module-title">Inscription et connexion</h2>
+      </div>
+      <p class="module-standfirst">
+        L'identifiant de connexion est toujours l'adresse e-mail — il n'y a pas de nom d'utilisateur séparé.
+      </p>
+      <div class="prose">
+        <p>
+          À l'inscription, la personne choisit son rôle (porteur de projet ou contributeur) et renseigne son
+          prénom, nom, e-mail, mot de passe et, en option, son téléphone.
+        </p>
+        <h3>Vérifier son e-mail</h3>
+        <p>
+          Un code de sécurité à six chiffres est envoyé par e-mail. Il doit être saisi dans un temps limité et
+          n'autorise que cinq tentatives. Dès que l'e-mail est vérifié, un compte « en attente » passe
+          automatiquement à « validé ».
+        </p>
+        <h3>La double vérification pour les administrateurs</h3>
+        <p>
+          Un compte administrateur ne peut jamais se connecter avec le seul mot de passe : une seconde étape est
+          systématiquement exigée, avec un nouveau code à six chiffres envoyé par e-mail. C'est ce qu'on appelle
+          la double authentification (MFA) — même en cas de mot de passe compromis, l'accès reste protégé.
+        </p>
+        <h3>Mot de passe oublié</h3>
+        <p>Un lien de réinitialisation à usage unique est envoyé par e-mail sur demande.</p>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section class="module" id="kyc">
+      <div class="module-head">
+        <span class="module-num">03</span>
+        <h2 class="module-title">Vérification d'identité (KYC)</h2>
+      </div>
+      <p class="module-standfirst">
+        KYC signifie « Know Your Customer » : s'assurer que la personne derrière un compte est bien qui elle
+        prétend être. C'est une exigence réglementaire (lutte contre le blanchiment de capitaux) autant qu'une
+        condition de confiance entre porteurs et financeurs.
+      </p>
+
+      <div class="prose">
+        <h3>Les documents possibles</h3>
+        <ul>
+          <li>Carte nationale d'identité</li>
+          <li>Passeport</li>
+          <li>Selfie de vérification</li>
+          <li>Justificatif d'activité <em>(porteurs de projet)</em></li>
+          <li>Justificatif de résidence à l'étranger <em>(porteurs déclarés diaspora uniquement)</em></li>
+          <li>Justificatif de l'origine des fonds <em>(porteurs déclarés diaspora uniquement)</em></li>
+        </ul>
+      </div>
+
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--neutral">Non soumis</span>
+          <p>Aucun document déposé pour l'instant.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">En attente de validation</span>
+          <p>Un dossier a été déposé et attend l'examen d'un administrateur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Validé</span>
+          <p>Identité confirmée par un administrateur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--bad">Rejeté</span>
+          <p>Dossier refusé, avec un motif communiqué à la personne.</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <div class="callout">
+          <span class="callout-label">Règle importante</span>
+          Le dépôt d'un nouveau document repasse toujours le dossier en « en attente », <strong>même s'il était
+          déjà validé</strong>. Cela évite qu'une personne substitue un document frauduleux après coup sans
+          nouvelle vérification.
+        </div>
+        <p>
+          Chaque décision (dépôt, validation, rejet) est consignée dans un journal d'audit permanent, avec la
+          date, l'administrateur concerné et le motif — cette trace ne peut jamais être modifiée ni supprimée.
+        </p>
+        <h3>Pourquoi c'est important</h3>
+        <p>
+          Une identité validée conditionne plusieurs choses : la possibilité de publier une campagne, de
+          contacter un porteur par message, l'accès à certains dispositifs du Guichet Unique, et une partie du
+          Score Jappandale®.
+        </p>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section class="module" id="score">
+      <div class="module-head">
+        <span class="module-num">04</span>
+        <h2 class="module-title">Le Score Jappandale®</h2>
+      </div>
+      <p class="module-standfirst">
+        Une note de confiance sur 100, recalculée à chaque consultation, qui résume la fiabilité d'un porteur de
+        projet à partir de son historique réel sur la plateforme.
+      </p>
+
+      <div class="prose">
+        <p>Le calcul part d'une base fixe, puis ajoute ou retire des points selon des critères objectifs :</p>
+      </div>
+
+      <div class="score-list">
+        <div class="score-item"><span>Score de base</span><span class="amt base">50</span></div>
+        <div class="score-item"><span>Identité vérifiée (KYC validé)</span><span class="amt plus">+15</span></div>
+        <div class="score-item"><span>Ancienneté du compte <em>(plafonné, atteint après 1 an)</em></span><span class="amt plus">+5 max</span></div>
+        <div class="score-item"><span>Nombre de campagnes publiées ou clôturées <em>(jusqu'à 5)</em></span><span class="amt plus">+10 max</span></div>
+        <div class="score-item"><span>Taux de réussite des campagnes clôturées</span><span class="amt plus">+20 max</span></div>
+        <div class="score-item"><span>Montant total collecté</span><span class="amt plus">+10 max</span></div>
+        <div class="score-item"><span>Litiges acceptés contre le porteur</span><span class="amt minus">−30 max</span></div>
+        <div class="score-item"><span>Signalements de campagne résolus contre lui</span><span class="amt minus">−15 max</span></div>
+        <div class="score-item"><span>Campagnes rejetées ou suspendues</span><span class="amt minus">−15 max</span></div>
+      </div>
+
+      <div class="prose">
+        <p>Le résultat est toujours ramené entre 0 et 100. Chaque calcul est conservé dans un historique — on
+          peut donc voir l'évolution du score dans le temps, pas seulement sa valeur actuelle.</p>
+        <div class="callout">
+          <span class="callout-label">Revue humaine</span>
+          Un administrateur peut, exceptionnellement, imposer une valeur différente du calcul automatique, à
+          condition de rédiger une justification écrite obligatoire. Ce score « manuel » prévaut alors sur le
+          calcul automatique jusqu'à nouvelle décision.
+        </div>
+        <p>
+          Techniquement, ce moteur de calcul est volontairement isolé du reste de l'application : il expose une
+          interface propre (et un accès interne sécurisé par une clé dédiée), pensée pour pouvoir faire évoluer
+          l'algorithme sans toucher au reste de la plateforme.
+        </p>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section class="module" id="passeport">
+      <div class="module-head">
+        <span class="module-num">05</span>
+        <h2 class="module-title">Le Passeport Financier Jappandale®</h2>
+      </div>
+      <p class="module-standfirst">
+        Un document qui résume tout l'historique vérifiable d'un porteur de projet — l'équivalent d'un CV
+        financier, utilisable en dehors de Jappandale.
+      </p>
+
+      <div class="prose">
+        <h3>Ce qu'il contient</h3>
+        <ul>
+          <li>Nombre de campagnes créées, publiées, clôturées avec succès, rejetées ou suspendues</li>
+          <li>Montant total collecté et nombre de contributeurs distincts</li>
+          <li>Nombre de litiges reçus et leur taux d'acceptation</li>
+          <li>Le Score Jappandale® au moment de la génération</li>
+        </ul>
+        <h3>Export et vérification</h3>
+        <p>
+          Le porteur peut exporter son passeport en PDF à tout moment. Chaque export est horodaté, porte un
+          identifiant de vérification unique et un QR code : n'importe qui peut scanner ce QR code (ou ouvrir le
+          lien) pour confirmer que le document est authentique, sans avoir besoin de compte Jappandale.
+        </p>
+        <div class="callout">
+          <span class="callout-label">Confidentialité</span>
+          Chaque export est <strong>privé par défaut</strong>. C'est toujours le porteur qui décide, export par
+          export, de le rendre consultable publiquement ou de le retirer — à tout moment, dans un sens comme dans
+          l'autre.
+        </div>
+        <p>
+          Cas d'usage typique : montrer ce document à une banque, un bailleur ou un partenaire extérieur à
+          Jappandale, comme preuve de sérieux et de régularité.
+        </p>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section class="module" id="campagnes">
+      <div class="module-head">
+        <span class="module-num">06</span>
+        <h2 class="module-title">Les campagnes de collecte</h2>
+      </div>
+      <p class="module-standfirst">
+        Le cœur de la plateforme : un porteur présente un projet, fixe un objectif financier et une échéance, et
+        les contributeurs peuvent soutenir ce projet.
+      </p>
+
+      <div class="prose">
+        <h3>Trois types de campagnes</h3>
+        <ul>
+          <li><strong>Don libre</strong> — le contributeur donne sans rien recevoir en retour.</li>
+          <li><strong>Don avec contrepartie</strong> — le porteur propose des paliers de récompense (par exemple
+            « 10 000 FCFA et plus → un exemplaire du produit »), avec une quantité disponible qui peut être
+            limitée.</li>
+          <li><strong>Investissement participatif</strong> — le porteur affiche un taux de rendement attendu,
+            promis aux financeurs.</li>
+        </ul>
+        <p>Huit catégories couvrent tous les projets : Artisanat, Commerce, Agriculture, Éducation, Santé,
+          Technologie, Culture, Autre.</p>
+
+        <h3>Le cycle de vie d'une campagne</h3>
+        <p>Une campagne traverse une suite d'états précis, et ne peut passer de l'un à l'autre que selon des
+          règles strictes :</p>
+      </div>
+
+      <div class="flow" role="img" aria-label="Brouillon vers En modération vers Publiée, avec possibilité de Suspendue puis réactivée, vers Clôturée. Depuis En modération, retour possible vers Brouillon en cas de rejet.">
+        <span class="flow-step">Brouillon</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">En modération</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Publiée</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Clôturée</span>
+        <span class="flow-branch">↳ « En modération » peut aussi être <strong>rejetée</strong> (retour en
+          brouillon, corrections possibles) · « Publiée » peut être <strong>suspendue</strong> temporairement
+          puis réactivée</span>
+      </div>
+
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--neutral">Brouillon</span>
+          <p>En cours de rédaction, invisible du public, librement modifiable et supprimable.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">En modération</span>
+          <p>Soumise pour examen. Pour soumettre, la localisation, les bénéficiaires attendus, l'utilisation
+            prévue des fonds et le calendrier prévisionnel doivent être renseignés.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Publiée</span>
+          <p>Visible publiquement, ouverte aux contributions.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--bad">Rejetée</span>
+          <p>Refusée par un administrateur, motif obligatoire. Redevient modifiable et peut être resoumise.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--bad">Suspendue</span>
+          <p>Retirée temporairement de la visibilité publique, avec motif, suite à un problème signalé. Peut être
+            réactivée par un administrateur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--neutral">Clôturée</span>
+          <p>Terminée définitivement — automatiquement dès que l'échéance est dépassée <strong>ou</strong> que
+            l'objectif financier est atteint, ou manuellement par un administrateur. N'accepte plus de nouvelles
+            contributions. La collecte reste « flexible » : les fonds déjà réunis restent acquis au porteur même
+            si l'objectif n'a pas été atteint à l'échéance.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">Fiabilité de la clôture</span>
+        Cette vérification a lieu à la volée à chaque consultation de la liste des campagnes ou confirmation
+        d'une contribution. En production, une tâche planifiée quotidienne (<code>cloturer_campagnes</code>)
+        vient en complément, pour garantir la clôture même sur une campagne que plus personne ne consulte.
+      </div>
+
+      <div class="prose">
+        <h3>Signaler une campagne</h3>
+        <p>
+          Tout contributeur avec un e-mail vérifié peut signaler une campagne (jamais le porteur lui-même sur sa
+          propre campagne, et une seule fois par personne), pour l'un de ces motifs : suspicion de fraude,
+          informations trompeuses, contenu inapproprié, usurpation d'identité, ou autre motif. Le signalement suit
+          son propre statut de traitement : nouveau, en cours d'examen, résolu, ou classé sans suite.
+        </p>
+        <h3>Les actualités</h3>
+        <p>
+          Une fois publiée, une campagne peut recevoir des actualités du porteur, pour informer ses contributeurs
+          de l'avancement du projet.
+        </p>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section class="module" id="contributions">
+      <div class="module-head">
+        <span class="module-num">07</span>
+        <h2 class="module-title">Contribuer à une campagne</h2>
+      </div>
+      <p class="module-standfirst">
+        Le contributeur choisit un montant (et une contrepartie le cas échéant), peut rester anonyme vis-à-vis des
+        autres visiteurs, puis règle sa contribution.
+      </p>
+
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--pending">Initiée</span>
+          <p>Le paiement vient d'être lancé, pas encore confirmé.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Confirmée</span>
+          <p>Paiement réussi. Les fonds sont mis « en séquestre » — gardés de côté, pas encore versés au
+            porteur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--bad">Échouée</span>
+          <p>Le paiement n'a pas abouti.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--neutral">Remboursée</span>
+          <p>Fonds restitués au contributeur, suite à un litige accepté ou à une décision administrative.</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>Anonymat</h3>
+        <p>
+          Un contributeur peut choisir d'apparaître de façon anonyme sur la page publique de la campagne — mais
+          son identité reste toujours connue de Jappandale, pour la comptabilité et la conformité.
+        </p>
+        <h3>Séquestre et reversement</h3>
+        <p>
+          Dès qu'une contribution est confirmée, l'argent n'est pas immédiatement transféré au porteur : il est
+          conservé « en séquestre ». Une fois la campagne clôturée — et seulement s'il n'existe aucun litige
+          encore ouvert ou en examen sur l'une de ses contributions — un administrateur déclenche le reversement
+          groupé : une commission de plateforme est prélevée (5 % par défaut, réglable), et le montant net est
+          transféré au porteur.
+        </p>
+        <div class="callout">
+          <span class="callout-label">Protection des financeurs</span>
+          Un litige ouvert ou en cours d'examen bloque le reversement de <strong>toute la campagne</strong> tant
+          qu'il n'est pas tranché — pas seulement la contribution concernée.
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section class="module" id="guichet">
+      <div class="module-head">
+        <span class="module-num">08</span>
+        <h2 class="module-title">Le Guichet Unique du Financement</h2>
+      </div>
+      <p class="module-standfirst">
+        Un catalogue de dispositifs de financement externes (fonds publics, bailleurs, banques partenaires,
+        programmes d'appui) que le système confronte automatiquement au profil de chaque porteur.
+      </p>
+
+      <div class="prose">
+        <h3>Les critères d'un dispositif</h3>
+        <p>
+          Chaque dispositif référencé peut poser ses propres conditions : un score Jappandale minimum, une
+          identité vérifiée obligatoire ou non, une exigence liée à la diaspora (indifférent, réservé à la
+          diaspora, ou fermé à la diaspora), des catégories de projet éligibles, des villes ou régions couvertes,
+          et une fourchette de montant recherché.
+        </p>
+        <h3>Le matching automatique</h3>
+        <p>
+          Pour chaque dispositif publié, le système compare tous ces critères à la situation réelle du porteur
+          (son score du moment, son statut KYC, son profil diaspora, sa ville, les catégories et montants de ses
+          campagnes). S'il coche toutes les cases, il est déclaré éligible ; sinon, la raison précise de chaque
+          critère manquant lui est expliquée en clair.
+        </p>
+      </div>
+
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--neutral">Brouillon <span style="font-weight:400">(dispositif)</span></span>
+          <p>Fiche en préparation, invisible des porteurs.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Publié <span style="font-weight:400">(dispositif)</span></span>
+          <p>Visible et évalué automatiquement pour chaque porteur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--neutral">Archivé <span style="font-weight:400">(dispositif)</span></span>
+          <p>Retiré, ne peut plus recevoir de nouvelles manifestations d'intérêt.</p>
+        </div>
+      </div>
+
+      <div class="prose">
+        <h3>Manifester son intérêt et suivi</h3>
+        <p>
+          Un porteur éligible peut manifester son intérêt en un clic. Cela crée une « orientation », dont le
+          statut est ensuite mis à jour par un administrateur au fil de l'avancement réel de la mise en relation :
+        </p>
+      </div>
+
+      <div class="flow" role="img" aria-label="Intérêt manifesté vers Contact engagé vers Financement obtenu, ou Refusé, ou Abandonné">
+        <span class="flow-step">Intérêt manifesté</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Contact engagé</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-step">Financement obtenu</span>
+        <span class="flow-branch">↳ peut aussi se terminer par <strong>Refusé</strong> ou <strong>Abandonné</strong>
+          à tout moment</span>
+      </div>
+
+      <div class="prose">
+        <p>
+          Cet historique alimente un <strong>taux de transformation</strong> — la part des orientations menées à
+          bien qui se sont conclues par un financement obtenu — suivi globalement et dispositif par dispositif
+          dans le back-office.
+        </p>
+      </div>
+    </section>
+
+    <!-- 09 -->
+    <section class="module" id="messagerie">
+      <div class="module-head">
+        <span class="module-num">09</span>
+        <h2 class="module-title">La messagerie</h2>
+      </div>
+      <p class="module-standfirst">
+        Un canal d'échange encadré, toujours rattaché à une campagne précise — pas de messagerie libre entre
+        inconnus.
+      </p>
+      <div class="prose">
+        <p>
+          Un contributeur peut ouvrir une conversation avec le porteur d'une campagne, à condition que son
+          identité soit vérifiée (KYC validé). Un seul fil de discussion existe par couple campagne / personne.
+          Ouvrir un fil marque automatiquement comme lus les messages déjà reçus.
+        </p>
+        <h3>Signaler un message</h3>
+        <p>
+          Chacun des deux participants d'une conversation peut signaler un message précis, pour l'un de ces
+          motifs : spam ou sollicitation, harcèlement, contenu inapproprié, tentative de contournement de la
+          plateforme (par exemple pour négocier un paiement hors Jappandale), ou autre motif. Comme pour les
+          campagnes, ces signalements suivent un statut de traitement : nouveau, en cours d'examen, résolu, classé
+          sans suite.
+        </p>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="module" id="notifications">
+      <div class="module-head">
+        <span class="module-num">10</span>
+        <h2 class="module-title">Les notifications</h2>
+      </div>
+      <p class="module-standfirst">
+        Chaque événement important déclenche une notification dans l'application et, en parallèle, une tentative
+        d'envoi par e-mail.
+      </p>
+      <div class="prose">
+        <ul>
+          <li><strong>Compte et identité</strong> — compte créé, identité validée, identité rejetée</li>
+          <li><strong>Vie d'une campagne</strong> — publiée, rejetée, suspendue, réactivée, clôturée, objectif
+            atteint</li>
+          <li><strong>Argent</strong> — contribution confirmée (pour le contributeur), contribution reçue (pour le
+            porteur), fonds reversés</li>
+          <li><strong>Échanges</strong> — nouveau message reçu</li>
+          <li><strong>Litiges</strong> — litige résolu</li>
+          <li><strong>Administration</strong> — action administrateur requise</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="module" id="litiges">
+      <div class="module-head">
+        <span class="module-num">11</span>
+        <h2 class="module-title">Les litiges</h2>
+      </div>
+      <p class="module-standfirst">
+        Un mécanisme de recours pour un contributeur qui conteste une contribution précise déjà effectuée.
+      </p>
+      <div class="prose">
+        <h3>Motifs possibles</h3>
+        <ul>
+          <li>Projet non conforme / fonds mal utilisés</li>
+          <li>Porteur injoignable</li>
+          <li>Contribution non voulue / erreur</li>
+          <li>Autre motif</li>
+        </ul>
+      </div>
+
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--pending">Ouvert</span>
+          <p>Litige déposé, en attente d'examen.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--info">En examen</span>
+          <p>Pris en charge par un administrateur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Accepté</span>
+          <p>Le contributeur a raison : la contribution concernée est <strong>automatiquement remboursée</strong>,
+            et le montant collecté de la campagne est recalculé.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--bad">Rejeté</span>
+          <p>Le litige n'est pas retenu ; aucun remboursement.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">Effet de bord</span>
+        Tant qu'un litige reste « ouvert » ou « en examen » sur une campagne, le reversement des fonds de
+        <strong>toute la campagne</strong> est bloqué (voir module 07).
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="module" id="backoffice">
+      <div class="module-head">
+        <span class="module-num">12</span>
+        <h2 class="module-title">Le back-office administrateur</h2>
+      </div>
+      <p class="module-standfirst">
+        L'espace de pilotage réservé à l'équipe Jappandale, qui centralise toutes les décisions et tout le suivi
+        de la plateforme.
+      </p>
+      <div class="prose">
+        <ul>
+          <li>Validation ou rejet des dossiers d'identité (KYC)</li>
+          <li>Validation, rejet, suspension, réactivation et clôture des campagnes</li>
+          <li>Traitement des litiges et des signalements (campagnes et messages)</li>
+          <li>Traitement des demandes d'assistance, avec réponse directe par e-mail</li>
+          <li>Gestion des comptes : rôle, statut, avec garde-fous pour éviter qu'un administrateur ne s'auto-sanctionne</li>
+          <li>Attribution d'un dossier à un administrateur précis, pour répartir la charge de travail</li>
+          <li>Réglages du moteur de Score Jappandale® (les poids de chaque critère)</li>
+          <li>Gestion complète du Guichet Unique (dispositifs et orientations)</li>
+          <li>Déclenchement des reversements de fonds aux porteurs</li>
+          <li>Exports de données (utilisateurs, campagnes, contributions, signalements) au format tableur</li>
+          <li><strong>Rapport réglementaire (BCEAO)</strong> — export consolidé des transactions confirmées avec,
+            pour chaque ligne, le statut d'identité vérifiée (KYC) du porteur et du contributeur, le statut
+            diaspora et le pays de résidence du porteur, les montants bruts, la commission et le montant net, et
+            le statut du reversement</li>
+          <li>Tableau de bord global avec les indicateurs clés de l'activité</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section class="module" id="langue">
+      <div class="module-head">
+        <span class="module-num">13</span>
+        <h2 class="module-title">Langue : français et wolof</h2>
+      </div>
+      <p class="module-standfirst">
+        Une bascule de langue est disponible dans le menu principal, sur ordinateur comme sur mobile, et le choix
+        de la personne est mémorisé d'une visite à l'autre.
+      </p>
+
+      <div class="prose">
+        <h3>Ce qui est déjà traduit en wolof</h3>
+        <p>
+          L'ensemble du parcours public et du parcours compte : connexion, inscription, mot de passe oublié,
+          vérification d'e-mail, page d'accueil (dont la section « Comment ça marche »), liste et détail des
+          campagnes, pages « À propos », « Contact » et « Confiance et transparence », l'espace « Mon compte »
+          (Score, Passeport Financier, Guichet Unique, messages, mes campagnes, mes contributions, contributions
+          reçues), les notifications, le parcours de contribution, le formulaire de signalement d'une campagne et
+          la page publique de vérification du Passeport Financier.
+        </p>
+        <h3>Ce qui reste uniquement en français</h3>
+        <p>
+          Le tableau de bord administrateur (outil interne à l'équipe, pas destiné au grand public) et les pages
+          légales — mentions légales, confidentialité, conditions d'utilisation — qui restent en français par
+          choix : une traduction contractuelle demande une relecture juridique professionnelle, pas une
+          traduction automatisée. La section « Vérification d'identité » (KYC) du compte reste également en
+          français, ses libellés de pièces provenant directement du back-end.
+        </p>
+        <div class="callout">
+          <span class="callout-label">À faire avant mise en avant publique</span>
+          Les textes wolof ont été rédigés sans certification de traducteur professionnel. Une relecture par un
+          locuteur natif est recommandée avant de mettre en avant cette fonctionnalité auprès du grand public.
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 -->
+    <section class="module" id="securite">
+      <div class="module-head">
+        <span class="module-num">14</span>
+        <h2 class="module-title">Sécurité et confidentialité</h2>
+      </div>
+      <p class="module-standfirst">
+        Quelques principes transversaux qui s'appliquent à toute la plateforme, pas à un seul module.
+      </p>
+      <div class="prose">
+        <ul>
+          <li>Les mots de passe ne sont jamais stockés en clair.</li>
+          <li>Toute connexion administrateur exige une double authentification par e-mail, sans exception.</li>
+          <li>Les documents d'identité déposés en KYC sont accessibles uniquement via des liens temporaires
+            signés, qui expirent après quelques minutes — jamais par une URL directe, y compris derrière le
+            serveur web de production (voir module 16).</li>
+          <li>Chaque décision administrative importante — identité, rôle, statut de compte, campagne, litige — est
+            enregistrée dans un journal d'audit permanent et non modifiable : qui, quand, pourquoi.</li>
+          <li>L'accès au back-office et le rôle administrateur sont strictement séparés d'un simple accès
+            technique Django ; un compte ne peut jamais modifier son propre rôle.</li>
+          <li>La déconnexion révoque réellement la session côté serveur, pas seulement les cookies du
+            navigateur.</li>
+          <li>Le Passeport Financier est privé par défaut ; seul le porteur décide de le rendre consultable.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 15 -->
+    <section class="module" id="audit">
+      <div class="module-head">
+        <span class="module-num">15</span>
+        <h2 class="module-title">Audit de sécurité et test d'intrusion</h2>
+      </div>
+      <p class="module-standfirst">
+        Un audit complet du code et un test d'intrusion en conditions réelles ont été réalisés le 1er août 2026,
+        avant la préparation du déploiement.
+      </p>
+      <div class="prose">
+        <p>
+          La méthode ne s'est pas arrêtée à la lecture du code : chaque piste sérieuse a été
+          <strong>exploitée pour de vrai</strong> sur un environnement de test, pour prouver qu'elle était
+          réellement dangereuse avant d'être corrigée — pas seulement une hypothèse théorique.
+        </p>
+        <h3>Deux failles critiques trouvées, exploitées, puis corrigées</h3>
+        <ul>
+          <li><strong>Paiement falsifiable.</strong> Un contributeur pouvait déclarer lui-même sa contribution
+            comme « payée », sans paiement réel — démontré en créditant une campagne de test de 500 000 FCFA sans
+            jamais payer. Le module de paiement (encore un simulateur, voir module 17) est désormais bloqué en
+            production tant qu'un vrai prestataire n'est pas branché.</li>
+          <li><strong>Auto-promotion administrateur.</strong> Un compte avec un simple accès technique Django
+            (sans le rôle métier ni la double authentification) pouvait accéder au back-office et s'attribuer
+            lui-même le rôle administrateur — démontré en direct. L'accès au back-office ne dépend plus que du
+            rôle métier, et personne ne peut modifier son propre rôle.</li>
+        </ul>
+        <p>
+          Deux points supplémentaires ont été corrigés : la déconnexion ne révoquait pas vraiment la session
+          côté serveur, et une campagne encore en brouillon pouvait être « signalée » par un utilisateur qui
+          devinait son adresse (fuite d'existence, impact mineur).
+        </p>
+        <p>
+          Messagerie, litiges, notifications, Guichet Unique, upload et accès aux pièces KYC, Passeport
+          Financier, API interne du Score et frontend ont été passés en revue sans faille exploitable
+          supplémentaire trouvée.
+        </p>
+        <div class="callout">
+          <span class="callout-label">Reste ouvert</span>
+          Rien de tout cela ne remplace l'intégration d'un vrai prestataire de paiement : c'est une brique
+          produit à construire, pas un correctif de code (voir module 17).
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 -->
+    <section class="module" id="deploiement">
+      <div class="module-head">
+        <span class="module-num">16</span>
+        <h2 class="module-title">Déploiement</h2>
+      </div>
+      <p class="module-standfirst">
+        La préparation du déploiement sur un VPS est terminée et testée en local ; il ne reste que l'achat du
+        serveur et du nom de domaine pour déployer réellement.
+      </p>
+      <div class="prose">
+        <p>
+          Toute la plateforme tourne dans des conteneurs Docker : le site (Django), la base de données
+          (PostgreSQL), une tâche planifiée quotidienne de clôture des campagnes, et un serveur web qui sert le
+          site et obtient automatiquement son certificat HTTPS dès qu'un nom de domaine réel y est pointé.
+        </p>
+        <p>
+          Un principe de sécurité central de cette configuration : le serveur web ne sert jamais directement les
+          documents d'identité (KYC) déposés par les utilisateurs — seuls sont exposés en accès direct les
+          éléments publics comme les photos de profil ou les images de campagne, exactement comme décrit au
+          module 14.
+        </p>
+        <p>
+          L'ensemble de la chaîne — construction des images, migrations automatiques, fichiers statiques, HTTPS
+          en local — a été vérifié avant d'écrire le guide de déploiement pas à pas destiné à l'équipe.
+        </p>
+        <div class="callout">
+          <span class="callout-label">Non testable sans serveur réel</span>
+          L'obtention du vrai certificat HTTPS (Let's Encrypt) ne peut être vérifiée qu'une fois le VPS acheté et
+          le domaine pointé dessus — ce sera la première vraie vérification du déploiement en conditions
+          réelles.
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 -->
+    <section class="module" id="roadmap">
+      <div class="module-head">
+        <span class="module-num">17</span>
+        <h2 class="module-title">Ce qui n'est pas encore en place</h2>
+      </div>
+      <p class="module-standfirst">
+        Par honnêteté : la plateforme fonctionne déjà de bout en bout, mais certains points du cahier des charges
+        restent à construire.
+      </p>
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--pending">À faire</span>
+          <p><strong>Paiement réel.</strong> Les contributions sont aujourd'hui simulées ; l'intégration Wave,
+            Orange Money et une passerelle internationale pour la diaspora reste à brancher. Le simulateur est
+            désormais explicitement désactivé en production (voir module 15).</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">À faire</span>
+          <p><strong>Déploiement effectif.</strong> La configuration est prête et testée (voir module 16) ; reste
+            à acheter le VPS et pointer un nom de domaine réel.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">À faire</span>
+          <p><strong>Notifications SMS et push.</strong> Seuls l'e-mail et les notifications dans l'application
+            existent pour l'instant.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">À faire</span>
+          <p><strong>Application mobile.</strong> La plateforme est aujourd'hui uniquement disponible sur le web.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--info">Partiel</span>
+          <p><strong>Couverture wolof.</strong> Voir module 13 — l'essentiel du parcours est traduit,
+            mais le back-office, les pages légales et quelques sous-sections du compte restent en français, et une
+            relecture par un locuteur natif reste recommandée.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="colophon">
+  <div class="shell">
+    <p>Ce document décrit le fonctionnement réel de la plateforme Jappandale tel qu'implémenté à ce jour. Il est
+      destiné à un usage interne et n'a pas vocation à remplacer le cahier des charges contractuel.</p>
+  </div>
+</footer>
+
