@@ -61,6 +61,7 @@ def _person(user):
         "email": user.email,
         "phone": user.phone,
         "role": user.role,
+        "partner_type": user.partner_type,
     }
 
 
@@ -752,6 +753,7 @@ class UserListView(APIView):
             first_name=data["first_name"],
             last_name=data["last_name"],
             role=data["role"],
+            partner_type=data.get("partner_type", User.PartnerType.AUTRE),
             phone=data.get("phone", ""),
             organization_name=data.get("organization_name", ""),
             city=data.get("city", ""),
@@ -853,7 +855,7 @@ class UserManagementView(APIView):
 
         note = serializer.validated_data.get("note", "").strip()
         fields = []
-        info_fields = ["first_name", "last_name", "phone", "organization_name", "city"]
+        info_fields = ["first_name", "last_name", "phone", "organization_name", "city", "partner_type"]
         changed_info = [
             field
             for field in info_fields

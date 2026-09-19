@@ -8,11 +8,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ApiError } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
-import type { RegisterData } from "@/lib/types"
+import type { PartnerType, RegisterData } from "@/lib/types"
 
 type RegisterRole = RegisterData["role"]
 
-const roleValues: RegisterRole[] = ["PORTEUR", "CONTRIBUTEUR"]
+const roleValues: RegisterRole[] = ["PORTEUR", "CONTRIBUTEUR", "PARTENAIRE"]
+const partnerTypes: PartnerType[] = ["BANQUE", "INSTITUTION_PUBLIQUE", "INCUBATEUR", "FONDS", "AUTRE"]
 
 function toMessage(value: unknown): string {
   if (Array.isArray(value)) return value.join(" ")
@@ -44,8 +45,13 @@ function RegisterPage() {
   const [password, setPassword] = useState("")
   const [phone, setPhone] = useState("")
   const [role, setRole] = useState<RegisterRole>(
-    searchParams.get("role") === "PORTEUR" ? "PORTEUR" : "CONTRIBUTEUR"
+    searchParams.get("role") === "PORTEUR"
+      ? "PORTEUR"
+      : searchParams.get("role") === "PARTENAIRE"
+        ? "PARTENAIRE"
+        : "CONTRIBUTEUR"
   )
+  const [partnerType, setPartnerType] = useState<PartnerType>("AUTRE")
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [globalError, setGlobalError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -62,6 +68,7 @@ function RegisterPage() {
       first_name: firstName,
       last_name: lastName,
       role,
+      ...(role === "PARTENAIRE" ? { partner_type: partnerType } : {}),
       ...(phone.trim() ? { phone: phone.trim() } : {}),
     }
 
@@ -141,7 +148,7 @@ function RegisterPage() {
             <legend className="mb-3 text-sm leading-none font-medium text-ink">
               {t("register.youAre")}
             </legend>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
               {roleOptions.map((option) => (
                 <label
                   key={option.value}
@@ -180,6 +187,24 @@ function RegisterPage() {
             </div>
             {errorFor("role")}
           </fieldset>
+
+          {role === "PARTENAIRE" && (
+            <div className="mt-5 space-y-2">
+              <Label htmlFor="partner_type" className="text-ink">
+                {t("register.partnerTypeLabel")}
+              </Label>
+              <select
+                id="partner_type"
+                value={partnerType}
+                onChange={(event) => setPartnerType(event.target.value as PartnerType)}
+                className="h-12 w-full rounded-xl border border-input bg-white px-4 text-sm text-ink outline-none focus:ring-2 focus:ring-gold-dark/30"
+              >
+                {partnerTypes.map((type) => (
+                  <option key={type} value={type}>{t(`register.partnerTypes.${type}`)}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="mt-7 space-y-5">
             <div className="grid gap-5 sm:grid-cols-2">

@@ -4,6 +4,8 @@
     "mobileLabel": "Navigation mobile",
     "campaigns": "Campagnes",
     "myCampaigns": "Mes campagnes",
+    "partnerSpace": "Espace partenaire",
+    "projectLibrary": "Mes documents",
     "about": "À propos"
   },
   "header": {
@@ -23,6 +25,7 @@
   "roles": {
     "PORTEUR": "Porteur de projet",
     "CONTRIBUTEUR": "Contributeur",
+    "PARTENAIRE": "Partenaire financier",
     "ADMIN": "Administrateur"
   },
   "footer": {

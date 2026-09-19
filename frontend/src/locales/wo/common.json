@@ -4,6 +4,8 @@
     "mobileLabel": "Yoonu doxin ci telefon",
     "campaigns": "Kanpaañ yi",
     "myCampaigns": "Sama kanpaañ yi",
+    "partnerSpace": "Espace partenaire",
+    "projectLibrary": "Sama dokiman yi",
     "about": "Ci mbiru Jappandale"
   },
   "header": {
@@ -23,6 +25,7 @@
   "roles": {
     "PORTEUR": "Boroom porojet",
     "CONTRIBUTEUR": "Kiy dokkal",
+    "PARTENAIRE": "Partenaire financier",
     "ADMIN": "Administrateur"
   },
   "footer": {

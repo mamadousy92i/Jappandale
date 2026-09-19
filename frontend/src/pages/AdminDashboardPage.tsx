@@ -1911,6 +1911,7 @@ export default function AdminDashboardPage() {
                     >
                       <option value="CONTRIBUTEUR">Contributeur</option>
                       <option value="PORTEUR">Porteur</option>
+                      <option value="PARTENAIRE">Partenaire financier</option>
                       <option value="ADMIN">Administrateur</option>
                     </select>
                   </label>
@@ -1964,6 +1965,7 @@ export default function AdminDashboardPage() {
                 <option value="">Tous les rôles</option>
                 <option value="PORTEUR">Porteurs</option>
                 <option value="CONTRIBUTEUR">Contributeurs</option>
+                <option value="PARTENAIRE">Partenaires financiers</option>
                 <option value="ADMIN">Administrateurs</option>
               </select>
               <select
@@ -2070,6 +2072,7 @@ export default function AdminDashboardPage() {
                             <select aria-label={`Rôle de ${member.name}`} value={member.role} onChange={(event) => ask("Modifier le rôle ?", `${member.name} recevra les droits correspondant au nouveau rôle.`, "Modifier", () => perform(`/backoffice/users/${member.id}/`, "PATCH", { role: event.target.value }, "Rôle mis à jour.", true), member.role === "ADMIN")} className="h-10 rounded-xl border border-black/10 bg-white px-3 text-sm">
                               <option value="CONTRIBUTEUR">Contributeur</option>
                               <option value="PORTEUR">Porteur</option>
+                              <option value="PARTENAIRE">Partenaire financier</option>
                               <option value="ADMIN">Administrateur</option>
                             </select>
                             <Button

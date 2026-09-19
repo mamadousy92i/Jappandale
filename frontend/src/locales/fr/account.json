@@ -3,6 +3,7 @@
     "roles": {
       "PORTEUR": "Porteur de projet",
       "CONTRIBUTEUR": "Contributeur",
+      "PARTENAIRE": "Partenaire financier",
       "ADMIN": "Administrateur"
     },
     "eyebrow": "Mon compte",

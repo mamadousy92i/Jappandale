@@ -494,8 +494,8 @@
       contribution ou un dossier peut prendre.
     </p>
     <div class="meta-row">
-      <span><strong>17</strong> modules couverts</span>
-      <span><strong>3</strong> types de comptes</span>
+      <span><strong>18</strong> modules couverts</span>
+      <span><strong>4</strong> types de comptes</span>
       <span><strong>Public</strong> visé : équipe YAMB, sans prérequis technique</span>
     </div>
   </div>
@@ -514,15 +514,16 @@
       <li><a href="#campagnes"><span class="num">06</span>Les campagnes</a></li>
       <li><a href="#contributions"><span class="num">07</span>Contribuer</a></li>
       <li><a href="#guichet"><span class="num">08</span>Guichet Unique</a></li>
-      <li><a href="#messagerie"><span class="num">09</span>Messagerie</a></li>
-      <li><a href="#notifications"><span class="num">10</span>Notifications</a></li>
-      <li><a href="#litiges"><span class="num">11</span>Litiges</a></li>
-      <li><a href="#backoffice"><span class="num">12</span>Back-office admin</a></li>
-      <li><a href="#langue"><span class="num">13</span>Langue : français et wolof</a></li>
-      <li><a href="#securite"><span class="num">14</span>Sécurité</a></li>
-      <li><a href="#audit"><span class="num">15</span>Audit de sécurité</a></li>
-      <li><a href="#deploiement"><span class="num">16</span>Déploiement</a></li>
-      <li><a href="#roadmap"><span class="num">17</span>Ce qui reste à faire</a></li>
+      <li><a href="#partenaires"><span class="num">09</span>Espace partenaires</a></li>
+      <li><a href="#messagerie"><span class="num">10</span>Messagerie</a></li>
+      <li><a href="#notifications"><span class="num">11</span>Notifications</a></li>
+      <li><a href="#litiges"><span class="num">12</span>Litiges</a></li>
+      <li><a href="#backoffice"><span class="num">13</span>Back-office admin</a></li>
+      <li><a href="#langue"><span class="num">14</span>Langue : français et wolof</a></li>
+      <li><a href="#securite"><span class="num">15</span>Sécurité</a></li>
+      <li><a href="#audit"><span class="num">16</span>Audit de sécurité</a></li>
+      <li><a href="#deploiement"><span class="num">17</span>Déploiement</a></li>
+      <li><a href="#roadmap"><span class="num">18</span>Ce qui reste à faire</a></li>
     </ol>
   </aside>
 
@@ -538,6 +539,7 @@
         <a href="#campagnes">Campagnes</a>
         <a href="#contributions">Contribuer</a>
         <a href="#guichet">Guichet Unique</a>
+        <a href="#partenaires">Partenaires</a>
         <a href="#messagerie">Messagerie</a>
         <a href="#notifications">Notifications</a>
         <a href="#litiges">Litiges</a>
@@ -563,21 +565,21 @@
 
       <div class="callout">
         <span class="callout-label">Adresse de la démo</span>
-        <a href="https://152-228-141-27.sslip.io"><strong>https://152-228-141-27.sslip.io</strong></a><br>
+        <a href="https://jappandale.76.13.53.119.nip.io"><strong>https://jappandale.76.13.53.119.nip.io</strong></a><br>
         Environnement de <strong>test</strong> : les données sont fictives, aucun paiement réel n'a lieu, et le
         contenu peut être réinitialisé à tout moment. Ne pas y déposer de vraies pièces d'identité.
       </div>
 
       <div class="prose">
         <h3>Comptes de démonstration</h3>
-        <p>Mot de passe identique pour tous : <code>JappandaleDemo2026!</code></p>
+        <p>Mot de passe par défaut : <code>MotDePasse123!</code>. Deux comptes historiques conservent leur propre mot de passe, indiqué ci-dessous.</p>
       </div>
 
       <div class="status-table">
         <div class="status-row">
           <span class="pill pill--ok">Porteur · KYC validé</span>
           <p><code>porteur.test@jappandale.sn</code><br>
-            Le compte le plus complet : peut créer et publier des campagnes, voir son Score, son Passeport
+            Mot de passe : <code>JappandaleDemo2026!</code>. Le compte le plus complet : peut créer et publier des campagnes, voir son Score, son Passeport
             Financier et le Guichet Unique.</p>
         </div>
         <div class="status-row">
@@ -594,12 +596,18 @@
         <div class="status-row">
           <span class="pill pill--ok">Contributeur · KYC validé</span>
           <p><code>financeur.test@jappandale.sn</code><br>
-            Peut contribuer, ouvrir un litige, envoyer un message à un porteur et signaler une campagne.</p>
+            Mot de passe : <code>JappandaleDemo2026!</code>. Peut contribuer, ouvrir un litige, envoyer un message à un porteur et signaler une campagne.</p>
         </div>
         <div class="status-row">
           <span class="pill pill--ok">Contributeur · 2<sup>e</sup> compte</span>
           <p><code>mariama.fall@jappandale.sn</code><br>
             Utile pour tester à deux en parallèle, ou vérifier ce que voit un autre contributeur.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Partenaire financier · KYC validé</span>
+          <p><code>partenaire.banque@jappandale.sn</code><br>
+            Accède à l'espace partenaires, aux campagnes publiées, aux documents explicitement partagés et à ses
+            offres de financement.</p>
         </div>
         <div class="status-row">
           <span class="pill pill--info">Administrateur</span>
@@ -718,7 +726,7 @@
           <li><strong>Les pièces d'identité n'ont pas été copiées</strong> depuis l'environnement local : ce sont
             des documents personnels réels, délibérément laissés hors d'un serveur de démonstration. Les dossiers
             KYC existent mais leurs fichiers s'afficheront comme manquants.</li>
-          <li><strong>Le wolof n'a pas été relu</strong> par un traducteur professionnel (voir module 13).</li>
+          <li><strong>Le wolof n'a pas été relu</strong> par un traducteur professionnel (voir module 14).</li>
           <li><strong>Les pages légales sont provisoires</strong> et doivent être validées juridiquement avant
             toute ouverture au public.</li>
         </ul>
@@ -732,7 +740,7 @@
         <h2 class="module-title">Comptes et rôles</h2>
       </div>
       <p class="module-standfirst">
-        Trois types de comptes cohabitent sur Jappandale. Le rôle est choisi à l'inscription (sauf administrateur,
+        Quatre types de comptes cohabitent sur Jappandale. Le rôle est choisi à l'inscription (sauf administrateur,
         qui est toujours créé en interne) et détermine ce que la personne peut voir et faire.
       </p>
 
@@ -750,6 +758,11 @@
         <div class="role-card">
           <h4>Administrateur</h4>
           <p>Équipe Jappandale : modère, valide, supervise l'ensemble de la plateforme depuis le back-office.</p>
+        </div>
+        <div class="role-card">
+          <h4>Partenaire financier</h4>
+          <p>Banque, fonds, incubateur ou institution : explore les projets publiés, exprime son intérêt et prépare
+            des offres de financement soumises à validation.</p>
         </div>
       </div>
 
@@ -806,7 +819,7 @@
       </p>
       <div class="prose">
         <p>
-          À l'inscription, la personne choisit son rôle (porteur de projet ou contributeur) et renseigne son
+          À l'inscription, la personne choisit son rôle (porteur de projet, contributeur ou partenaire financier) et renseigne son
           prénom, nom, e-mail, mot de passe et, en option, son téléphone.
         </p>
         <h3>Vérifier son e-mail</h3>
@@ -1192,9 +1205,42 @@
     </section>
 
     <!-- 09 -->
-    <section class="module" id="messagerie">
+    <section class="module" id="partenaires">
       <div class="module-head">
         <span class="module-num">09</span>
+        <h2 class="module-title">Espace partenaires financiers</h2>
+      </div>
+      <p class="module-standfirst">
+        Un espace simple pour les banques, fonds, institutions publiques et incubateurs qui souhaitent étudier des projets et proposer un financement.
+      </p>
+      <div class="prose">
+        <p>
+          Un partenaire doit avoir son adresse e-mail vérifiée et son KYC validé. Il peut alors consulter les campagnes publiées, filtrer les projets, manifester son intérêt et créer une offre de financement. Toute offre créée par un partenaire reste d'abord en <strong>brouillon</strong> : elle ne devient jamais publique automatiquement.
+        </p>
+        <p>
+          La bibliothèque de projets ne montre que les documents explicitement partagés avec les partenaires. Les documents KYC restent privés et ne sont jamais accessibles depuis cet espace.
+        </p>
+      </div>
+      <div class="status-table">
+        <div class="status-row">
+          <span class="pill pill--ok">Campagnes publiées</span>
+          <p>Consultation, filtres et manifestation d'intérêt pour le partenaire validé.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--neutral">Offre de financement</span>
+          <p>Créée en brouillon, puis traitée par l'équipe depuis le back-office.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--info">Bibliothèque projet</span>
+          <p>Documents de projet partagés uniquement ; aucune pièce d'identité KYC n'est exposée.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="module" id="messagerie">
+      <div class="module-head">
+        <span class="module-num">10</span>
         <h2 class="module-title">La messagerie</h2>
       </div>
       <p class="module-standfirst">
@@ -1218,10 +1264,10 @@
       </div>
     </section>
 
-    <!-- 10 -->
+    <!-- 11 -->
     <section class="module" id="notifications">
       <div class="module-head">
-        <span class="module-num">10</span>
+        <span class="module-num">11</span>
         <h2 class="module-title">Les notifications</h2>
       </div>
       <p class="module-standfirst">
@@ -1242,10 +1288,10 @@
       </div>
     </section>
 
-    <!-- 11 -->
+    <!-- 12 -->
     <section class="module" id="litiges">
       <div class="module-head">
-        <span class="module-num">11</span>
+        <span class="module-num">12</span>
         <h2 class="module-title">Les litiges</h2>
       </div>
       <p class="module-standfirst">
@@ -1288,10 +1334,10 @@
       </div>
     </section>
 
-    <!-- 12 -->
+    <!-- 13 -->
     <section class="module" id="backoffice">
       <div class="module-head">
-        <span class="module-num">12</span>
+        <span class="module-num">13</span>
         <h2 class="module-title">Le back-office administrateur</h2>
       </div>
       <p class="module-standfirst">
@@ -1319,10 +1365,10 @@
       </div>
     </section>
 
-    <!-- 13 -->
+    <!-- 14 -->
     <section class="module" id="langue">
       <div class="module-head">
-        <span class="module-num">13</span>
+        <span class="module-num">14</span>
         <h2 class="module-title">Langue : français et wolof</h2>
       </div>
       <p class="module-standfirst">
@@ -1356,10 +1402,10 @@
       </div>
     </section>
 
-    <!-- 14 -->
+    <!-- 15 -->
     <section class="module" id="securite">
       <div class="module-head">
-        <span class="module-num">14</span>
+        <span class="module-num">15</span>
         <h2 class="module-title">Sécurité et confidentialité</h2>
       </div>
       <p class="module-standfirst">
@@ -1371,7 +1417,7 @@
           <li>Toute connexion administrateur exige une double authentification par e-mail, sans exception.</li>
           <li>Les documents d'identité déposés en KYC sont accessibles uniquement via des liens temporaires
             signés, qui expirent après quelques minutes — jamais par une URL directe, y compris derrière le
-            serveur web de production (voir module 16).</li>
+            serveur web de production (voir module 03).</li>
           <li>Chaque décision administrative importante — identité, rôle, statut de compte, campagne, litige — est
             enregistrée dans un journal d'audit permanent et non modifiable : qui, quand, pourquoi.</li>
           <li>L'accès au back-office et le rôle administrateur sont strictement séparés d'un simple accès
@@ -1383,10 +1429,10 @@
       </div>
     </section>
 
-    <!-- 15 -->
+    <!-- 16 -->
     <section class="module" id="audit">
       <div class="module-head">
-        <span class="module-num">15</span>
+        <span class="module-num">16</span>
         <h2 class="module-title">Audit de sécurité et test d'intrusion</h2>
       </div>
       <p class="module-standfirst">
@@ -1403,8 +1449,8 @@
         <ul>
           <li><strong>Paiement falsifiable.</strong> Un contributeur pouvait déclarer lui-même sa contribution
             comme « payée », sans paiement réel — démontré en créditant une campagne de test de 500 000 FCFA sans
-            jamais payer. Le module de paiement (encore un simulateur, voir module 17) est désormais bloqué en
-            production tant qu'un vrai prestataire n'est pas branché.</li>
+            jamais payer. Le module de paiement est un simulateur : il est actif sur cette démo pour les tests,
+            mais doit rester désactivé sur une production commerciale tant qu'un vrai prestataire n'est pas branché.</li>
           <li><strong>Auto-promotion administrateur.</strong> Un compte avec un simple accès technique Django
             (sans le rôle métier ni la double authentification) pouvait accéder au back-office et s'attribuer
             lui-même le rôle administrateur — démontré en direct. L'accès au back-office ne dépend plus que du
@@ -1423,50 +1469,50 @@
         <div class="callout">
           <span class="callout-label">Reste ouvert</span>
           Rien de tout cela ne remplace l'intégration d'un vrai prestataire de paiement : c'est une brique
-          produit à construire, pas un correctif de code (voir module 17).
-        </div>
-      </div>
-    </section>
-
-    <!-- 16 -->
-    <section class="module" id="deploiement">
-      <div class="module-head">
-        <span class="module-num">16</span>
-        <h2 class="module-title">Déploiement</h2>
-      </div>
-      <p class="module-standfirst">
-        La préparation du déploiement sur un VPS est terminée et testée en local ; il ne reste que l'achat du
-        serveur et du nom de domaine pour déployer réellement.
-      </p>
-      <div class="prose">
-        <p>
-          Toute la plateforme tourne dans des conteneurs Docker : le site (Django), la base de données
-          (PostgreSQL), une tâche planifiée quotidienne de clôture des campagnes, et un serveur web qui sert le
-          site et obtient automatiquement son certificat HTTPS dès qu'un nom de domaine réel y est pointé.
-        </p>
-        <p>
-          Un principe de sécurité central de cette configuration : le serveur web ne sert jamais directement les
-          documents d'identité (KYC) déposés par les utilisateurs — seuls sont exposés en accès direct les
-          éléments publics comme les photos de profil ou les images de campagne, exactement comme décrit au
-          module 14.
-        </p>
-        <p>
-          L'ensemble de la chaîne — construction des images, migrations automatiques, fichiers statiques, HTTPS
-          en local — a été vérifié avant d'écrire le guide de déploiement pas à pas destiné à l'équipe.
-        </p>
-        <div class="callout">
-          <span class="callout-label">Non testable sans serveur réel</span>
-          L'obtention du vrai certificat HTTPS (Let's Encrypt) ne peut être vérifiée qu'une fois le VPS acheté et
-          le domaine pointé dessus — ce sera la première vraie vérification du déploiement en conditions
-          réelles.
+          produit à construire, pas un correctif de code (voir module 18).
         </div>
       </div>
     </section>
 
     <!-- 17 -->
-    <section class="module" id="roadmap">
+    <section class="module" id="deploiement">
       <div class="module-head">
         <span class="module-num">17</span>
+        <h2 class="module-title">Déploiement</h2>
+      </div>
+      <p class="module-standfirst">
+        La démo est déployée et accessible en HTTPS sur le VPS. L'application, la base de données, les fichiers
+        média et les données de démonstration y sont déjà en ligne.
+      </p>
+      <div class="prose">
+        <p>
+          Toute la plateforme tourne dans des conteneurs Docker : le site React/Django, la base de données
+          PostgreSQL, une tâche planifiée quotidienne de clôture des campagnes et le serveur web. L'instance de
+          démonstration est publiée à <a href="https://jappandale.76.13.53.119.nip.io">jappandale.76.13.53.119.nip.io</a>, avec une redirection HTTP vers HTTPS et un certificat Let's Encrypt valide.
+        </p>
+        <p>
+          Un principe de sécurité central de cette configuration : le serveur web ne sert jamais directement les
+          documents d'identité (KYC) déposés par les utilisateurs — seuls sont exposés en accès direct les
+          éléments publics comme les photos de profil ou les images de campagne, exactement comme décrit au
+          module 03.
+        </p>
+        <p>
+          L'ensemble de la chaîne est vérifié en ligne : construction des images, migrations automatiques,
+          fichiers statiques, API de santé, e-mail SMTP, connexion utilisateur et données de démonstration.
+        </p>
+        <div class="callout">
+          <span class="callout-label">Précaution pour une ouverture publique</span>
+          Cette adresse est une instance de démonstration. Avant une ouverture commerciale, il faut relier un nom
+          de domaine Jappandale définitif, remplacer les mots de passe de démonstration et désactiver le simulateur
+          de paiement jusqu'à l'intégration d'un prestataire réel.
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 -->
+    <section class="module" id="roadmap">
+      <div class="module-head">
+        <span class="module-num">18</span>
         <h2 class="module-title">Ce qui n'est pas encore en place</h2>
       </div>
       <p class="module-standfirst">
@@ -1478,12 +1524,12 @@
           <span class="pill pill--pending">À faire</span>
           <p><strong>Paiement réel.</strong> Les contributions sont aujourd'hui simulées ; l'intégration Wave,
             Orange Money et une passerelle internationale pour la diaspora reste à brancher. Le simulateur est
-            désormais explicitement désactivé en production (voir module 15).</p>
+            activé sur cette démo pour permettre les tests, mais ne constitue pas un paiement réel.</p>
         </div>
         <div class="status-row">
-          <span class="pill pill--pending">À faire</span>
-          <p><strong>Déploiement effectif.</strong> La configuration est prête et testée (voir module 16) ; reste
-            à acheter le VPS et pointer un nom de domaine réel.</p>
+          <span class="pill pill--ok">Réalisé</span>
+          <p><strong>Déploiement de démonstration.</strong> Le VPS, HTTPS, PostgreSQL, les données locales, les
+            médias et l'e-mail SMTP sont actifs (voir module 17).</p>
         </div>
         <div class="status-row">
           <span class="pill pill--pending">À faire</span>
@@ -1491,12 +1537,13 @@
             existent pour l'instant.</p>
         </div>
         <div class="status-row">
-          <span class="pill pill--pending">À faire</span>
-          <p><strong>Application mobile.</strong> La plateforme est aujourd'hui uniquement disponible sur le web.</p>
+          <span class="pill pill--info">Hors périmètre</span>
+          <p><strong>Application mobile.</strong> Hors périmètre actuel : la plateforme est disponible sur le web,
+            y compris sur mobile via son interface responsive.</p>
         </div>
         <div class="status-row">
           <span class="pill pill--info">Partiel</span>
-          <p><strong>Couverture wolof.</strong> Voir module 13 — l'essentiel du parcours est traduit,
+          <p><strong>Couverture wolof.</strong> Voir module 14 — l'essentiel du parcours est traduit,
             mais le back-office, les pages légales et quelques sous-sections du compte restent en français, et une
             relecture par un locuteur natif reste recommandée.</p>
         </div>
@@ -1511,4 +1558,3 @@
       destiné à un usage interne et n'a pas vocation à remplacer le cahier des charges contractuel.</p>
   </div>
 </footer>
-

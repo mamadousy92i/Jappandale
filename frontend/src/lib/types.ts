@@ -1,4 +1,6 @@
-export type Role = "PORTEUR" | "CONTRIBUTEUR" | "ADMIN";
+export type Role = "PORTEUR" | "CONTRIBUTEUR" | "PARTENAIRE" | "ADMIN";
+
+export type PartnerType = "BANQUE" | "INSTITUTION_PUBLIQUE" | "INCUBATEUR" | "FONDS" | "AUTRE";
 
 export type KycStatus = "NON_SOUMIS" | "EN_ATTENTE" | "VALIDE" | "REJETE";
 
@@ -24,6 +26,7 @@ export interface User {
   first_name: string;
   last_name: string;
   role: Role;
+  partner_type: PartnerType;
   phone: string;
   avatar: string | null;
   organization_name: string;
@@ -39,7 +42,8 @@ export interface RegisterData {
   password: string;
   first_name: string;
   last_name: string;
-  role: "PORTEUR" | "CONTRIBUTEUR";
+  role: "PORTEUR" | "CONTRIBUTEUR" | "PARTENAIRE";
+  partner_type?: PartnerType;
   phone?: string;
 }
 
@@ -297,6 +301,27 @@ export interface SchemeReferral {
   id: number;
   scheme: FinancingScheme;
   status: SchemeReferralStatus;
+  status_display: string;
+  note: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectDocument {
+  id: number;
+  campaign: string;
+  title: string;
+  document_type: "BUSINESS_PLAN" | "PITCH_DECK" | "BUDGET" | "JUSTIFICATIF" | "AUTRE";
+  document_type_display: string;
+  shared_with_partners: boolean;
+  file_url: string;
+  created_at: string;
+}
+
+export interface PartnerProjectInterest {
+  id: number;
+  campaign: CampaignListItem;
+  status: "INTERESSE" | "EN_COURS" | "CONTACTE" | "CLOTURE";
   status_display: string;
   note: string;
   created_at: string;

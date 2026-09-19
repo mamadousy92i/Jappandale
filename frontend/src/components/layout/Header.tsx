@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Bell,
+  BriefcaseBusiness,
   ChevronDown,
   FolderKanban,
   LayoutDashboard,
@@ -24,6 +25,7 @@ export function Header() {
   const roleLabels: Record<Role, string> = {
     PORTEUR: t("roles.PORTEUR"),
     CONTRIBUTEUR: t("roles.CONTRIBUTEUR"),
+    PARTENAIRE: t("roles.PARTENAIRE"),
     ADMIN: t("roles.ADMIN"),
   };
   const { user, logout, authFetch } = useAuth();
@@ -141,6 +143,14 @@ export function Header() {
               {t("nav.myCampaigns")}
             </Link>
           )}
+          {user?.role === "PARTENAIRE" && (
+            <Link
+              to="/partenaires"
+              className="rounded-full px-4 py-2 text-sm font-medium text-ink-secondary hover:bg-surface-alt hover:text-ink"
+            >
+              {t("nav.partnerSpace")}
+            </Link>
+          )}
           <Link
             to="/a-propos"
             aria-current={isCurrentPath("/a-propos") ? "page" : undefined}
@@ -223,23 +233,33 @@ export function Header() {
                     </div>
                     <div className="py-2">
                       {user.role === "ADMIN" && (
-                        <Link
-                          role="menuitem"
-                          to="/administration"
-                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt"
-                        >
-                          <LayoutDashboard className="size-4 text-gold-dark" />
-                          {t("header.admin")}
-                        </Link>
+                        <>
+                          <Link role="menuitem" to="/administration" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt">
+                            <LayoutDashboard className="size-4 text-gold-dark" />
+                            {t("header.admin")}
+                          </Link>
+                          <Link role="menuitem" to="/mes-documents" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt">
+                            <FolderKanban className="size-4 text-gold-dark" />
+                            Bibliothèque des projets
+                          </Link>
+                        </>
                       )}
                       {user.role === "PORTEUR" && (
-                        <Link
-                          role="menuitem"
-                          to="/campagnes?vue=mes-campagnes"
-                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt"
-                        >
-                          <FolderKanban className="size-4 text-gold-dark" />
-                          {t("nav.myCampaigns")}
+                        <>
+                          <Link role="menuitem" to="/campagnes?vue=mes-campagnes" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt">
+                            <FolderKanban className="size-4 text-gold-dark" />
+                            {t("nav.myCampaigns")}
+                          </Link>
+                          <Link role="menuitem" to="/mes-documents" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt">
+                            <FolderKanban className="size-4 text-gold-dark" />
+                            {t("nav.projectLibrary")}
+                          </Link>
+                        </>
+                      )}
+                      {user.role === "PARTENAIRE" && (
+                        <Link role="menuitem" to="/partenaires" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-surface-alt">
+                          <BriefcaseBusiness className="size-4 text-gold-dark" />
+                          {t("nav.partnerSpace")}
                         </Link>
                       )}
                       <Link
@@ -360,12 +380,18 @@ export function Header() {
                   </Link>
                 )}
                 {user.role === "PORTEUR" && (
-                  <Link
-                    to="/campagnes?vue=mes-campagnes"
-                    onClick={closeMenus}
-                    className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt"
-                  >
-                    {t("nav.myCampaigns")}
+                  <>
+                    <Link to="/campagnes?vue=mes-campagnes" onClick={closeMenus} className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt">
+                      {t("nav.myCampaigns")}
+                    </Link>
+                    <Link to="/mes-documents" onClick={closeMenus} className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt">
+                      {t("nav.projectLibrary")}
+                    </Link>
+                  </>
+                )}
+                {user.role === "PARTENAIRE" && (
+                  <Link to="/partenaires" onClick={closeMenus} className="rounded-xl px-4 py-3 font-medium text-ink hover:bg-surface-alt">
+                    {t("nav.partnerSpace")}
                   </Link>
                 )}
                 <Link

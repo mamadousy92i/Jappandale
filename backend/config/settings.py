@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.scoring",
     "apps.financial_passport",
     "apps.guichet",
+    "apps.partners",
 ]
 
 MIDDLEWARE = [

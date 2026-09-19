@@ -11,6 +11,7 @@ Idempotent : relancer le script ne crée pas de doublons.
 
 from datetime import timedelta
 
+from django.core.files.base import ContentFile
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -19,6 +20,7 @@ from apps.contributions.models import Contribution
 from apps.disputes.models import Dispute
 from apps.guichet.models import FinancingScheme, SchemeReferral
 from apps.messaging.models import Message, MessageThread
+from apps.partners.models import PartnerProjectInterest, ProjectDocument
 
 now = timezone.now()
 today = timezone.localdate()
@@ -354,5 +356,177 @@ for slug, email_contributeur, echanges in ECHANGES:
     thread.last_message_at = horodatage
     thread.save(update_fields=["last_message_at"])
 print(f"Messagerie : {fils} fil(s) et {msgs} message(s) créé(s)")
+
+# ---------------------------------------------------------------------------
+# 8. Espace partenaires — profils, offres, intérêts et documents de projet
+# ---------------------------------------------------------------------------
+PARTENAIRES = {
+    "banque": {
+        "email": "partenaire.banque@jappandale.sn",
+        "first_name": "Aminata",
+        "last_name": "Diallo",
+        "phone": "+221 33 825 10 50",
+        "organization_name": "Banque SenTeranga",
+        "city": "Dakar",
+        "partner_type": User.PartnerType.BANQUE,
+        "bio": "Équipe PME et entrepreneuriat de Banque SenTeranga.",
+    },
+    "incubateur": {
+        "email": "partenaire.incubateur@jappandale.sn",
+        "first_name": "Moussa",
+        "last_name": "Faye",
+        "phone": "+221 77 555 08 41",
+        "organization_name": "Dakar Impact Lab",
+        "city": "Dakar",
+        "partner_type": User.PartnerType.INCUBATEUR,
+        "bio": "Incubateur dédié aux projets numériques et à impact local.",
+    },
+    "fonds": {
+        "email": "partenaire.fonds@jappandale.sn",
+        "first_name": "Khady",
+        "last_name": "Seck",
+        "phone": "+221 76 412 87 20",
+        "organization_name": "Sahel Croissance",
+        "city": "Thiès",
+        "partner_type": User.PartnerType.FONDS,
+        "bio": "Fonds d'investissement orienté agriculture et transformation locale.",
+    },
+}
+
+partenaires = {}
+for key, profile in PARTENAIRES.items():
+    partner, _ = User.objects.get_or_create(email=profile["email"], defaults=profile)
+    for field, value in profile.items():
+        setattr(partner, field, value)
+    partner.role = User.Role.PARTENAIRE
+    partner.kyc_status = User.KycStatus.VALIDE
+    partner.account_status = User.AccountStatus.VALIDE
+    partner.email_verified_at = now
+    partner.set_password("MotDePasse123!")
+    partner.save()
+    partenaires[key] = partner
+
+OFFRES_PARTENAIRES = [
+    {
+        "partner": "banque",
+        "name": "Crédit équipement PME",
+        "provider_type": FinancingScheme.ProviderType.BANQUE,
+        "description": "Crédit pour l'acquisition d'équipements productifs par des PME avec activité vérifiable.",
+        "min_score": 65,
+        "eligible_categories": ["COMMERCE", "ARTISANAT", "TECHNOLOGIE"],
+        "eligible_regions": ["Dakar", "Thiès"],
+        "min_goal_amount": 500_000,
+        "max_goal_amount": 15_000_000,
+        "status": FinancingScheme.Status.PUBLIE,
+    },
+    {
+        "partner": "incubateur",
+        "name": "Programme d'incubation Impact Numérique",
+        "provider_type": FinancingScheme.ProviderType.PROGRAMME_APPUI,
+        "description": "Accompagnement de six mois : mentorat, ateliers business model et mise en relation avec des investisseurs.",
+        "min_score": 45,
+        "eligible_categories": ["TECHNOLOGIE", "EDUCATION", "CULTURE"],
+        "eligible_regions": ["Dakar"],
+        "min_goal_amount": 100_000,
+        "max_goal_amount": 3_000_000,
+        "status": FinancingScheme.Status.PUBLIE,
+    },
+    {
+        "partner": "fonds",
+        "name": "Fonds de croissance agroalimentaire",
+        "provider_type": FinancingScheme.ProviderType.BAILLEUR,
+        "description": "Financement patient et appui à la structuration pour les unités de transformation agricole.",
+        "min_score": 70,
+        "eligible_categories": ["AGRICULTURE"],
+        "eligible_regions": ["Kaolack", "Thiès", "Saint-Louis"],
+        "min_goal_amount": 1_000_000,
+        "max_goal_amount": 25_000_000,
+        "status": FinancingScheme.Status.BROUILLON,
+    },
+]
+
+offres_creees = 0
+for item in OFFRES_PARTENAIRES:
+    partner = partenaires[item["partner"]]
+    defaults = {
+        "provider_name": partner.organization_name,
+        "provider_type": item["provider_type"],
+        "description": item["description"],
+        "min_score": item["min_score"],
+        "requires_kyc_valide": True,
+        "diaspora_requirement": FinancingScheme.DiasporaRequirement.INDIFFERENT,
+        "eligible_categories": item["eligible_categories"],
+        "eligible_regions": item["eligible_regions"],
+        "min_goal_amount": item["min_goal_amount"],
+        "max_goal_amount": item["max_goal_amount"],
+        "status": item["status"],
+        "created_by": partner,
+    }
+    offer, created = FinancingScheme.objects.get_or_create(name=item["name"], defaults=defaults)
+    if created:
+        if offer.status == FinancingScheme.Status.PUBLIE:
+            offer.published_at = now - timedelta(days=5)
+            offer.save(update_fields=["published_at"])
+        offres_creees += 1
+
+INTERETS_PARTENAIRES = [
+    ("banque", "equiper-un-atelier-ecole-de-couture-a-la-medina", PartnerProjectInterest.Status.EN_COURS, "Premier échange prévu avec le porteur pour analyser le besoin en équipement."),
+    ("incubateur", "renforcer-une-boutique-de-produits-essentiels-a-pikine", PartnerProjectInterest.Status.CONTACTE, "Le porteur a été invité à présenter son projet lors du prochain comité."),
+    ("fonds", "moderniser-une-unite-de-transformation-de-cereales", PartnerProjectInterest.Status.INTERESSE, "Analyse du potentiel de transformation locale en cours."),
+]
+
+interets_crees = 0
+for partner_key, campaign_slug, interest_status, note in INTERETS_PARTENAIRES:
+    campaign = Campaign.objects.filter(slug=campaign_slug).first()
+    if not campaign:
+        continue
+    _, created = PartnerProjectInterest.objects.get_or_create(
+        partner=partenaires[partner_key],
+        campaign=campaign,
+        defaults={"status": interest_status, "note": note},
+    )
+    if created:
+        interets_crees += 1
+
+DOCUMENTS_PROJETS = [
+    ("equiper-un-atelier-ecole-de-couture-a-la-medina", "Business plan — Atelier Sunu Couture", ProjectDocument.DocumentType.BUSINESS_PLAN, True),
+    ("equiper-un-atelier-ecole-de-couture-a-la-medina", "Budget prévisionnel des équipements", ProjectDocument.DocumentType.BUDGET, True),
+    ("moderniser-une-unite-de-transformation-de-cereales", "Pitch deck — Unité céréalière", ProjectDocument.DocumentType.PITCH_DECK, True),
+    ("renforcer-une-boutique-de-produits-essentiels-a-pikine", "Justificatif commercial interne", ProjectDocument.DocumentType.JUSTIFICATIF, False),
+]
+
+documents_crees = 0
+for campaign_slug, title, document_type, shared in DOCUMENTS_PROJETS:
+    campaign = Campaign.objects.filter(slug=campaign_slug).first()
+    if not campaign:
+        continue
+    document, created = ProjectDocument.objects.get_or_create(
+        campaign=campaign,
+        title=title,
+        defaults={
+            "uploaded_by": campaign.owner,
+            "document_type": document_type,
+            "shared_with_partners": shared,
+        },
+    )
+    if created:
+        document.file.save(
+            f"{campaign.slug}-{document_type.lower()}.pdf",
+            ContentFile(
+                (
+                    "%PDF-1.4\n"
+                    "% Document de démonstration Jappandale — sans valeur contractuelle\n"
+                    f"% Projet : {campaign.title}\n"
+                ).encode()
+            ),
+            save=True,
+        )
+        documents_crees += 1
+
+print(
+    "Espace partenaires : "
+    f"{len(partenaires)} profil(s), {offres_creees} offre(s), "
+    f"{interets_crees} intérêt(s) et {documents_crees} document(s) créés."
+)
 
 print("\nPeuplement de démonstration terminé.")

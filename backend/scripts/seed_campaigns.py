@@ -15,8 +15,11 @@ from django.utils import timezone
 from apps.campaigns.models import Campaign, CampaignAuditLog, CampaignReport, CampaignUpdate
 from apps.contributions.models import Contribution, Transaction
 from apps.core.models import SupportReply, SupportRequest
+from apps.disputes.models import Dispute
 from apps.kyc.models import KycAuditLog, KycDocument
+from apps.messaging.models import MessageThread
 from apps.notifications.models import Notification
+from apps.partners.models import PartnerProjectInterest, ProjectDocument
 
 User = get_user_model()
 PHOTOS = settings.BASE_DIR.parent / "frontend" / "public" / "photos"
@@ -148,6 +151,16 @@ kyc_rejected.save()
 demo_users = [*porteurs.values(), contributor, administrator, kyc_pending, kyc_rejected]
 demo_emails = [user.email for user in demo_users]
 demo_campaigns = Campaign.objects.filter(owner__in=porteurs.values())
+
+# Les objets protégeant une contribution ou une campagne sont retirés avant la
+# réinitialisation du jeu de démo. Les fichiers de projet sont aussi supprimés
+# du stockage local afin de ne pas laisser d'orphelins à chaque relance.
+Dispute.objects.filter(contribution__campaign__in=demo_campaigns).delete()
+MessageThread.objects.filter(campaign__in=demo_campaigns).delete()
+PartnerProjectInterest.objects.filter(campaign__in=demo_campaigns).delete()
+for document in ProjectDocument.objects.filter(campaign__in=demo_campaigns):
+    document.file.delete(save=False)
+    document.delete()
 Transaction.objects.filter(contribution__campaign__in=demo_campaigns).delete()
 Contribution.objects.filter(campaign__in=demo_campaigns).delete()
 CampaignAuditLog.objects.filter(campaign__in=demo_campaigns).delete()

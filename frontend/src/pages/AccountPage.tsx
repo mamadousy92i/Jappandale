@@ -25,6 +25,7 @@ function AccountPage() {
   const roleLabels: Record<Role, string> = {
     PORTEUR: t("main.roles.PORTEUR"),
     CONTRIBUTEUR: t("main.roles.CONTRIBUTEUR"),
+    PARTENAIRE: t("main.roles.PARTENAIRE"),
     ADMIN: t("main.roles.ADMIN"),
   }
   const { user, authFetch, refreshUser } = useAuth()

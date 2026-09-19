@@ -39,7 +39,15 @@ class User(AbstractUser):
     class Role(models.TextChoices):
         PORTEUR = "PORTEUR", "Porteur de projet"
         CONTRIBUTEUR = "CONTRIBUTEUR", "Contributeur"
+        PARTENAIRE = "PARTENAIRE", "Partenaire financier"
         ADMIN = "ADMIN", "Administrateur"
+
+    class PartnerType(models.TextChoices):
+        BANQUE = "BANQUE", "Banque"
+        INSTITUTION_PUBLIQUE = "INSTITUTION_PUBLIQUE", "Institution publique"
+        INCUBATEUR = "INCUBATEUR", "Incubateur / accompagnateur"
+        FONDS = "FONDS", "Fonds / investisseur"
+        AUTRE = "AUTRE", "Autre partenaire"
 
     class KycStatus(models.TextChoices):
         NON_SOUMIS = "NON_SOUMIS", "Non soumis"
@@ -57,6 +65,12 @@ class User(AbstractUser):
     email = models.EmailField("adresse e-mail", unique=True)
     role = models.CharField(
         "rôle", max_length=20, choices=Role.choices, default=Role.CONTRIBUTEUR
+    )
+    partner_type = models.CharField(
+        "type de partenaire",
+        max_length=25,
+        choices=PartnerType.choices,
+        default=PartnerType.AUTRE,
     )
     phone = models.CharField("téléphone", max_length=20, blank=True)
     avatar = models.ImageField(

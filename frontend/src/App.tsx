@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import { RequireAuth } from "@/components/RequireAuth";
 import { RequireAdmin } from "@/components/RequireAdmin";
+import { RequirePartner } from "@/components/RequirePartner";
 import { RequireVerifiedEmail } from "@/components/RequireVerifiedEmail";
 import { Layout } from "@/components/layout/Layout";
 import AccountPage from "@/pages/AccountPage";
@@ -21,6 +22,8 @@ import LoginPage from "@/pages/LoginPage";
 import MessagesPage from "@/pages/MessagesPage";
 import NotificationsPage from "@/pages/NotificationsPage";
 import PassportVerificationPage from "@/pages/PassportVerificationPage";
+import PartnerDashboardPage from "@/pages/PartnerDashboardPage";
+import ProjectLibraryPage from "@/pages/ProjectLibraryPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ReportCampaignPage from "@/pages/ReportCampaignPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
@@ -150,6 +153,28 @@ function App() {
           element={
             <RequireAuth>
               <AccountPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/partenaires"
+          element={
+            <RequireAuth>
+              <RequireVerifiedEmail>
+                <RequirePartner>
+                  <PartnerDashboardPage />
+                </RequirePartner>
+              </RequireVerifiedEmail>
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/mes-documents"
+          element={
+            <RequireAuth>
+              <RequireVerifiedEmail>
+                <ProjectLibraryPage />
+              </RequireVerifiedEmail>
             </RequireAuth>
           }
         />

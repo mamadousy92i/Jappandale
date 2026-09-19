@@ -36,7 +36,13 @@ Application sur http://localhost:5173, API sur http://localhost:8001/api/.
 ```bash
 cd backend
 python manage.py shell < scripts/seed_campaigns.py
+python manage.py shell < scripts/seed_demo.py
 ```
+
+Le second script complète les comptes et campagnes de démonstration avec le
+Guichet Unique, les partenaires financiers, leurs offres, intérêts et documents
+de projet. Les identifiants de démonstration utilisent le mot de passe
+`MotDePasse123!` ; ils ne doivent jamais être utilisés en production.
 
 
 

@@ -15,15 +15,20 @@ logger = logging.getLogger(__name__)
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     role = serializers.ChoiceField(
-        choices=[User.Role.PORTEUR, User.Role.CONTRIBUTEUR],
+        choices=[User.Role.PORTEUR, User.Role.CONTRIBUTEUR, User.Role.PARTENAIRE],
         default=User.Role.CONTRIBUTEUR,
+    )
+    partner_type = serializers.ChoiceField(
+        choices=User.PartnerType.choices,
+        required=False,
+        default=User.PartnerType.AUTRE,
     )
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150)
 
     class Meta:
         model = User
-        fields = ["id", "email", "password", "first_name", "last_name", "role", "phone"]
+        fields = ["id", "email", "password", "first_name", "last_name", "role", "partner_type", "phone"]
         read_only_fields = ["id"]
 
     def create(self, validated_data):
@@ -55,7 +60,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "email_verified", "first_name", "last_name", "role", "phone", "avatar", "organization_name", "city", "bio", "is_diaspora", "country", "kyc_status"]
+        fields = ["id", "email", "email_verified", "first_name", "last_name", "role", "partner_type", "phone", "avatar", "organization_name", "city", "bio", "is_diaspora", "country", "kyc_status"]
         read_only_fields = ["id", "email", "role", "kyc_status"]
 
     def validate_avatar(self, avatar):

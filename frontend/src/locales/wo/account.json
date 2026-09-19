@@ -3,6 +3,7 @@
     "roles": {
       "PORTEUR": "Boroom porojet",
       "CONTRIBUTEUR": "Kiy dokkal",
+      "PARTENAIRE": "Partenaire financier",
       "ADMIN": "Administrateur"
     },
     "eyebrow": "Sama kont",

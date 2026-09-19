@@ -18,6 +18,7 @@ const member: User = {
   first_name: "Awa",
   last_name: "Ndiaye",
   role: "CONTRIBUTEUR",
+  partner_type: "AUTRE",
   phone: "",
   avatar: null,
   organization_name: "",
