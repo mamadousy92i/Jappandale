@@ -519,7 +519,7 @@
       <li><a href="#notifications"><span class="num">11</span>Notifications</a></li>
       <li><a href="#litiges"><span class="num">12</span>Litiges</a></li>
       <li><a href="#backoffice"><span class="num">13</span>Back-office admin</a></li>
-      <li><a href="#langue"><span class="num">14</span>Langue : français et wolof</a></li>
+      <li><a href="#langue"><span class="num">14</span>Langue : 4 langues</a></li>
       <li><a href="#securite"><span class="num">15</span>Sécurité</a></li>
       <li><a href="#audit"><span class="num">16</span>Audit de sécurité</a></li>
       <li><a href="#deploiement"><span class="num">17</span>Déploiement</a></li>
@@ -565,14 +565,14 @@
 
       <div class="callout">
         <span class="callout-label">Adresse de la démo</span>
-        <a href="https://jappandale.76.13.53.119.nip.io"><strong>https://jappandale.76.13.53.119.nip.io</strong></a><br>
+        <a href="https://152-228-141-27.sslip.io"><strong>https://152-228-141-27.sslip.io</strong></a><br>
         Environnement de <strong>test</strong> : les données sont fictives, aucun paiement réel n'a lieu, et le
         contenu peut être réinitialisé à tout moment. Ne pas y déposer de vraies pièces d'identité.
       </div>
 
       <div class="prose">
         <h3>Comptes de démonstration</h3>
-        <p>Mot de passe par défaut : <code>MotDePasse123!</code>. Deux comptes historiques conservent leur propre mot de passe, indiqué ci-dessous.</p>
+        <p>Même mot de passe pour tous les comptes ci-dessous : <code>JappandaleDemo2026!</code>.</p>
       </div>
 
       <div class="status-table">
@@ -604,10 +604,21 @@
             Utile pour tester à deux en parallèle, ou vérifier ce que voit un autre contributeur.</p>
         </div>
         <div class="status-row">
-          <span class="pill pill--ok">Partenaire financier · KYC validé</span>
-          <p><code>partenaire.banque@jappandale.sn</code><br>
+          <span class="pill pill--ok">Partenaire · Banque</span>
+          <p><code>partenaire.banque@jappandale.sn</code> — Banque SenTeranga<br>
             Accède à l'espace partenaires, aux campagnes publiées, aux documents explicitement partagés et à ses
-            offres de financement.</p>
+            propres offres de financement. A déjà manifesté un intérêt et publié une offre.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Partenaire · Incubateur</span>
+          <p><code>partenaire.incubateur@jappandale.sn</code> — Dakar Impact Lab<br>
+            Même espace, pour tester un second profil de partenaire en parallèle.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--ok">Partenaire · Fonds d'investissement</span>
+          <p><code>partenaire.fonds@jappandale.sn</code> — Sahel Croissance<br>
+            Son offre de financement est encore en <strong>brouillon</strong> : utile pour voir cet état avant
+            publication.</p>
         </div>
         <div class="status-row">
           <span class="pill pill--info">Administrateur</span>
@@ -703,6 +714,20 @@
             passage du dossier en « en attente ».</li>
           <li>Tester « mot de passe oublié » et le lien de réinitialisation.</li>
         </ol>
+
+        <h3>Parcours n° 5 — Partenaire financier (~5 min)</h3>
+        <p>Connexion avec <code>partenaire.banque@jappandale.sn</code>.</p>
+        <ol>
+          <li>Parcourir les campagnes publiées depuis l'espace partenaire, filtrer par secteur ou rechercher un
+            projet.</li>
+          <li>Ouvrir une campagne et télécharger un document de projet partagé (business plan, budget…).</li>
+          <li>Consulter « Mes intérêts » : un intérêt a déjà été manifesté sur une campagne, à suivre au fil de
+            son traitement par le porteur.</li>
+          <li>Consulter « Mes offres » : une offre de financement est déjà publiée. En créer une nouvelle — elle
+            démarre en <strong>brouillon</strong>, jamais publique automatiquement (voir module 09).</li>
+          <li>Se reconnecter avec <code>partenaire.fonds@jappandale.sn</code> pour voir une offre encore en
+            brouillon, à l'inverse.</li>
+        </ol>
       </div>
 
       <div class="callout">
@@ -716,6 +741,14 @@
         données fictives, mais il devra impérativement être désactivé
         (<code>SIMULATED_PAYMENTS_ENABLED=False</code>) sur la future production réelle, où un vrai prestataire de
         paiement prendra le relais.
+      </div>
+
+      <div class="callout">
+        <span class="callout-label">Avant de faire tester la démo</span>
+        Les échéances des campagnes de démonstration sont réelles : une campagne dont la date limite est dépassée
+        se clôture automatiquement, comme en production. Avant toute présentation, lancer
+        <code>bash scripts/rafraichir-demo.sh</code> depuis le dépôt remet à jour le code du serveur et republie
+        les campagnes closes par expiration (jamais celles closes par un vrai succès).
       </div>
 
       <div class="prose">
@@ -1369,15 +1402,16 @@
     <section class="module" id="langue">
       <div class="module-head">
         <span class="module-num">14</span>
-        <h2 class="module-title">Langue : français et wolof</h2>
+        <h2 class="module-title">Langue : français, wolof, italien et espagnol</h2>
       </div>
       <p class="module-standfirst">
-        Une bascule de langue est disponible dans le menu principal, sur ordinateur comme sur mobile, et le choix
-        de la personne est mémorisé d'une visite à l'autre.
+        Un menu déroulant (icône <span aria-hidden="true">🌐</span>) est disponible dans le menu principal, sur
+        ordinateur comme sur mobile, pour choisir sa langue. Le choix de la personne est mémorisé d'une visite à
+        l'autre.
       </p>
 
       <div class="prose">
-        <h3>Ce qui est déjà traduit en wolof</h3>
+        <h3>Ce qui est déjà traduit dans les 4 langues</h3>
         <p>
           L'ensemble du parcours public et du parcours compte : connexion, inscription, mot de passe oublié,
           vérification d'e-mail, page d'accueil (dont la section « Comment ça marche »), liste et détail des
@@ -1388,16 +1422,17 @@
         </p>
         <h3>Ce qui reste uniquement en français</h3>
         <p>
-          Le tableau de bord administrateur (outil interne à l'équipe, pas destiné au grand public) et les pages
-          légales — mentions légales, confidentialité, conditions d'utilisation — qui restent en français par
-          choix : une traduction contractuelle demande une relecture juridique professionnelle, pas une
-          traduction automatisée. La section « Vérification d'identité » (KYC) du compte reste également en
-          français, ses libellés de pièces provenant directement du back-end.
+          Le tableau de bord administrateur et l'espace partenaire (outils internes, pas destinés au grand
+          public) et les pages légales — mentions légales, confidentialité, conditions d'utilisation — qui
+          restent en français par choix : une traduction contractuelle demande une relecture juridique
+          professionnelle, pas une traduction automatisée. La section « Vérification d'identité » (KYC) du
+          compte reste également en français, ses libellés de pièces provenant directement du back-end.
         </p>
         <div class="callout">
           <span class="callout-label">À faire avant mise en avant publique</span>
-          Les textes wolof ont été rédigés sans certification de traducteur professionnel. Une relecture par un
-          locuteur natif est recommandée avant de mettre en avant cette fonctionnalité auprès du grand public.
+          Les textes wolof, italien et espagnol ont été rédigés sans certification de traducteur professionnel.
+          Une relecture par un locuteur natif de chaque langue est recommandée avant de mettre en avant cette
+          fonctionnalité auprès du grand public.
         </div>
       </div>
     </section>
@@ -1488,7 +1523,7 @@
         <p>
           Toute la plateforme tourne dans des conteneurs Docker : le site React/Django, la base de données
           PostgreSQL, une tâche planifiée quotidienne de clôture des campagnes et le serveur web. L'instance de
-          démonstration est publiée à <a href="https://jappandale.76.13.53.119.nip.io">jappandale.76.13.53.119.nip.io</a>, avec une redirection HTTP vers HTTPS et un certificat Let's Encrypt valide.
+          démonstration est publiée à <a href="https://152-228-141-27.sslip.io">152-228-141-27.sslip.io</a>, avec une redirection HTTP vers HTTPS et un certificat Let's Encrypt valide.
         </p>
         <p>
           Un principe de sécurité central de cette configuration : le serveur web ne sert jamais directement les
@@ -1543,9 +1578,9 @@
         </div>
         <div class="status-row">
           <span class="pill pill--info">Partiel</span>
-          <p><strong>Couverture wolof.</strong> Voir module 14 — l'essentiel du parcours est traduit,
-            mais le back-office, les pages légales et quelques sous-sections du compte restent en français, et une
-            relecture par un locuteur natif reste recommandée.</p>
+          <p><strong>Couverture multilingue.</strong> Voir module 14 — l'essentiel du parcours est traduit en
+            wolof, italien et espagnol, mais le back-office, l'espace partenaire et les pages légales restent en
+            français, et une relecture par un locuteur natif de chaque langue reste recommandée.</p>
         </div>
       </div>
     </section>
