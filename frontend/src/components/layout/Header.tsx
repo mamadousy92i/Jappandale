@@ -337,7 +337,7 @@ export function Header() {
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-2">
             <div className="mb-1 flex justify-start">
-              <LanguageSwitcher />
+              <LanguageSwitcher align="left" />
             </div>
             {user && (
               <div className="mb-2 flex items-center gap-3 rounded-2xl bg-surface-alt p-3">
