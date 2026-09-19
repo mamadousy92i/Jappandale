@@ -193,6 +193,16 @@
     "publishUpdate": "Yónnee xibaar bu bees",
     "submitDraft": "Yónnee ngir wóoral",
     "resubmit": "Yónneeat ngir wóoral",
-    "submitting": "Di yónnee…"
+    "submitting": "Di yónnee…",
+    "fee": {
+      "title": "Xaalisu dosye",
+      "notRequested": "Balaa nga yónnee kanpaañ bii ngir ñu ko wóoral, fey xaalisu dosye bi ci ekipu Jappandale, gannaaw loolu laaj ñu wóoral ko.",
+      "pending": "Sa laaj ngir wóoral xaalisu dosye bi mungi ci xool ci kow ab administrateur.",
+      "rejectedFallback": "Xaalisu dosye bi ñu bàyyi ko. Jokkoo ak ekipu Jappandale ngir jubal sa dosye.",
+      "request": "Laaj wóoral xaalis yi",
+      "requestAgain": "Laajaat wóoral bi",
+      "requesting": "Di yónnee…",
+      "requestError": "Laaj bi baaxul. Jéema beneen yoon."
+    }
   }
 }

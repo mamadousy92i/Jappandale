@@ -106,13 +106,85 @@ def test_detail_campagne_publiee_accessible_au_public():
 @pytest.mark.django_db
 def test_soumission_passe_en_moderation():
     porteur = _porteur_valide()
-    campagne = _creer_campagne(porteur, status=Campaign.Status.BROUILLON)
+    campagne = _creer_campagne(
+        porteur,
+        status=Campaign.Status.BROUILLON,
+        dossier_fee_status=Campaign.DossierFeeStatus.VALIDE,
+    )
     client = APIClient()
     client.force_authenticate(porteur)
     response = client.post(f"/api/campaigns/{campagne.slug}/submit/")
     assert response.status_code == 200
     campagne.refresh_from_db()
     assert campagne.status == Campaign.Status.EN_MODERATION
+
+
+@pytest.mark.django_db
+def test_soumission_refusee_sans_frais_de_dossier_valides():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(porteur, status=Campaign.Status.BROUILLON)
+    assert campagne.dossier_fee_status == Campaign.DossierFeeStatus.NON_DEMANDE
+    client = APIClient()
+    client.force_authenticate(porteur)
+    response = client.post(f"/api/campaigns/{campagne.slug}/submit/")
+    assert response.status_code == 400
+    assert "dossier_fee_status" in response.data
+    campagne.refresh_from_db()
+    assert campagne.status == Campaign.Status.BROUILLON
+
+
+@pytest.mark.django_db
+def test_demande_de_validation_des_frais_puis_soumission():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(porteur, status=Campaign.Status.BROUILLON)
+    client = APIClient()
+    client.force_authenticate(porteur)
+
+    demande = client.post(f"/api/campaigns/{campagne.slug}/demande-validation-frais/")
+    assert demande.status_code == 200
+    campagne.refresh_from_db()
+    assert campagne.dossier_fee_status == Campaign.DossierFeeStatus.EN_ATTENTE
+
+    # Toujours bloquée tant qu'un administrateur n'a pas validé.
+    toujours_bloquee = client.post(f"/api/campaigns/{campagne.slug}/submit/")
+    assert toujours_bloquee.status_code == 400
+
+    campagne.dossier_fee_status = Campaign.DossierFeeStatus.VALIDE
+    campagne.save(update_fields=["dossier_fee_status"])
+    soumission = client.post(f"/api/campaigns/{campagne.slug}/submit/")
+    assert soumission.status_code == 200
+
+
+@pytest.mark.django_db
+def test_impossible_de_redemander_une_validation_deja_en_cours():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(
+        porteur,
+        status=Campaign.Status.BROUILLON,
+        dossier_fee_status=Campaign.DossierFeeStatus.EN_ATTENTE,
+    )
+    client = APIClient()
+    client.force_authenticate(porteur)
+    response = client.post(f"/api/campaigns/{campagne.slug}/demande-validation-frais/")
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_porteur_peut_redemander_apres_un_rejet_des_frais():
+    porteur = _porteur_valide()
+    campagne = _creer_campagne(
+        porteur,
+        status=Campaign.Status.BROUILLON,
+        dossier_fee_status=Campaign.DossierFeeStatus.REJETE,
+        dossier_fee_note="Référence de paiement introuvable.",
+    )
+    client = APIClient()
+    client.force_authenticate(porteur)
+    response = client.post(f"/api/campaigns/{campagne.slug}/demande-validation-frais/")
+    assert response.status_code == 200
+    campagne.refresh_from_db()
+    assert campagne.dossier_fee_status == Campaign.DossierFeeStatus.EN_ATTENTE
+    assert campagne.dossier_fee_note == ""
 
 
 @pytest.mark.django_db
@@ -153,6 +225,7 @@ def test_porteur_modifie_une_campagne_suspendue_et_la_renvoie_en_validation():
         porteur,
         status=Campaign.Status.SUSPENDUE,
         suspension_note="Le calendrier doit être corrigé.",
+        dossier_fee_status=Campaign.DossierFeeStatus.VALIDE,
     )
     client = APIClient()
     client.force_authenticate(porteur)

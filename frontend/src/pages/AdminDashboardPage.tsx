@@ -20,7 +20,7 @@ type Person = {
   phone: string
   role: string
 }
-type MetricKey = "pending_kyc" | "pending_campaigns" | "open_reports" | "open_support" | "open_message_reports" | "open_disputes"
+type MetricKey = "pending_kyc" | "pending_campaigns" | "pending_fee_campaigns" | "open_reports" | "open_support" | "open_message_reports" | "open_disputes"
 type CampaignStatus = "EN_MODERATION" | "PUBLIEE" | "SUSPENDUE"
 
 interface DashboardData {
@@ -60,6 +60,14 @@ interface DashboardData {
       actor: string
       created_at: string
     }>
+  }>
+  fee_requests: Array<{
+    id: number
+    slug: string
+    title: string
+    goal_amount: number
+    owner: Person
+    requested_at: string
   }>
   reports: Array<{
     id: number
@@ -806,6 +814,12 @@ export default function AdminDashboardPage() {
       target: "campaigns",
     },
     {
+      label: "Frais de dossier à valider",
+      value: data.metrics.pending_fee_campaigns,
+      icon: Banknote,
+      target: "campaigns",
+    },
+    {
       label: "Signalements ouverts",
       value: data.metrics.open_reports,
       icon: ShieldAlert,
@@ -1182,6 +1196,84 @@ export default function AdminDashboardPage() {
               </h2>
               <p className="mt-1 text-sm text-ink-secondary">Modération, suspension et historique des décisions.</p>
             </div>
+
+            {data.fee_requests.length > 0 && (
+              <div className="space-y-3 rounded-[20px] border border-gold/30 bg-gold/5 p-5">
+                <h3 className="font-heading text-lg font-bold text-ink">
+                  Frais de dossier à valider ({data.fee_requests.length})
+                </h3>
+                <p className="text-sm text-ink-secondary">
+                  Ces porteurs ont déclaré avoir réglé les frais de dossier et attendent votre validation avant de
+                  pouvoir soumettre leur campagne à modération.
+                </p>
+                <div className="space-y-3">
+                  {data.fee_requests.map((item) => {
+                    const key = `fee-${item.id}`
+                    const note = drafts[key] ?? ""
+                    return (
+                      <article key={item.id} className="rounded-2xl border border-black/5 bg-white p-4">
+                        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+                          <div>
+                            <h4 className="font-heading text-base font-bold text-ink">{item.title}</h4>
+                            <p className="text-xs text-ink-muted">
+                              {item.owner.name} · {item.owner.email} · {formatFcfa(item.goal_amount)}
+                            </p>
+                          </div>
+                          <Link
+                            to={`/campagnes/${item.slug}`}
+                            target="_blank"
+                            className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-ink-secondary hover:text-ink"
+                          >
+                            Prévisualiser
+                            <ExternalLink className="size-4" />
+                          </Link>
+                        </div>
+                        <div className="mt-3">
+                          <NoteField
+                            value={note}
+                            onChange={(value) => setDrafts((current) => ({ ...current, [key]: value }))}
+                            placeholder="Motif obligatoire en cas de refus"
+                            rows={2}
+                          />
+                        </div>
+                        <div className="mt-3 flex flex-wrap justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            disabled={!note.trim()}
+                            onClick={() =>
+                              askWithNote(
+                                note,
+                                "Rejeter ces frais de dossier ?",
+                                "Le porteur recevra le motif et ne pourra pas soumettre sa campagne tant que le problème n’est pas résolu.",
+                                "Rejeter",
+                                () => perform(`/backoffice/campaigns/${item.id}/frais/`, "POST", { decision: "REJETE", note }, "Frais de dossier rejetés."),
+                              )
+                            }
+                            className="rounded-full border-red-200 text-red-700"
+                          >
+                            Rejeter
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              ask(
+                                "Valider ces frais de dossier ?",
+                                "Le porteur pourra soumettre sa campagne à modération.",
+                                "Valider",
+                                () => perform(`/backoffice/campaigns/${item.id}/frais/`, "POST", { decision: "VALIDE", note: "" }, "Frais de dossier validés."),
+                              )
+                            }
+                            className="rounded-full bg-emerald-600 text-white"
+                          >
+                            Valider
+                          </Button>
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {visibleItems.length === 0 ? (
               <EmptyQueue label="campagne" />
             ) : (

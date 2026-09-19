@@ -44,6 +44,7 @@ class CampaignViewSet(viewsets.ModelViewSet):
         if self.action in (
             "retrieve",
             "submit",
+            "request_fee_validation",
             "add_update",
             "create_reward",
             "reward_detail",
@@ -106,6 +107,38 @@ class CampaignViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=["post"], url_path="demande-validation-frais")
+    def request_fee_validation(self, request, slug=None):
+        campaign = self.get_object()
+        if campaign.owner_id != request.user.id:
+            raise PermissionDenied("Cette campagne ne vous appartient pas.")
+        if campaign.status != Campaign.Status.BROUILLON:
+            raise ValidationError(
+                "La validation des frais de dossier ne concerne que les campagnes en brouillon."
+            )
+        if campaign.dossier_fee_status not in (
+            Campaign.DossierFeeStatus.NON_DEMANDE,
+            Campaign.DossierFeeStatus.REJETE,
+        ):
+            raise ValidationError(
+                "Une demande de validation des frais de dossier est déjà en cours ou déjà acceptée."
+            )
+        campaign.dossier_fee_status = Campaign.DossierFeeStatus.EN_ATTENTE
+        campaign.dossier_fee_note = ""
+        campaign.save(update_fields=["dossier_fee_status", "dossier_fee_note"])
+        CampaignAuditLog.objects.create(
+            campaign=campaign,
+            actor=request.user,
+            action=CampaignAuditLog.Action.FEE_REQUESTED,
+            previous_status=campaign.status,
+            new_status=campaign.status,
+        )
+        notify_admins(
+            subject="Frais de dossier à valider",
+            message=f"Le porteur de « {campaign.title} » a réglé les frais de dossier et attend leur validation.",
+        )
+        return Response(CampaignDetailSerializer(campaign).data)
+
     @action(detail=True, methods=["post"])
     def submit(self, request, slug=None):
         campaign = self.get_object()
@@ -113,6 +146,15 @@ class CampaignViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Cette campagne ne vous appartient pas.")
         if campaign.status not in EDITABLE_STATUSES:
             raise ValidationError("Cette campagne ne peut pas être soumise à modération.")
+        if campaign.dossier_fee_status != Campaign.DossierFeeStatus.VALIDE:
+            raise ValidationError(
+                {
+                    "dossier_fee_status": (
+                        "Les frais de dossier doivent être validés par un administrateur "
+                        "avant de soumettre cette campagne."
+                    )
+                }
+            )
         required_fields = {
             "location": "Indiquez la localisation du projet.",
             "beneficiaries": "Précisez les bénéficiaires attendus.",

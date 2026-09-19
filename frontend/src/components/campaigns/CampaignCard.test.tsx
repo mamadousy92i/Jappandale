@@ -24,6 +24,9 @@ const campaign: CampaignListItem = {
   status_display: "Publiée",
   moderation_note: "",
   suspension_note: "",
+  dossier_fee_status: "VALIDE",
+  dossier_fee_status_display: "Validés",
+  dossier_fee_note: "",
   progress_percent: 40,
   days_left: 20,
 };

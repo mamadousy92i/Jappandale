@@ -65,6 +65,8 @@ export type CampaignStatus =
   | "SUSPENDUE"
   | "CLOTUREE";
 
+export type DossierFeeStatus = "NON_DEMANDE" | "EN_ATTENTE" | "VALIDE" | "REJETE";
+
 export type CampaignType =
   | "DON_LIBRE"
   | "DON_CONTREPARTIE"
@@ -100,6 +102,9 @@ export interface CampaignListItem {
   status_display: string;
   moderation_note: string;
   suspension_note: string;
+  dossier_fee_status: DossierFeeStatus;
+  dossier_fee_status_display: string;
+  dossier_fee_note: string;
   progress_percent: number;
   days_left: number;
 }

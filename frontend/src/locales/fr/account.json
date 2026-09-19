@@ -193,6 +193,16 @@
     "publishUpdate": "Publier une actualité",
     "submitDraft": "Soumettre à validation",
     "resubmit": "Renvoyer en validation",
-    "submitting": "Envoi…"
+    "submitting": "Envoi…",
+    "fee": {
+      "title": "Frais de dossier",
+      "notRequested": "Avant de soumettre cette campagne à modération, réglez les frais de dossier auprès de l'équipe Jappandale, puis demandez leur validation.",
+      "pending": "Votre demande de validation des frais de dossier est en cours d'examen par un administrateur.",
+      "rejectedFallback": "Les frais de dossier ont été rejetés. Contactez l'équipe Jappandale pour régulariser votre dossier.",
+      "request": "Demander la validation des frais",
+      "requestAgain": "Redemander la validation",
+      "requesting": "Envoi…",
+      "requestError": "La demande a échoué. Réessayez."
+    }
   }
 }

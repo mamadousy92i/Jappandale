@@ -27,6 +27,16 @@ class CampaignDecisionSerializer(serializers.Serializer):
         return attrs
 
 
+class CampaignFeeDecisionSerializer(serializers.Serializer):
+    decision = serializers.ChoiceField(choices=["VALIDE", "REJETE"])
+    note = serializers.CharField(required=False, allow_blank=True, max_length=1500)
+
+    def validate(self, attrs):
+        if attrs["decision"] == "REJETE" and not attrs.get("note", "").strip():
+            raise serializers.ValidationError({"note": "Indiquez le motif du refus."})
+        return attrs
+
+
 class ReportReviewSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=CampaignReport.Status.choices)
     admin_note = serializers.CharField(required=False, allow_blank=True, max_length=2000)

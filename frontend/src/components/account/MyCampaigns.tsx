@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
   ArrowUpRight,
+  Banknote,
   FolderOpen,
   Gift,
   Newspaper,
@@ -50,11 +51,18 @@ function CampaignRow({
   const { authFetch } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
+  const [requestingFee, setRequestingFee] = useState(false);
+  const [feeError, setFeeError] = useState(false);
 
   const canEdit = ["BROUILLON", "REJETEE", "SUSPENDUE"].includes(
     campaign.status,
   );
-  const canSubmit = canEdit;
+  const feeValidated = campaign.dossier_fee_status === "VALIDE";
+  const canSubmit = canEdit && feeValidated;
+  const canRequestFee =
+    campaign.status === "BROUILLON" &&
+    (campaign.dossier_fee_status === "NON_DEMANDE" ||
+      campaign.dossier_fee_status === "REJETE");
   const decisionReason =
     campaign.status === "REJETEE"
       ? campaign.moderation_note
@@ -73,6 +81,20 @@ function CampaignRow({
     } catch {
       setError(true);
       setSubmitting(false);
+    }
+  };
+
+  const handleRequestFeeValidation = async () => {
+    setFeeError(false);
+    setRequestingFee(true);
+    try {
+      await authFetch(`/campaigns/${campaign.slug}/demande-validation-frais/`, {
+        method: "POST",
+      });
+      onReload();
+    } catch {
+      setFeeError(true);
+      setRequestingFee(false);
     }
   };
 
@@ -131,6 +153,47 @@ function CampaignRow({
                   : t("myCampaigns.suspensionReason")}
               </p>
               <p className="mt-1.5 leading-relaxed">{decisionReason}</p>
+            </div>
+          )}
+
+          {campaign.status === "BROUILLON" && campaign.dossier_fee_status !== "VALIDE" && (
+            <div
+              className={`mt-4 rounded-xl border px-4 py-3 text-sm ${
+                campaign.dossier_fee_status === "REJETE"
+                  ? "border-red-200 bg-red-50 text-red-800"
+                  : "border-gold/30 bg-gold/10 text-ink-secondary"
+              }`}
+            >
+              <p className="flex items-center gap-2 font-semibold">
+                <Banknote aria-hidden="true" className="size-4 shrink-0" />
+                {t("myCampaigns.fee.title")}
+              </p>
+              <p className="mt-1.5 leading-relaxed">
+                {campaign.dossier_fee_status === "EN_ATTENTE"
+                  ? t("myCampaigns.fee.pending")
+                  : campaign.dossier_fee_status === "REJETE"
+                    ? campaign.dossier_fee_note || t("myCampaigns.fee.rejectedFallback")
+                    : t("myCampaigns.fee.notRequested")}
+              </p>
+              {feeError && (
+                <p role="alert" className="mt-2 text-sm text-red-600">
+                  {t("myCampaigns.fee.requestError")}
+                </p>
+              )}
+              {canRequestFee && (
+                <Button
+                  size="sm"
+                  disabled={requestingFee}
+                  onClick={() => void handleRequestFeeValidation()}
+                  className="mt-3 rounded-full bg-ink font-semibold text-surface shadow-sm transition-all hover:bg-ink/85"
+                >
+                  {requestingFee
+                    ? t("myCampaigns.fee.requesting")
+                    : campaign.dossier_fee_status === "REJETE"
+                      ? t("myCampaigns.fee.requestAgain")
+                      : t("myCampaigns.fee.request")}
+                </Button>
+              )}
             </div>
           )}
 

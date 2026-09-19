@@ -37,6 +37,7 @@ from apps.scoring.serializers import ScoreSerializer, ScoringSettingsSerializer
 from .permissions import IsJappandaleAdmin
 from .serializers import (
     CampaignDecisionSerializer,
+    CampaignFeeDecisionSerializer,
     CampaignWorkflowSerializer,
     DisputeReviewSerializer,
     KycDecisionSerializer,
@@ -108,6 +109,14 @@ class DashboardView(APIView):
             .select_related("owner", "moderation_assigned_to")
             .order_by("-updated_at")[:100]
         )
+        pending_fee_campaigns = (
+            Campaign.objects.filter(
+                status=Campaign.Status.BROUILLON,
+                dossier_fee_status=Campaign.DossierFeeStatus.EN_ATTENTE,
+            )
+            .select_related("owner")
+            .order_by("updated_at")[:30]
+        )
         open_reports = (
             CampaignReport.objects.exclude(
                 status__in=[CampaignReport.Status.RESOLU, CampaignReport.Status.CLASSE]
@@ -160,6 +169,7 @@ class DashboardView(APIView):
                     "pending_campaigns": Campaign.objects.filter(
                         status=Campaign.Status.EN_MODERATION
                     ).count(),
+                    "pending_fee_campaigns": pending_fee_campaigns.count(),
                     "open_reports": CampaignReport.objects.exclude(
                         status__in=[CampaignReport.Status.RESOLU, CampaignReport.Status.CLASSE]
                     ).count(),
@@ -236,6 +246,17 @@ class DashboardView(APIView):
                         ],
                     }
                     for campaign in managed_campaigns
+                ],
+                "fee_requests": [
+                    {
+                        "id": campaign.id,
+                        "slug": campaign.slug,
+                        "title": campaign.title,
+                        "goal_amount": campaign.goal_amount,
+                        "owner": _person(campaign.owner),
+                        "requested_at": campaign.updated_at,
+                    }
+                    for campaign in pending_fee_campaigns
                 ],
                 "reports": [
                     {
@@ -477,6 +498,68 @@ class CampaignDecisionView(APIView):
             action_url=f"/campagnes/{campaign.slug}" if published else "/compte",
         )
         return Response({"detail": "Décision de modération enregistrée."})
+
+
+class CampaignFeeDecisionView(APIView):
+    permission_classes = [IsJappandaleAdmin]
+
+    @transaction.atomic
+    def post(self, request, campaign_id):
+        serializer = CampaignFeeDecisionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        campaign = get_object_or_404(
+            Campaign,
+            pk=campaign_id,
+            dossier_fee_status=Campaign.DossierFeeStatus.EN_ATTENTE,
+        )
+        decision = serializer.validated_data["decision"]
+        note = serializer.validated_data.get("note", "").strip()
+        campaign.dossier_fee_status = decision
+        campaign.dossier_fee_note = note if decision == "REJETE" else ""
+        campaign.dossier_fee_reviewed_at = timezone.now()
+        campaign.dossier_fee_reviewed_by = request.user
+        campaign.save(
+            update_fields=[
+                "dossier_fee_status",
+                "dossier_fee_note",
+                "dossier_fee_reviewed_at",
+                "dossier_fee_reviewed_by",
+            ]
+        )
+        validated = decision == "VALIDE"
+        CampaignAuditLog.objects.create(
+            campaign=campaign,
+            actor=request.user,
+            action=(
+                CampaignAuditLog.Action.FEE_VALIDATED
+                if validated
+                else CampaignAuditLog.Action.FEE_REJECTED
+            ),
+            previous_status=campaign.status,
+            new_status=campaign.status,
+            note=note,
+        )
+        notify_user(
+            recipient=campaign.owner,
+            kind=(
+                Notification.Kind.CAMPAIGN_FEE_VALIDATED
+                if validated
+                else Notification.Kind.CAMPAIGN_FEE_REJECTED
+            ),
+            subject=(
+                "Frais de dossier validés"
+                if validated
+                else "Frais de dossier à corriger"
+            ),
+            message=(
+                f"Les frais de dossier de « {campaign.title} » sont validés : "
+                "vous pouvez soumettre votre campagne."
+                if validated
+                else f"Les frais de dossier de « {campaign.title} » ont été rejetés. Motif : {note}"
+            ),
+            action_url="/compte?onglet=mes-campagnes",
+        )
+        return Response({"detail": "Décision sur les frais de dossier enregistrée."})
 
 
 class ReportReviewView(APIView):

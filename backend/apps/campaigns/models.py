@@ -32,6 +32,12 @@ class Campaign(models.Model):
         SUSPENDUE = "SUSPENDUE", "Suspendue"
         CLOTUREE = "CLOTUREE", "Clôturée"
 
+    class DossierFeeStatus(models.TextChoices):
+        NON_DEMANDE = "NON_DEMANDE", "Non demandée"
+        EN_ATTENTE = "EN_ATTENTE", "En attente de validation"
+        VALIDE = "VALIDE", "Validés"
+        REJETE = "REJETE", "Rejetés"
+
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="porteur",
@@ -82,6 +88,24 @@ class Campaign(models.Model):
     )
     suspension_note = models.TextField("motif de suspension", blank=True)
     suspended_at = models.DateTimeField("suspendue le", null=True, blank=True)
+    dossier_fee_status = models.CharField(
+        "statut des frais de dossier",
+        max_length=20,
+        choices=DossierFeeStatus.choices,
+        default=DossierFeeStatus.NON_DEMANDE,
+    )
+    dossier_fee_note = models.TextField("motif (frais de dossier)", blank=True)
+    dossier_fee_reviewed_at = models.DateTimeField(
+        "frais de dossier examinés le", null=True, blank=True
+    )
+    dossier_fee_reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="frais de dossier examinés par",
+    )
     created_at = models.DateTimeField("créée le", auto_now_add=True)
     updated_at = models.DateTimeField("mise à jour le", auto_now=True)
     published_at = models.DateTimeField("publiée le", null=True, blank=True)
@@ -244,6 +268,9 @@ class CampaignAuditLog(models.Model):
         SUSPENDED = "SUSPENDED", "Suspendue"
         REACTIVATED = "REACTIVATED", "Réactivée"
         CLOSED = "CLOSED", "Clôturée"
+        FEE_REQUESTED = "FEE_REQUESTED", "Validation des frais de dossier demandée"
+        FEE_VALIDATED = "FEE_VALIDATED", "Frais de dossier validés"
+        FEE_REJECTED = "FEE_REJECTED", "Frais de dossier rejetés"
 
     campaign = models.ForeignKey(
         Campaign, on_delete=models.PROTECT, related_name="audit_logs"

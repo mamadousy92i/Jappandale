@@ -60,6 +60,9 @@ class OwnerSerializer(serializers.Serializer):
 class CampaignListSerializer(serializers.ModelSerializer):
     category_display = serializers.CharField(source="get_category_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+    dossier_fee_status_display = serializers.CharField(
+        source="get_dossier_fee_status_display", read_only=True
+    )
     campaign_type_display = serializers.CharField(
         source="get_campaign_type_display", read_only=True
     )
@@ -87,6 +90,9 @@ class CampaignListSerializer(serializers.ModelSerializer):
             "status_display",
             "moderation_note",
             "suspension_note",
+            "dossier_fee_status",
+            "dossier_fee_status_display",
+            "dossier_fee_note",
             "progress_percent",
             "days_left",
         ]
@@ -95,6 +101,9 @@ class CampaignListSerializer(serializers.ModelSerializer):
 class CampaignDetailSerializer(serializers.ModelSerializer):
     category_display = serializers.CharField(source="get_category_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
+    dossier_fee_status_display = serializers.CharField(
+        source="get_dossier_fee_status_display", read_only=True
+    )
     campaign_type_display = serializers.CharField(
         source="get_campaign_type_display", read_only=True
     )
@@ -155,6 +164,9 @@ class CampaignDetailSerializer(serializers.ModelSerializer):
             "status_display",
             "moderation_note",
             "suspension_note",
+            "dossier_fee_status",
+            "dossier_fee_status_display",
+            "dossier_fee_note",
             "progress_percent",
             "days_left",
             "owner",
