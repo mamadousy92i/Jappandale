@@ -402,7 +402,7 @@ for key, profile in PARTENAIRES.items():
     partner.kyc_status = User.KycStatus.VALIDE
     partner.account_status = User.AccountStatus.VALIDE
     partner.email_verified_at = now
-    partner.set_password("MotDePasse123!")
+    partner.set_password("JappandaleDemo2026!")
     partner.save()
     partenaires[key] = partner
 
