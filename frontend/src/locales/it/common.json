@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "mainLabel": "Navigazione principale",
+    "mobileLabel": "Navigazione mobile",
+    "campaigns": "Campagne",
+    "myCampaigns": "Le mie campagne",
+    "partnerSpace": "Area partner",
+    "projectLibrary": "I miei documenti",
+    "about": "Chi siamo"
+  },
+  "header": {
+    "unreadMessages": "{{count}} messaggio/i non letto/i",
+    "unreadNotifications": "{{count}} notifica/e non letta/e",
+    "openMenu": "Aprire il menu",
+    "closeMenu": "Chiudere il menu",
+    "admin": "Amministrazione",
+    "myProfile": "Il mio profilo",
+    "logout": "Disconnettersi",
+    "login": "Accedere",
+    "register": "Creare un account",
+    "seeCampaigns": "Vedere le campagne",
+    "messages": "Messaggi",
+    "notifications": "Notifiche"
+  },
+  "roles": {
+    "PORTEUR": "Promotore di progetto",
+    "CONTRIBUTEUR": "Contributore",
+    "PARTENAIRE": "Partner finanziario",
+    "ADMIN": "Amministratore"
+  },
+  "footer": {
+    "tagline": "Il crowdfunding al servizio dei progetti senegalesi. Insieme, diamo vita alle idee di qui.",
+    "understandLabel": "Capire",
+    "howItWorks": "Come funziona",
+    "about": "Chi siamo",
+    "trust": "Fiducia e trasparenza",
+    "support": "Assistenza",
+    "accountLabel": "Account",
+    "createAccount": "Creare un account",
+    "login": "Accedere",
+    "legalNavLabel": "Informazioni legali",
+    "legalLabel": "Legale",
+    "legalNotice": "Note legali",
+    "privacy": "Privacy",
+    "terms": "Condizioni d'uso",
+    "copyright": "© {{year}} Jappandale — Dakar, Senegal"
+  }
+}

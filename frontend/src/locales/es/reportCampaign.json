@@ -1,0 +1,23 @@
+{
+  "eyebrow": "Confianza y seguridad",
+  "title": "Denunciar esta campaña",
+  "intro": "Describe únicamente hechos precisos. Una denuncia inicia una revisión pero no elimina automáticamente la campaña.",
+  "reasonLabel": "Motivo",
+  "reasons": {
+    "FRAUDE": "Sospecha de fraude",
+    "INFORMATION_TROMPEUSE": "Información engañosa",
+    "CONTENU_INAPPROPRIE": "Contenido inapropiado",
+    "USURPATION": "Suplantación de identidad",
+    "AUTRE": "Otro motivo"
+  },
+  "detailsLabel": "Precisiones",
+  "detailsPlaceholder": "Explica qué debe verificarse e indica los elementos observados…",
+  "submitError": "La denuncia no pudo enviarse. Puede que ya se haya transmitido.",
+  "submit": "Enviar la denuncia",
+  "submitting": "Enviando…",
+  "sent": {
+    "title": "Denuncia recibida",
+    "text": "Nuestro equipo examinará la información transmitida. Para proteger a las personas implicadas, el seguimiento se mantiene confidencial.",
+    "back": "Volver a la campaña"
+  }
+}

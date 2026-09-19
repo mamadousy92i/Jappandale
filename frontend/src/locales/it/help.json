@@ -1,0 +1,114 @@
+{
+  "homepage": {
+    "hero": {
+      "eyebrow": "Piattaforma di progetti senegalesi",
+      "title": "Finanziare i progetti che fanno avanzare il Senegal.",
+      "intro": "Scopri progetti locali documentati, portati avanti da persone verificate, e segui concretamente l'utilizzo previsto dei fondi e il loro avanzamento.",
+      "ctaDiscover": "Vedere i progetti pubblicati",
+      "ctaSubmit": "Presentare un progetto",
+      "note": "Ogni contributo viene registrato e può essere seguito dal tuo spazio personale.",
+      "imageAlt": "Sarto nel suo laboratorio a Dakar",
+      "imageCaption": "Laboratorio di cucito — Medina, Dakar"
+    },
+    "published": {
+      "eyebrow": "In fase di preparazione",
+      "title": "I progetti pubblicati",
+      "intro": "Ogni scheda presenta il bisogno, il luogo, i beneficiari e l'uso previsto del finanziamento.",
+      "seeAll": "Tutte le campagne",
+      "empty": "Le campagne saranno visualizzate qui non appena il servizio sarà disponibile."
+    },
+    "modal": {
+      "previewLabel": "Anteprima del percorso",
+      "closeLabel": "Chiudere l'anteprima",
+      "zoomedLabel": "Schermata ingrandita: {{title}}"
+    },
+    "today": {
+      "title": "Disponibile oggi",
+      "items": [
+        "Creazione dell'account e profilo del promotore",
+        "Deposito e revisione manuale dei documenti KYC",
+        "Creazione, moderazione e pubblicazione di una campagna",
+        "Consultazione pubblica dei progetti pubblicati"
+      ]
+    },
+    "contribJourney": {
+      "title": "Percorso di contribuzione",
+      "text": "Scegli un importo, conferma il tuo contributo e ritrova immediatamente il suo stato nella tua cronologia personale.",
+      "cta": "Creare il mio account"
+    },
+    "eyebrow": "Come funziona",
+    "title": "Un percorso chiaro, dall'idea al monitoraggio",
+    "intro": "Jappandale accompagna ogni progetto attraverso quattro fasi semplici, con la trasparenza come filo conduttore.",
+    "stepLabel": "Fase 0{{number}}",
+    "expandLabel": "Ingrandire",
+    "steps": {
+      "create": {
+        "title": "Presentare il progetto",
+        "text": "Descrivi il bisogno, i beneficiari, il budget e le fasi previste."
+      },
+      "verify": {
+        "title": "Far verificare il fascicolo",
+        "text": "L'identità, l'attività e le informazioni della campagna vengono rilette prima della pubblicazione."
+      },
+      "mobilize": {
+        "title": "Mobilitare i contributori",
+        "text": "Condividi la pagina pubblica e segui l'evoluzione della raccolta in tutta chiarezza."
+      },
+      "report": {
+        "title": "Rendere conto",
+        "text": "Gestisci le tue raccolte e pubblica notizie sulle fasi raggiunte."
+      }
+    },
+    "ctaDiscover": "Scoprire i progetti",
+    "ctaSubmit": "Presentare un progetto",
+    "verified": {
+      "title": "Cosa significa «progetto verificato»",
+      "intro": "Una convalida non garantisce il successo del progetto. Conferma che il promotore ha trasmesso i documenti richiesti e che le informazioni della campagna sono state rilette prima della pubblicazione.",
+      "steps": {
+        "identity": {
+          "title": "Identità e attività",
+          "text": "Il promotore trasmette i suoi giustificativi. Il team verifica il fascicolo prima di ogni pubblicazione."
+        },
+        "project": {
+          "title": "Progetto e bisogno finanziario",
+          "text": "L'importo, l'utilizzo dei fondi, i beneficiari e il calendario vengono riletti."
+        },
+        "publication": {
+          "title": "Pubblicazione controllata",
+          "text": "La campagna è visibile solo dopo la convalida. Un rifiuto deve essere motivato e corretto."
+        }
+      }
+    }
+  },
+  "trust": {
+    "eyebrow": "Fiducia e trasparenza",
+    "title": "Cosa verifica Jappandale — e cosa non promette.",
+    "intro": "La fiducia nasce da informazioni precise, decisioni tracciabili e una comunicazione onesta sui limiti del servizio.",
+    "principles": {
+      "identity": {
+        "title": "Identità controllata",
+        "text": "Una campagna viene pubblicata solo dopo la verifica dei documenti richiesti al promotore e la revisione manuale del fascicolo."
+      },
+      "budget": {
+        "title": "Budget visibile",
+        "text": "I beneficiari, l'utilizzo previsto dei fondi, il calendario e gli aggiornamenti restano accessibili sulla pagina del progetto."
+      },
+      "promises": {
+        "title": "Promesse misurate",
+        "text": "La verifica conferma la coerenza del fascicolo; non garantisce né il successo del progetto né un rendimento finanziario."
+      },
+      "contributions": {
+        "title": "Contributi tracciabili",
+        "text": "Ogni contributo è associato a un riferimento e resta consultabile dalla cronologia personale del membro."
+      },
+      "reports": {
+        "title": "Segnalazioni esaminate",
+        "text": "Ogni membro può inviare una segnalazione confidenziale. Viene conservata e trattata dal back-office."
+      }
+    },
+    "transparency": {
+      "title": "La trasparenza a ogni fase",
+      "text": "Gli stati delle campagne, delle verifiche e dei contributi restano accessibili nelle aree interessate per facilitare il monitoraggio di ogni operazione."
+    }
+  }
+}

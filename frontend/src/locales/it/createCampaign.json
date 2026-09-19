@@ -1,0 +1,143 @@
+{
+  "types": {
+    "DON_LIBRE": {
+      "title": "Donazione libera",
+      "description": "I contributori donano senza contropartita materiale."
+    },
+    "DON_CONTREPARTIE": {
+      "title": "Donazione con contropartita",
+      "description": "Proponi livelli di ricompensa per ringraziare i tuoi contributori."
+    },
+    "INVESTISSEMENT_PARTICIPATIF": {
+      "title": "Investimento partecipativo",
+      "description": "I finanziatori investono in attesa di un ritorno, a un tasso di rendimento annunciato."
+    }
+  },
+  "access": {
+    "campaignUnavailableTitle": "Campagna inaccessibile",
+    "campaignUnavailableText": "Questa campagna non esiste o non ti appartiene.",
+    "ownerOnlyTitle": "Area riservata ai promotori di progetto",
+    "ownerOnlyText": "La creazione di campagne è riservata ai promotori di progetto. Il tuo account è registrato come contributore: puoi sostenere le campagne esistenti.",
+    "kycTitle": "Verifica prima la tua identità",
+    "kycText": "Per lanciare una campagna, la tua identità deve essere verificata. Completa la verifica dal tuo account: ci vogliono solo pochi minuti.",
+    "kycCta": "Completare la mia verifica",
+    "lockedTitle": "Modifica non disponibile",
+    "lockedText": "Una campagna in moderazione, pubblicata o conclusa non può essere modificata da questa area."
+  },
+  "page": {
+    "eyebrowEdit": "Correzione della campagna",
+    "eyebrowNew": "Nuova campagna",
+    "titleEdit": "Modificare la tua campagna",
+    "titleNew": "Lanciare la tua campagna",
+    "introEdit": "Correggi le informazioni segnalate, salva le tue modifiche e poi rinvia la campagna per la convalida.",
+    "introNew": "Presenta il tuo progetto con cura: il nostro team lo rileggerà prima della pubblicazione per garantire la fiducia dei contributori."
+  },
+  "form": {
+    "errors": {
+      "forbidden": "Non sei autorizzato a creare una campagna.",
+      "invalid": "Alcune informazioni non sono valide. Controlla il modulo.",
+      "generic": "Si è verificato un errore. Riprova."
+    },
+    "title": "Titolo della campagna",
+    "titlePlaceholder": "Un laboratorio di cucito a Thiès",
+    "summary": "Slogan",
+    "summaryHint": "(una o due frasi)",
+    "summaryPlaceholder": "Riassumi il tuo progetto in poche parole incisive.",
+    "description": "Descrizione dettagliata",
+    "descriptionPlaceholder": "Racconta la tua storia: da dove nasce il progetto, a cosa serviranno i fondi, quale impatto per la tua comunità…",
+    "typeLegend": "Tipo di campagna",
+    "returnRateLabel": "Tasso di rendimento atteso",
+    "returnRateUnit": "(%)",
+    "manageRewardsPrefix": "Gestire le ricompense",
+    "manageRewardsSuffix": "di questa campagna.",
+    "location": "Localizzazione del progetto",
+    "locationPlaceholder": "Medina, Dakar",
+    "beneficiaries": "Beneficiari attesi",
+    "beneficiariesPlaceholder": "10 apprendiste sarte",
+    "fundingLegend": "Utilizzo previsto dei fondi",
+    "fundingHint": "Dettaglia le principali spese e il loro importo stimato.",
+    "expenseLabel": "Spesa {{number}}",
+    "expensePlaceholder": "Es. Macchine da cucire",
+    "amountLabel": "Importo (F CFA)",
+    "amountPlaceholder": "150.000",
+    "removeExpense": "Rimuovere la spesa {{number}}",
+    "addExpense": "Aggiungere una spesa",
+    "timelineLegend": "Fasi previste del progetto",
+    "timelineHint": "Presenta le azioni in ordine e indica il periodo previsto.",
+    "stepLabel": "Fase {{number}}",
+    "stepPlaceholder": "Es. Acquisto del materiale",
+    "periodLabel": "Periodo",
+    "periodPlaceholder": "Es. Settimana 1",
+    "removeStep": "Rimuovere la fase {{number}}",
+    "addStep": "Aggiungere una fase",
+    "category": "Categoria",
+    "goalAmount": "Obiettivo",
+    "goalAmountUnit": "(F CFA)",
+    "goalAmountPlaceholder": "500.000",
+    "deadline": "Scadenza della raccolta",
+    "coverImage": "Immagine di copertina",
+    "optional": "(facoltativo)",
+    "coverAlt": "Anteprima dell'immagine di copertina",
+    "removeCover": "Rimuovere l'immagine selezionata",
+    "coverHint": "Una bella immagine invoglia due volte di più a contribuire.",
+    "saving": "Salvataggio…",
+    "creating": "Creazione…",
+    "saveSubmit": "Salvare le modifiche",
+    "createSubmit": "Creare la mia campagna",
+    "editNote": "Dopo le tue correzioni, torna in «Le mie campagne» per rinviarla in convalida.",
+    "createNote": "La tua campagna sarà prima registrata come bozza. Potrai inviarla per la convalida dalla tua area «Le mie campagne»."
+  },
+  "update": {
+    "notFound": "Questa campagna è introvabile o non ti appartiene.",
+    "validationError": "Aggiungi un titolo preciso e almeno qualche frase sull'avanzamento.",
+    "publishError": "La pubblicazione non è riuscita. Verifica che la campagna sia ancora pubblicata.",
+    "backToAccount": "Tornare alla mia area",
+    "eyebrow": "Aggiornamento della campagna",
+    "title": "Tenere informati i contributori",
+    "introWithCampaign": "Condividi un avanzamento, una difficoltà o una tappa raggiunta per «{{title}}».",
+    "loading": "Caricamento della campagna…",
+    "titleLabel": "Titolo dell'aggiornamento",
+    "titlePlaceholder": "Es. Il materiale è stato ordinato",
+    "messageLabel": "Messaggio ai contributori",
+    "messagePlaceholder": "Spiega cosa è stato realizzato, le prossime fasi e gli eventuali scostamenti rispetto al calendario.",
+    "publishing": "Pubblicazione…",
+    "publish": "Pubblicare l'aggiornamento"
+  },
+  "rewards": {
+    "backToAccount": "Tornare alla mia area",
+    "eyebrow": "Ricompense",
+    "titleWithCampaign": "Ricompense di «{{title}}»",
+    "loading": "Caricamento…",
+    "intro": "Proponi livelli per ringraziare i tuoi contributori in base all'importo della loro donazione.",
+    "notFound": "Questa campagna è introvabile o non ti appartiene.",
+    "notRewardType": "Questa campagna è di tipo «donazione libera»: non propone ricompense.",
+    "notEditableStatus": "Le ricompense possono essere modificate solo su una campagna in bozza, rifiutata o sospesa.",
+    "empty": "Nessuna ricompensa al momento.",
+    "addReward": "Aggiungere una ricompensa",
+    "form": {
+      "genericError": "Si è verificato un errore. Riprova.",
+      "title": "Titolo della ricompensa",
+      "titlePlaceholder": "Es. Borsa cucita a mano",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Descrivi ciò che riceverà il contributore.",
+      "minimum": "Importo minimo (F CFA)",
+      "minimumPlaceholder": "15.000",
+      "quantity": "Quantità disponibile",
+      "quantityHint": "(vuoto = illimitata)",
+      "quantityPlaceholder": "20",
+      "saving": "Salvataggio…",
+      "save": "Salvare",
+      "add": "Aggiungere la ricompensa",
+      "cancel": "Annullare"
+    },
+    "row": {
+      "soldOut": "Esaurita",
+      "minimum": "minimo",
+      "unlimited": "quantità illimitata",
+      "remaining": "{{remaining}} rimanente/i su {{limit}}",
+      "editLabel": "Modificare {{title}}",
+      "deleteLabel": "Eliminare {{title}}",
+      "deleteError": "L'eliminazione non è riuscita."
+    }
+  }
+}

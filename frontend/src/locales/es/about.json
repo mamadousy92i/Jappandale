@@ -1,0 +1,59 @@
+{
+  "hero": {
+    "eyebrow": "Sobre Jappandale",
+    "title": "Hacer circular la confianza tanto como la financiación.",
+    "intro": "Jappandale es una plataforma senegalesa de financiación colectiva y de puesta en relación financiera, pensada para acercar los proyectos locales a quienes desean apoyarlos.",
+    "discover": "Descubrir los proyectos",
+    "understand": "Entender el recorrido",
+    "imageAlt": "Logotipo de Jappandale — conectar los proyectos con oportunidades de financiación"
+  },
+  "why": {
+    "eyebrow": "Por qué Jappandale",
+    "title": "Una realidad local, una respuesta colectiva",
+    "p1": "En Senegal y en el espacio UEMOA, el acceso a la financiación sigue siendo un freno importante para numerosos emprendedores, pymes, cooperativas y asociaciones.",
+    "p2": "Al mismo tiempo, la diáspora y los inversores de proximidad buscan medios más estructurados para identificar proyectos locales, comprender sus necesidades y seguir su evolución.",
+    "p3": "Jappandale crea este punto de encuentro: un marco común para presentar, examinar, financiar y seguir iniciativas de impacto."
+  },
+  "mission": {
+    "eyebrow": "Nuestra misión",
+    "title": "Crear una financiación más clara, más cercana y mejor seguida",
+    "commitments": {
+      "connect": {
+        "title": "Conectar",
+        "text": "Acercar a los promotores de proyectos senegaleses, los contribuyentes, los inversores y la diáspora en torno a oportunidades concretas."
+      },
+      "evaluate": {
+        "title": "Evaluar",
+        "text": "Examinar la identidad de los promotores y la coherencia de los expedientes antes de su publicación en la plataforma."
+      },
+      "follow": {
+        "title": "Seguir",
+        "text": "Hacer visibles los objetivos, el uso previsto de los fondos y los avances comunicados por cada proyecto."
+      }
+    }
+  },
+  "roots": {
+    "eyebrow": "Nuestras raíces",
+    "title": "Una plataforma pensada para el ecosistema senegalés",
+    "p1": "Jappandale parte de las realidades de los emprendedores, las cooperativas, las asociaciones y las comunidades que dan vida a la economía local cada día.",
+    "p2": "Nuestra ambición es poner la tecnología al servicio de una relación financiera más accesible entre las iniciativas locales, la diáspora y sus comunidades de apoyo.",
+    "imageAlt": "Actividad económica en un mercado senegalés"
+  },
+  "trustSection": {
+    "title": "La confianza se construye con pruebas",
+    "text": "Una campaña verificada no garantiza su éxito. Indica que la información y los documentos solicitados han sido examinados antes de la publicación.",
+    "principles": [
+      "Campañas examinadas antes de su publicación",
+      "Información financiera presentada con claridad",
+      "Decisiones y estados trazables",
+      "Un seguimiento accesible para promotores y contribuyentes"
+    ]
+  },
+  "cta": {
+    "eyebrow": "Participar",
+    "title": "¿Un proyecto por hacer crecer o una iniciativa que apoyar?",
+    "text": "Únete a Jappandale para presentar tu proyecto, descubrir las campañas publicadas y contribuir a su progreso.",
+    "submit": "Presentar un proyecto",
+    "see": "Ver las campañas"
+  }
+}

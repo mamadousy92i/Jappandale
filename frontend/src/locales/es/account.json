@@ -1,0 +1,208 @@
+{
+  "main": {
+    "roles": {
+      "PORTEUR": "Promotor de proyecto",
+      "CONTRIBUTEUR": "Contribuyente",
+      "PARTENAIRE": "Socio financiero",
+      "ADMIN": "Administrador"
+    },
+    "eyebrow": "Mi cuenta",
+    "greeting": "Hola {{name}}",
+    "greetingFallback": "a usted",
+    "tabsLabel": "Secciones de mi cuenta",
+    "tabs": {
+      "apercu": "Resumen",
+      "profil": "Información personal",
+      "kyc": "Verificación de identidad",
+      "contributions": "Contribuciones",
+      "guichet": "Ventanilla Única"
+    },
+    "actionRequired": "Acción requerida",
+    "avatar": {
+      "title": "Foto de perfil",
+      "hint": "JPG, PNG o WebP · 3 MB como máximo.",
+      "change": "Cambiar la foto",
+      "add": "Añadir una foto",
+      "remove": "Eliminar",
+      "invalidFile": "Elige una imagen JPG, PNG o WebP de 3 MB como máximo.",
+      "updated": "Tu foto de perfil se ha actualizado.",
+      "saveError": "No se pudo guardar esta foto.",
+      "removed": "La foto se ha eliminado.",
+      "removeError": "No se pudo eliminar esta foto."
+    },
+    "emailNotVerified": {
+      "title": "Dirección de correo no verificada",
+      "text": "Introduce el código recibido por correo electrónico para proteger tu cuenta.",
+      "cta": "Verificar ahora"
+    },
+    "form": {
+      "title": "Información personal",
+      "hint": "Tu dirección de correo electrónico y tu rol no se pueden modificar.",
+      "edit": "Modificar",
+      "invalid": "Algunos datos no son válidos. Revisa el formulario.",
+      "genericError": "Se ha producido un error. Vuelve a intentarlo.",
+      "saved": "Tu información se ha guardado.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "phone": "Teléfono",
+      "optional": "(opcional)",
+      "diasporaLabel": "Resido en el extranjero (diáspora)",
+      "diasporaHint": "Se solicitará una verificación reforzada (justificante de residencia y origen de los fondos) en la pestaña Verificación de identidad.",
+      "country": "País de residencia",
+      "countryPlaceholder": "— Selecciona un país —",
+      "regions": {
+        "westAfrica": "África Occidental",
+        "centralNorthAfrica": "África Central y del Norte",
+        "europe": "Europa",
+        "northAmerica": "América del Norte",
+        "middleEast": "Oriente Medio",
+        "asia": "Asia"
+      },
+      "organization": "Organización",
+      "organizationPlaceholder": "Nombre de la asociación o de la actividad",
+      "city": "Ciudad",
+      "bio": "Presentación pública",
+      "bioPlaceholder": "Presenta tu experiencia y lo que te motiva…",
+      "saving": "Guardando…",
+      "save": "Guardar los cambios",
+      "cancel": "Cancelar"
+    }
+  },
+  "score": {
+    "title": "Score Jappandale®",
+    "subtitle": "Indicador de fiabilidad calculado a partir de tu historial.",
+    "manualOverride": "Validado manualmente",
+    "overrideNote": "Nota del equipo de Jappandale: {{note}}",
+    "factors": {
+      "base": "Puntuación base",
+      "kyc": "Identidad verificada",
+      "anciennete": "Antigüedad de la cuenta",
+      "activite": "Campañas publicadas",
+      "reussite": "Tasa de éxito",
+      "montant_collecte": "Monto recaudado",
+      "litiges": "Disputas",
+      "signalements": "Denuncias",
+      "campagnes_rejetees": "Campañas rechazadas/suspendidas"
+    },
+    "recentEvolution": "Evolución reciente",
+    "historyLabel": "Historial reciente del Score Jappandale",
+    "historyHint": "Cada consulta actualiza tu historial a partir de los datos de la plataforma."
+  },
+  "passport": {
+    "title": "Pasaporte Financiero Jappandale®",
+    "subtitle": "Tu historial consolidado, exportable y verificable.",
+    "exporting": "Generando…",
+    "export": "Exportar a PDF",
+    "exportError": "No se pudo generar el PDF en este momento. Vuelve a intentarlo.",
+    "stats": {
+      "campaignsTotal": "Campañas creadas",
+      "campaignsSuccess": "Cerradas con éxito",
+      "totalCollected": "Monto recaudado",
+      "distinctContributors": "Financiadores distintos",
+      "confirmedContributions": "Contribuciones recibidas",
+      "disputesReceived": "Disputas recibidas"
+    },
+    "exportsTitle": "Pasaportes exportados",
+    "exportsHint": "Un enlace de verificación es privado de forma predeterminada. Actívalo solo cuando quieras compartirlo con un tercero.",
+    "exportDate": "Exportación del {{date}}",
+    "linkActive": "Enlace de verificación activo",
+    "linkPrivate": "Enlace privado",
+    "copyLink": "Copiar el enlace",
+    "makePrivate": "Hacer privado",
+    "allowSharing": "Permitir compartir",
+    "sharingError": "No se pudo modificar el uso compartido de este pasaporte.",
+    "copyError": "No se pudo copiar el enlace. Puedes volver a intentarlo desde un navegador seguro."
+  },
+  "guichet": {
+    "title": "Ventanilla Única de Financiación",
+    "subtitle": "Los dispositivos de financiación para los que tu perfil es elegible.",
+    "empty": "Ningún dispositivo de financiación está publicado por el momento. Vuelve pronto.",
+    "eligible": "Eres elegible",
+    "notEligible": "No elegible",
+    "minScore": "Puntuación mínima: {{score}}/100",
+    "goalRange": "Objetivo de {{min}} a {{max}}",
+    "websiteLink": "Sitio del dispositivo",
+    "expressInterest": "Manifestar mi interés",
+    "referralPrefix": "Orientación: {{status}}",
+    "eligibilityLostError": "Ya no cumples los criterios de elegibilidad de este dispositivo.",
+    "genericError": "No se pudo registrar tu interés en este momento."
+  },
+  "myContributions": {
+    "title": "Mis contribuciones",
+    "subtitle": "Historial de tus contribuciones realizadas en Jappandale.",
+    "loadError": "No se pudieron cargar tus contribuciones.",
+    "empty": "Todavía no has contribuido a ninguna campaña.",
+    "anonymous": "Contribución anónima",
+    "nameVisible": "Nombre visible",
+    "status": {
+      "INITIEE": "Pendiente",
+      "CONFIRMEE": "Confirmada",
+      "ECHOUEE": "Fallida",
+      "REMBOURSEE": "Reembolsada"
+    },
+    "disputeStatusPrefix": "Disputa: {{status}}",
+    "openDispute": "Abrir una disputa",
+    "disputeForm": {
+      "reasonLabel": "Motivo de la disputa",
+      "reasons": {
+        "PROJET_NON_CONFORME": "Proyecto no conforme / fondos mal utilizados",
+        "PORTEUR_INJOIGNABLE": "Promotor ilocalizable",
+        "ERREUR_CONTRIBUTION": "Contribución no deseada / error",
+        "AUTRE": "Otro motivo"
+      },
+      "detailsLabel": "Detalles de la disputa",
+      "detailsPlaceholder": "Describe el problema encontrado…",
+      "cancel": "Cancelar",
+      "submit": "Abrir la disputa",
+      "missingDetails": "Describe el problema encontrado.",
+      "submitError": "No se pudo abrir esta disputa. Vuelve a intentarlo."
+    }
+  },
+  "receivedContributions": {
+    "title": "Contribuciones recibidas",
+    "subtitle": "Seguimiento de los intentos y confirmaciones en tus campañas.",
+    "loadError": "No se pudieron cargar las contribuciones recibidas.",
+    "empty": "Ninguna contribución recibida por el momento.",
+    "net": "neto {{amount}}"
+  },
+  "myCampaigns": {
+    "title": "Mis campañas",
+    "subtitle": "Sigue tus recaudaciones y envía tus borradores a validación.",
+    "create": "Crear una campaña",
+    "loadError": "No se pudieron cargar tus campañas. Comprueba tu conexión y vuelve a intentarlo.",
+    "retry": "Reintentar",
+    "empty": {
+      "title": "Ninguna campaña por el momento",
+      "text": "Tu primera campaña está a un clic de distancia: presenta tu proyecto y lanza la recaudación."
+    },
+    "status": {
+      "BROUILLON": "Borrador",
+      "EN_MODERATION": "En moderación",
+      "PUBLIEE": "Publicada",
+      "REJETEE": "Rechazada",
+      "SUSPENDUE": "Suspendida",
+      "CLOTUREE": "Cerrada"
+    },
+    "goalOf": "de {{amount}}",
+    "rejectionReason": "Motivo del rechazo",
+    "suspensionReason": "Motivo de la suspensión",
+    "submitError": "El envío ha fallado. Vuelve a intentarlo.",
+    "edit": "Modificar",
+    "rewards": "Recompensas",
+    "viewPage": "Ver la página",
+    "publishUpdate": "Publicar una novedad",
+    "submitDraft": "Enviar a validación",
+    "resubmit": "Reenviar a validación",
+    "submitting": "Enviando…",
+    "fee": {
+      "title": "Gastos de expediente",
+      "notRequested": "Antes de enviar esta campaña a moderación, paga los gastos de expediente al equipo de Jappandale y luego solicita su validación.",
+      "pending": "Tu solicitud de validación de los gastos de expediente está siendo examinada por un administrador.",
+      "rejectedFallback": "Los gastos de expediente han sido rechazados. Contacta con el equipo de Jappandale para regularizar tu expediente.",
+      "request": "Solicitar la validación de los gastos",
+      "requestAgain": "Volver a solicitar la validación",
+      "requesting": "Enviando…",
+      "requestError": "La solicitud ha fallado. Vuelve a intentarlo."
+    }
+  }
+}

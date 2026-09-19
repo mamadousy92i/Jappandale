@@ -5,9 +5,11 @@ import { SUPPORTED_LANGUAGES, type SupportedLanguage } from "@/lib/i18n"
 const languageLabels: Record<SupportedLanguage, string> = {
   fr: "Français",
   wo: "Wolof",
+  it: "Italiano",
+  es: "Español",
 }
 
-/** Bascule la langue de l'interface (français / wolof). */
+/** Bascule la langue de l'interface (français / wolof / italien / espagnol). */
 export function LanguageSwitcher({ className = "" }: { className?: string }) {
   const { i18n } = useTranslation()
 

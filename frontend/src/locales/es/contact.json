@@ -1,0 +1,17 @@
+{
+  "eyebrow": "Asistencia",
+  "title": "¿Cómo podemos ayudarte?",
+  "intro": "¿Una pregunta sobre una campaña, el KYC o una contribución? Describe tu situación sin transmitir contraseñas ni datos bancarios.",
+  "reportNote": "Para denunciar un contenido preocupante, utiliza más bien el botón «Denunciar» presente en la campaña en cuestión.",
+  "sentTitle": "Solicitud recibida",
+  "sentText": "Ya está registrada en el área de asistencia de Jappandale.",
+  "form": {
+    "name": "Nombre completo",
+    "email": "Dirección de correo electrónico",
+    "subject": "Asunto",
+    "message": "Tu mensaje",
+    "sending": "Enviando…",
+    "submit": "Enviar la solicitud",
+    "error": "Tu solicitud no pudo enviarse. Comprueba la información introducida."
+  }
+}

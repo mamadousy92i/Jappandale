@@ -1,0 +1,23 @@
+{
+  "eyebrow": "Fiducia e sicurezza",
+  "title": "Segnalare questa campagna",
+  "intro": "Descrivi solo fatti precisi. Una segnalazione avvia una revisione ma non elimina automaticamente la campagna.",
+  "reasonLabel": "Motivo",
+  "reasons": {
+    "FRAUDE": "Sospetto di frode",
+    "INFORMATION_TROMPEUSE": "Informazioni ingannevoli",
+    "CONTENU_INAPPROPRIE": "Contenuto inappropriato",
+    "USURPATION": "Furto d'identità",
+    "AUTRE": "Altro motivo"
+  },
+  "detailsLabel": "Precisazioni",
+  "detailsPlaceholder": "Spiega cosa deve essere verificato e indica gli elementi osservati…",
+  "submitError": "La segnalazione non ha potuto essere inviata. Potrebbe essere già stata trasmessa.",
+  "submit": "Inviare la segnalazione",
+  "submitting": "Invio…",
+  "sent": {
+    "title": "Segnalazione ricevuta",
+    "text": "Il nostro team esaminerà le informazioni trasmesse. Per proteggere le persone coinvolte, il monitoraggio resta riservato.",
+    "back": "Tornare alla campagna"
+  }
+}

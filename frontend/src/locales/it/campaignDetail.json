@@ -1,0 +1,58 @@
+{
+  "backToCampaigns": "Tutte le campagne",
+  "verifiedOwner": "Promotore verificato",
+  "flexibleCollection": "Raccolta flessibile",
+  "byLine": "Promosso da",
+  "publishedOn": "Pubblicata il {{date}}",
+  "notFound": {
+    "title": "Campagna introvabile",
+    "text404": "Questa campagna non esiste o non è più disponibile.",
+    "textError": "Impossibile caricare questa campagna al momento.",
+    "back": "Tornare alle campagne"
+  },
+  "about": "Informazioni sul progetto",
+  "impact": "Impatto atteso",
+  "rewards": {
+    "title": "Ricompense",
+    "soldOut": "Esaurita",
+    "minimum": "minimo",
+    "unlimited": "Quantità illimitata",
+    "remaining": "{{remaining}} rimanente/i su {{limit}}"
+  },
+  "fundingPlan": "Utilizzo dei fondi",
+  "timeline": "Calendario del progetto",
+  "verification": {
+    "title": "Cosa è stato verificato prima della pubblicazione",
+    "text": "L'identità del promotore e le informazioni dichiarate in questa campagna sono state rilette dal team di moderazione. Questa verifica non costituisce una garanzia di risultato né una consulenza di investimento."
+  },
+  "owner": {
+    "eyebrow": "Il promotore del progetto",
+    "loginPrompt": "Accedi",
+    "loginSuffix": "per contattare il promotore di questo progetto.",
+    "messagePlaceholder": "Fai la tua domanda al promotore del progetto…",
+    "messageLabel": "Il tuo messaggio al promotore",
+    "sendError": "Impossibile inviare questo messaggio. Verifica la tua identità (KYC) e riprova.",
+    "sentPrefix": "Messaggio inviato. Ritrova la conversazione in",
+    "sentLinkText": "il tuo spazio Messaggi",
+    "sending": "Invio…",
+    "contact": "Contattare il promotore"
+  },
+  "contributors": "Contributi recenti",
+  "updates": "Aggiornamenti",
+  "donation": {
+    "collectedOutOf": "raccolti su un obiettivo di {{amount}}",
+    "ofGoal": "dell'obiettivo",
+    "daysLeft": "G-{{count}}",
+    "ended": "Terminata",
+    "beforeClosing": "prima della chiusura",
+    "closed": "campagna conclusa",
+    "expectedReturn": "Rendimento atteso",
+    "contribute": "Contribuire ora",
+    "suspended": "Campagna temporaneamente sospesa",
+    "endedButton": "Campagna conclusa",
+    "note": "Il tuo contributo sarà associato al tuo account e a questa campagna.",
+    "shareCopied": "Link copiato",
+    "share": "Condividere questa campagna",
+    "report": "Segnalare questa campagna"
+  }
+}

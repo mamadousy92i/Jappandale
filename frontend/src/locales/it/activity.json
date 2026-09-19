@@ -1,0 +1,78 @@
+{
+  "contribution": {
+    "genericError": "L'operazione non è riuscita. Controlla le informazioni e riprova.",
+    "notFound": "Questa campagna è introvabile o non disponibile.",
+    "loading": "Caricamento…",
+    "backToCampaigns": "Torna alle campagne",
+    "amountRange": "L'importo deve essere compreso tra 1.000 e 5.000.000 FCFA.",
+    "rewardMinimum": "L'importo minimo per questa ricompensa è {{amount}}.",
+    "kycRequired": {
+      "title": "Verifica d'identità richiesta",
+      "text": "La tua identità deve essere convalidata prima di contribuire. Trova i documenti richiesti e lo stato del tuo fascicolo nel tuo account.",
+      "cta": "Accedere al mio account"
+    },
+    "backToCampaign": "Torna alla campagna",
+    "eyebrow": "Contributo",
+    "title": "Contribuire a {{campaign}}",
+    "verifyNote": "Controlla l'importo e le informazioni della campagna prima di confermare il tuo contributo.",
+    "reward": {
+      "label": "Ricompensa",
+      "none": "Nessuna ricompensa — donazione libera",
+      "soldOut": "Esaurita",
+      "from": "A partire da {{amount}}",
+      "remaining": " · {{count}} rimanente/i"
+    },
+    "amountLabel": "Importo in FCFA",
+    "hideNameLabel": "Nascondere il mio nome nell'elenco pubblico dei contributori",
+    "preparing": "Preparazione…",
+    "continue": "Continuare",
+    "confirmed": "Contributo confermato",
+    "notConfirmed": "Contributo non confermato",
+    "reference": "riferimento {{ref}}",
+    "seeCampaign": "Vedere la campagna",
+    "seeHistory": "Vedere la mia cronologia",
+    "reviewTitle": "Verificare il tuo contributo",
+    "amount": "Importo",
+    "display": "Visualizzazione",
+    "anonymous": "Anonimo",
+    "nameVisible": "Nome visibile",
+    "status": "Stato",
+    "pending": "In attesa di conferma",
+    "confirmHint": "Conferma le informazioni qui sopra per finalizzare il tuo contributo.",
+    "confirmSubmit": "Confermare il contributo",
+    "cancel": "Annullare"
+  },
+  "notifications": {
+    "eyebrow": "Il mio spazio",
+    "title": "Notifiche",
+    "intro": "Decisioni KYC, campagne e attività dei tuoi contributi.",
+    "markAllRead": "Segna tutto come letto",
+    "loadError": "Impossibile caricare le tue notifiche.",
+    "retry": "Riprova",
+    "emptyTitle": "Niente di nuovo",
+    "emptyText": "Le tue prossime conferme appariranno qui.",
+    "seeDetail": "Vedere il dettaglio →"
+  },
+  "messages": {
+    "eyebrow": "Il mio spazio",
+    "title": "Messaggi",
+    "intro": "I tuoi scambi con i promotori di progetto e i finanziatori.",
+    "empty": "Nessuna conversazione al momento.",
+    "selectConversation": "Seleziona una conversazione.",
+    "messagePlaceholder": "Scrivi il tuo messaggio…",
+    "messageLabel": "Il tuo messaggio",
+    "report": "Segnalare",
+    "reported": "Segnalato",
+    "reportReasonLabel": "Motivo della segnalazione",
+    "reportDetailsLabel": "Precisazioni",
+    "reportDetailsPlaceholder": "Precisazioni (facoltativo)",
+    "cancel": "Annullare",
+    "reasons": {
+      "SPAM": "Spam o sollecitazione",
+      "HARCELEMENT": "Molestie",
+      "CONTENU_INAPPROPRIE": "Contenuto inappropriato",
+      "TENTATIVE_CONTOURNEMENT": "Tentativo di aggiramento della piattaforma",
+      "AUTRE": "Altro motivo"
+    }
+  }
+}

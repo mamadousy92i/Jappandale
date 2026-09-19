@@ -1,0 +1,143 @@
+{
+  "types": {
+    "DON_LIBRE": {
+      "title": "Donación libre",
+      "description": "Los contribuyentes donan sin contrapartida material."
+    },
+    "DON_CONTREPARTIE": {
+      "title": "Donación con contrapartida",
+      "description": "Propón niveles de recompensa para agradecer a tus contribuyentes."
+    },
+    "INVESTISSEMENT_PARTICIPATIF": {
+      "title": "Inversión participativa",
+      "description": "Los financiadores invierten a la espera de un retorno, a una tasa de rendimiento anunciada."
+    }
+  },
+  "access": {
+    "campaignUnavailableTitle": "Campaña inaccesible",
+    "campaignUnavailableText": "Esta campaña no existe o no te pertenece.",
+    "ownerOnlyTitle": "Área reservada a los promotores de proyecto",
+    "ownerOnlyText": "La creación de campañas está reservada a los promotores de proyecto. Tu cuenta está registrada como contribuyente: puedes apoyar las campañas existentes.",
+    "kycTitle": "Verifica primero tu identidad",
+    "kycText": "Para lanzar una campaña, tu identidad debe estar verificada. Completa la verificación desde tu cuenta: solo toma unos minutos.",
+    "kycCta": "Completar mi verificación",
+    "lockedTitle": "Modificación no disponible",
+    "lockedText": "Una campaña en moderación, publicada o cerrada no puede modificarse desde esta área."
+  },
+  "page": {
+    "eyebrowEdit": "Corrección de campaña",
+    "eyebrowNew": "Nueva campaña",
+    "titleEdit": "Modificar tu campaña",
+    "titleNew": "Lanzar tu campaña",
+    "introEdit": "Corrige la información señalada, guarda tus cambios y luego reenvía la campaña a validación.",
+    "introNew": "Presenta tu proyecto con cuidado: nuestro equipo lo revisará antes de la publicación para garantizar la confianza de los contribuyentes."
+  },
+  "form": {
+    "errors": {
+      "forbidden": "No estás autorizado a crear una campaña.",
+      "invalid": "Algunos datos no son válidos. Revisa el formulario.",
+      "generic": "Se ha producido un error. Vuelve a intentarlo."
+    },
+    "title": "Título de la campaña",
+    "titlePlaceholder": "Un taller de costura en Thiès",
+    "summary": "Eslogan",
+    "summaryHint": "(una o dos frases)",
+    "summaryPlaceholder": "Resume tu proyecto en unas palabras contundentes.",
+    "description": "Descripción detallada",
+    "descriptionPlaceholder": "Cuenta tu historia: de dónde viene el proyecto, para qué servirán los fondos, qué impacto tendrá en tu comunidad…",
+    "typeLegend": "Tipo de campaña",
+    "returnRateLabel": "Tasa de rendimiento esperada",
+    "returnRateUnit": "(%)",
+    "manageRewardsPrefix": "Gestionar las recompensas",
+    "manageRewardsSuffix": "de esta campaña.",
+    "location": "Ubicación del proyecto",
+    "locationPlaceholder": "Medina, Dakar",
+    "beneficiaries": "Beneficiarios previstos",
+    "beneficiariesPlaceholder": "10 aprendices de costura",
+    "fundingLegend": "Uso previsto de los fondos",
+    "fundingHint": "Detalla los principales gastos y su importe estimado.",
+    "expenseLabel": "Gasto {{number}}",
+    "expensePlaceholder": "Ej. Máquinas de coser",
+    "amountLabel": "Importe (F CFA)",
+    "amountPlaceholder": "150.000",
+    "removeExpense": "Eliminar el gasto {{number}}",
+    "addExpense": "Añadir un gasto",
+    "timelineLegend": "Etapas previstas del proyecto",
+    "timelineHint": "Presenta las acciones en orden e indica su período previsto.",
+    "stepLabel": "Etapa {{number}}",
+    "stepPlaceholder": "Ej. Compra del material",
+    "periodLabel": "Período",
+    "periodPlaceholder": "Ej. Semana 1",
+    "removeStep": "Eliminar la etapa {{number}}",
+    "addStep": "Añadir una etapa",
+    "category": "Categoría",
+    "goalAmount": "Objetivo",
+    "goalAmountUnit": "(F CFA)",
+    "goalAmountPlaceholder": "500.000",
+    "deadline": "Plazo de la recaudación",
+    "coverImage": "Imagen de portada",
+    "optional": "(opcional)",
+    "coverAlt": "Vista previa de la imagen de portada",
+    "removeCover": "Quitar la imagen seleccionada",
+    "coverHint": "Una buena imagen da el doble de ganas de contribuir.",
+    "saving": "Guardando…",
+    "creating": "Creando…",
+    "saveSubmit": "Guardar los cambios",
+    "createSubmit": "Crear mi campaña",
+    "editNote": "Después de tus correcciones, vuelve a «Mis campañas» para reenviarla a validación.",
+    "createNote": "Tu campaña se registrará primero como borrador. Podrás enviarla a validación desde tu área «Mis campañas»."
+  },
+  "update": {
+    "notFound": "Esta campaña no se encuentra o no te pertenece.",
+    "validationError": "Añade un título preciso y al menos algunas frases sobre el avance.",
+    "publishError": "La publicación ha fallado. Comprueba que la campaña siga publicada.",
+    "backToAccount": "Volver a mi área",
+    "eyebrow": "Novedad de campaña",
+    "title": "Mantener informados a los contribuyentes",
+    "introWithCampaign": "Comparte un avance, una dificultad o una etapa alcanzada para «{{title}}».",
+    "loading": "Cargando la campaña…",
+    "titleLabel": "Título de la novedad",
+    "titlePlaceholder": "Ej. El material ha sido encargado",
+    "messageLabel": "Mensaje a los contribuyentes",
+    "messagePlaceholder": "Explica lo que se ha realizado, las próximas etapas y las posibles desviaciones respecto al calendario.",
+    "publishing": "Publicando…",
+    "publish": "Publicar la novedad"
+  },
+  "rewards": {
+    "backToAccount": "Volver a mi área",
+    "eyebrow": "Recompensas",
+    "titleWithCampaign": "Recompensas de «{{title}}»",
+    "loading": "Cargando…",
+    "intro": "Propón niveles para agradecer a tus contribuyentes según el importe de su donación.",
+    "notFound": "Esta campaña no se encuentra o no te pertenece.",
+    "notRewardType": "Esta campaña es de tipo «donación libre»: no propone recompensas.",
+    "notEditableStatus": "Las recompensas solo pueden modificarse en una campaña en borrador, rechazada o suspendida.",
+    "empty": "Ninguna recompensa por el momento.",
+    "addReward": "Añadir una recompensa",
+    "form": {
+      "genericError": "Se ha producido un error. Vuelve a intentarlo.",
+      "title": "Título de la recompensa",
+      "titlePlaceholder": "Ej. Bolso cosido a mano",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describe lo que recibirá el contribuyente.",
+      "minimum": "Importe mínimo (F CFA)",
+      "minimumPlaceholder": "15.000",
+      "quantity": "Cantidad disponible",
+      "quantityHint": "(vacío = ilimitada)",
+      "quantityPlaceholder": "20",
+      "saving": "Guardando…",
+      "save": "Guardar",
+      "add": "Añadir la recompensa",
+      "cancel": "Cancelar"
+    },
+    "row": {
+      "soldOut": "Agotada",
+      "minimum": "mínimo",
+      "unlimited": "cantidad ilimitada",
+      "remaining": "{{remaining}} restante(s) de {{limit}}",
+      "editLabel": "Modificar {{title}}",
+      "deleteLabel": "Eliminar {{title}}",
+      "deleteError": "La eliminación ha fallado."
+    }
+  }
+}

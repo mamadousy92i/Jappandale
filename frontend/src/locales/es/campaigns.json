@@ -1,0 +1,40 @@
+{
+  "categories": {
+    "ARTISANAT": "Artesanía",
+    "COMMERCE": "Comercio",
+    "AGRICULTURE": "Agricultura",
+    "EDUCATION": "Educación",
+    "SANTE": "Salud",
+    "TECHNOLOGIE": "Tecnología",
+    "CULTURE": "Cultura",
+    "AUTRE": "Otro"
+  },
+  "card": {
+    "amountOutOf": "de {{amount}}",
+    "ended": "Finalizada",
+    "daysLeft": "Quedan {{count}} días"
+  },
+  "list": {
+    "eyebrowMine": "Área del promotor",
+    "eyebrowAll": "Proyectos publicados",
+    "titleMine": "Gestiona tus campañas",
+    "titleAll": "Necesidades concretas, presentadas por sus promotores",
+    "introMine": "Encuentra tus borradores, sigue su validación y publica las novedades de tus recaudaciones.",
+    "introAll": "Consulta los objetivos, el uso previsto de los fondos y el calendario de cada campaña.",
+    "discover": "Descubrir los proyectos",
+    "myCampaigns": "Mis campañas",
+    "createCampaign": "Crear una campaña",
+    "searchPlaceholder": "Buscar un proyecto, una palabra clave…",
+    "searchLabel": "Buscar una campaña",
+    "filterLabel": "Filtrar por categoría",
+    "all": "Todas",
+    "errorTitle": "No se pudieron cargar las campañas",
+    "errorText": "Se ha producido un error. Comprueba tu conexión y vuelve a intentarlo.",
+    "retry": "Reintentar",
+    "emptyFilteredTitle": "Ninguna campaña coincide",
+    "emptyTitle": "Ninguna campaña por el momento",
+    "emptyFilteredText": "Prueba con otra palabra clave u otra categoría. ¿Y si el proyecto que falta fuera el tuyo?",
+    "emptyText": "Sé de los primeros: lanza tu proyecto y abre camino.",
+    "launchProject": "Lanzar un proyecto"
+  }
+}

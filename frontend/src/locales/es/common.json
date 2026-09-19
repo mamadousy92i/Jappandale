@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "mainLabel": "Navegación principal",
+    "mobileLabel": "Navegación móvil",
+    "campaigns": "Campañas",
+    "myCampaigns": "Mis campañas",
+    "partnerSpace": "Área de socios",
+    "projectLibrary": "Mis documentos",
+    "about": "Acerca de"
+  },
+  "header": {
+    "unreadMessages": "{{count}} mensaje(s) sin leer",
+    "unreadNotifications": "{{count}} notificación(es) sin leer",
+    "openMenu": "Abrir el menú",
+    "closeMenu": "Cerrar el menú",
+    "admin": "Administración",
+    "myProfile": "Mi perfil",
+    "logout": "Cerrar sesión",
+    "login": "Iniciar sesión",
+    "register": "Crear una cuenta",
+    "seeCampaigns": "Ver las campañas",
+    "messages": "Mensajes",
+    "notifications": "Notificaciones"
+  },
+  "roles": {
+    "PORTEUR": "Promotor de proyecto",
+    "CONTRIBUTEUR": "Contribuyente",
+    "PARTENAIRE": "Socio financiero",
+    "ADMIN": "Administrador"
+  },
+  "footer": {
+    "tagline": "La financiación colectiva al servicio de los proyectos senegaleses. Juntos, demos vida a las ideas de aquí.",
+    "understandLabel": "Entender",
+    "howItWorks": "Cómo funciona",
+    "about": "Acerca de",
+    "trust": "Confianza y transparencia",
+    "support": "Asistencia",
+    "accountLabel": "Cuenta",
+    "createAccount": "Crear una cuenta",
+    "login": "Iniciar sesión",
+    "legalNavLabel": "Información legal",
+    "legalLabel": "Legal",
+    "legalNotice": "Aviso legal",
+    "privacy": "Privacidad",
+    "terms": "Condiciones de uso",
+    "copyright": "© {{year}} Jappandale — Dakar, Senegal"
+  }
+}
