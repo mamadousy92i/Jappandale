@@ -412,3 +412,48 @@ def test_video_de_presentation_refusee_si_trop_volumineuse():
     response = client.post("/api/campaigns/", data, format="multipart")
     assert response.status_code == 400
     assert "presentation_video" in response.data
+
+
+@pytest.mark.django_db
+def test_video_de_presentation_acceptee_via_url():
+    porteur = _porteur_valide()
+    client = APIClient()
+    client.force_authenticate(porteur)
+    data = {
+        **DONNEES_CAMPAGNE,
+        "presentation_video_url": "https://videos.example.com/atelier-presentation.mp4",
+    }
+    response = client.post("/api/campaigns/", data, format="multipart")
+    assert response.status_code == 201
+    assert response.data["presentation_video_url"] == "https://videos.example.com/atelier-presentation.mp4"
+
+
+@pytest.mark.django_db
+def test_video_de_presentation_url_refusee_si_schema_invalide():
+    porteur = _porteur_valide()
+    client = APIClient()
+    client.force_authenticate(porteur)
+    data = {**DONNEES_CAMPAGNE, "presentation_video_url": "javascript:alert(1)"}
+    response = client.post("/api/campaigns/", data, format="multipart")
+    assert response.status_code == 400
+    assert "presentation_video_url" in response.data
+
+
+@pytest.mark.django_db
+def test_video_de_presentation_refusee_si_fichier_et_url_fournis():
+    porteur = _porteur_valide()
+    client = APIClient()
+    client.force_authenticate(porteur)
+    fichier = SimpleUploadedFile(
+        "presentation.mp4",
+        b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 32,
+        content_type="video/mp4",
+    )
+    data = {
+        **DONNEES_CAMPAGNE,
+        "presentation_video": fichier,
+        "presentation_video_url": "https://videos.example.com/atelier-presentation.mp4",
+    }
+    response = client.post("/api/campaigns/", data, format="multipart")
+    assert response.status_code == 400
+    assert "presentation_video_url" in response.data

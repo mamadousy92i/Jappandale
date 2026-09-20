@@ -56,6 +56,8 @@
     "report": "Denunciar esta campaña"
   },
   "video": {
-    "title": "Video de presentación"
+    "title": "Video de presentación",
+    "play": "Reproducir el video",
+    "previewBadge": "Vista previa"
   }
 }

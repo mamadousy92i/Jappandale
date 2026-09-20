@@ -88,7 +88,11 @@
     "createNote": "La tua campagna sarà prima registrata come bozza. Potrai inviarla per la convalida dalla tua area «Le mie campagne».",
     "video": "Video di presentazione",
     "videoHint": "Un breve video (MP4 o WebM, 80 MB massimo) invoglia ancora di più a contribuire.",
-    "removeVideo": "Rimuovere il video selezionato"
+    "removeVideo": "Rimuovere il video selezionato",
+    "videoModeFile": "Caricare un file",
+    "videoModeUrl": "Link video (URL)",
+    "videoUrlPlaceholder": "https://esempio.com/mio-video.mp4",
+    "videoUrlHint": "Incolla un link YouTube o un link diretto a un file video già online."
   },
   "update": {
     "notFound": "Questa campagna è introvabile o non ti appartiene.",

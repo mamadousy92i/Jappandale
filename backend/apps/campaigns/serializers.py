@@ -164,6 +164,7 @@ class CampaignDetailSerializer(serializers.ModelSerializer):
             "collected_amount",
             "cover_image",
             "presentation_video",
+            "presentation_video_url",
             "deadline",
             "status",
             "status_display",
@@ -203,6 +204,7 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
             "goal_amount",
             "cover_image",
             "presentation_video",
+            "presentation_video_url",
             "deadline",
             "status",
         ]
@@ -230,6 +232,14 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
 
         return uploaded_file
 
+    def validate_presentation_video_url(self, value):
+        value = value.strip()
+        if value and not value.lower().startswith(("http://", "https://")):
+            raise serializers.ValidationError(
+                "Le lien vidéo doit commencer par http:// ou https://."
+            )
+        return value
+
     def validate_campaign_type(self, value):
         if (
             self.instance
@@ -242,6 +252,14 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        if attrs.get("presentation_video") and attrs.get("presentation_video_url"):
+            raise serializers.ValidationError(
+                {
+                    "presentation_video_url": [
+                        "Choisissez soit un fichier vidéo, soit un lien, pas les deux."
+                    ]
+                }
+            )
         campaign_type = attrs.get(
             "campaign_type",
             self.instance.campaign_type if self.instance else Campaign.CampaignType.DON_LIBRE,

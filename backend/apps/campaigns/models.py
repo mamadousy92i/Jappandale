@@ -76,6 +76,9 @@ class Campaign(models.Model):
     presentation_video = models.FileField(
         "vidéo de présentation", upload_to="campaigns/videos/%Y/%m/", blank=True
     )
+    presentation_video_url = models.URLField(
+        "URL de la vidéo de présentation", max_length=500, blank=True
+    )
     deadline = models.DateField("échéance")
     status = models.CharField(
         "statut", max_length=20, choices=Status.choices, default=Status.BROUILLON

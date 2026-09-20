@@ -88,7 +88,11 @@
     "createNote": "Sa kanpaañ dina njëkk denc ni dàkkantal. Mën ngaa ko yónnee ci wóoral ci sa bérabu « Sama kanpaañ yi ».",
     "video": "Widéwo bu wone porojet bi",
     "videoHint": "Ab widéwo bu gàtt (MP4 walla WebM, 80 Mo bu gën a bare) dinañu gën a soxla ñu dokkal.",
-    "removeVideo": "Far widéwo bi nga tann"
+    "removeVideo": "Far widéwo bi nga tann",
+    "videoModeFile": "Yónnee benn fichier",
+    "videoModeUrl": "Lien widéwo (URL)",
+    "videoUrlPlaceholder": "https://exemple.com/sama-video.mp4",
+    "videoUrlHint": "Def ci lien YouTube walla lien bu jub ci benn fichier widéwo bu nekk ci internet."
   },
   "update": {
     "notFound": "Kanpaañ bii gisul walla boroom moo ko.",

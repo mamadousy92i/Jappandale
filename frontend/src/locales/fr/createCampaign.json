@@ -88,7 +88,11 @@
     "createNote": "Votre campagne sera d’abord enregistrée en brouillon. Vous pourrez la soumettre à validation depuis votre espace « Mes campagnes ».",
     "video": "Vidéo de présentation",
     "videoHint": "Une courte vidéo (MP4 ou WebM, 80 Mo maximum) donne encore plus envie de contribuer.",
-    "removeVideo": "Retirer la vidéo sélectionnée"
+    "removeVideo": "Retirer la vidéo sélectionnée",
+    "videoModeFile": "Téléverser un fichier",
+    "videoModeUrl": "Lien vidéo (URL)",
+    "videoUrlPlaceholder": "https://exemple.com/ma-video.mp4",
+    "videoUrlHint": "Collez un lien YouTube ou un lien direct vers un fichier vidéo déjà en ligne."
   },
   "update": {
     "notFound": "Cette campagne est introuvable ou ne vous appartient pas.",

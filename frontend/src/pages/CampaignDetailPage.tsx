@@ -26,6 +26,7 @@ import type { LucideIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ProgressBar } from "@/components/campaigns/CampaignCard"
+import { CampaignVideoPlayer } from "@/components/campaigns/CampaignVideoPlayer"
 import { Button } from "@/components/ui/button"
 import { ApiError, apiFetch } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
@@ -377,7 +378,7 @@ function CampaignDetailPage() {
             </p>
           </section>
 
-          {campaign.presentation_video && (
+          {(campaign.presentation_video || campaign.presentation_video_url) && (
             <section aria-labelledby="video-presentation" className="mt-8">
               <h2
                 id="video-presentation"
@@ -385,13 +386,10 @@ function CampaignDetailPage() {
               >
                 {t("video.title")}
               </h2>
-              <div className="mt-5 overflow-hidden rounded-2xl border border-black/5 bg-black shadow-sm">
-                {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-                <video
-                  src={campaign.presentation_video}
-                  controls
-                  preload="metadata"
-                  className="aspect-video w-full"
+              <div className="mt-5 overflow-hidden rounded-2xl border border-black/5 shadow-sm">
+                <CampaignVideoPlayer
+                  videoFileUrl={campaign.presentation_video}
+                  videoLinkUrl={campaign.presentation_video_url}
                 />
               </div>
             </section>

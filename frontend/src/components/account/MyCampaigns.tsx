@@ -16,9 +16,18 @@ import {
 
 import { ProgressBar } from "@/components/campaigns/CampaignCard";
 import { Button } from "@/components/ui/button";
+import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { formatFcfa } from "@/lib/format";
 import type { CampaignListItem, CampaignStatus } from "@/lib/types";
+
+function toMessage(value: unknown): string {
+  if (Array.isArray(value)) return value.map(toMessage).join(" ");
+  if (value && typeof value === "object") {
+    return Object.values(value as Record<string, unknown>).map(toMessage).join(" ");
+  }
+  return String(value);
+}
 
 const statusBadgeClasses: Record<CampaignStatus, string> = {
   BROUILLON: "bg-black/[0.06] text-ink-secondary",
@@ -50,7 +59,7 @@ function CampaignRow({
   const { t } = useTranslation("account");
   const { authFetch } = useAuth();
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [requestingFee, setRequestingFee] = useState(false);
   const [feeError, setFeeError] = useState(false);
 
@@ -71,15 +80,19 @@ function CampaignRow({
         : "";
 
   const handleSubmit = async () => {
-    setError(false);
+    setError(null);
     setSubmitting(true);
     try {
       await authFetch(`/campaigns/${campaign.slug}/submit/`, {
         method: "POST",
       });
       onReload();
-    } catch {
-      setError(true);
+    } catch (err) {
+      setError(
+        err instanceof ApiError && err.details
+          ? toMessage(err.details)
+          : t("myCampaigns.submitError"),
+      );
       setSubmitting(false);
     }
   };
@@ -199,7 +212,7 @@ function CampaignRow({
 
           {error && (
             <p role="alert" className="mt-3 text-sm text-red-600">
-              {t("myCampaigns.submitError")}
+              {error}
             </p>
           )}
 

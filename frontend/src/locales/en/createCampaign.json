@@ -88,7 +88,11 @@
     "createNote": "Your campaign will first be saved as a draft. You'll be able to submit it for validation from your « My campaigns » area.",
     "video": "Presentation video",
     "videoHint": "A short video (MP4 or WebM, 80 MB maximum) makes people even more likely to contribute.",
-    "removeVideo": "Remove selected video"
+    "removeVideo": "Remove selected video",
+    "videoModeFile": "Upload a file",
+    "videoModeUrl": "Video link (URL)",
+    "videoUrlPlaceholder": "https://example.com/my-video.mp4",
+    "videoUrlHint": "Paste a YouTube link or a direct link to a video file already online."
   },
   "update": {
     "notFound": "This campaign cannot be found or doesn't belong to you.",

@@ -88,7 +88,11 @@
     "createNote": "Tu campaña se registrará primero como borrador. Podrás enviarla a validación desde tu área «Mis campañas».",
     "video": "Video de presentación",
     "videoHint": "Un breve video (MP4 o WebM, 80 MB como máximo) da aún más ganas de contribuir.",
-    "removeVideo": "Quitar el video seleccionado"
+    "removeVideo": "Quitar el video seleccionado",
+    "videoModeFile": "Subir un archivo",
+    "videoModeUrl": "Enlace de video (URL)",
+    "videoUrlPlaceholder": "https://ejemplo.com/mi-video.mp4",
+    "videoUrlHint": "Pega un enlace de YouTube o un enlace directo a un archivo de video ya publicado."
   },
   "update": {
     "notFound": "Esta campaña no se encuentra o no te pertenece.",

@@ -51,6 +51,7 @@ const fieldNames = [
   "deadline",
   "cover_image",
   "presentation_video",
+  "presentation_video_url",
 ];
 
 type FundingItem = { label: string; amount: string };
@@ -175,6 +176,10 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
   const [videoPreview, setVideoPreview] = useState<string | null>(
     campaign?.presentation_video ?? null,
   );
+  const [videoMode, setVideoMode] = useState<"file" | "url">(
+    campaign?.presentation_video_url ? "url" : "file",
+  );
+  const [videoUrl, setVideoUrl] = useState(campaign?.presentation_video_url ?? "");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -253,7 +258,12 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
     data.append("goal_amount", goalAmount);
     data.append("deadline", deadline);
     if (coverImage) data.append("cover_image", coverImage);
-    if (video) data.append("presentation_video", video);
+    if (videoMode === "url") {
+      data.append("presentation_video_url", videoUrl.trim());
+    } else {
+      if (video) data.append("presentation_video", video);
+      data.append("presentation_video_url", "");
+    }
 
     try {
       await authFetch(
@@ -727,41 +737,88 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="presentation_video" className="text-ink">
+          <Label className="text-ink">
             {t("form.video")}{" "}
             <span className="font-normal text-ink-muted">{t("form.optional")}</span>
           </Label>
-          <input
-            id="presentation_video"
-            type="file"
-            accept="video/mp4,video/webm"
-            onChange={(e) => handleVideoChange(e.target.files?.[0] ?? null)}
-            className="block min-h-14 w-full rounded-xl border border-black/10 bg-surface text-base text-ink-secondary file:mr-4 file:min-h-14 file:cursor-pointer file:border-0 file:bg-gold/15 file:px-5 file:py-3.5 file:font-medium file:text-gold-dark hover:file:bg-gold/25"
-            {...invalidProps("presentation_video")}
-          />
-          {errorFor("presentation_video")}
-          {videoPreview ? (
-            <div className="relative mt-3 overflow-hidden rounded-2xl border border-black/5">
-              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-              <video
-                src={videoPreview}
-                controls
-                className="aspect-video w-full bg-black"
+
+          <div className="inline-flex rounded-full border border-black/10 bg-surface p-1">
+            <button
+              type="button"
+              onClick={() => setVideoMode("file")}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                videoMode === "file"
+                  ? "bg-gold/15 text-gold-dark"
+                  : "text-ink-muted hover:text-ink-secondary"
+              }`}
+            >
+              {t("form.videoModeFile")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setVideoMode("url")}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                videoMode === "url"
+                  ? "bg-gold/15 text-gold-dark"
+                  : "text-ink-muted hover:text-ink-secondary"
+              }`}
+            >
+              {t("form.videoModeUrl")}
+            </button>
+          </div>
+
+          {videoMode === "file" ? (
+            <>
+              <input
+                id="presentation_video"
+                type="file"
+                accept="video/mp4,video/webm"
+                onChange={(e) => handleVideoChange(e.target.files?.[0] ?? null)}
+                className="block min-h-14 w-full rounded-xl border border-black/10 bg-surface text-base text-ink-secondary file:mr-4 file:min-h-14 file:cursor-pointer file:border-0 file:bg-gold/15 file:px-5 file:py-3.5 file:font-medium file:text-gold-dark hover:file:bg-gold/25"
+                {...invalidProps("presentation_video")}
               />
-              <button
-                type="button"
-                onClick={() => handleVideoChange(null)}
-                aria-label={t("form.removeVideo")}
-                className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition-colors outline-none hover:bg-white focus-visible:ring-2 focus-visible:ring-gold-dark/50"
-              >
-                <X aria-hidden="true" className="size-4" />
-              </button>
-            </div>
+              {errorFor("presentation_video")}
+              {videoPreview ? (
+                <div className="relative mt-3 overflow-hidden rounded-2xl border border-black/5">
+                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                  <video
+                    src={videoPreview}
+                    controls
+                    className="aspect-video w-full bg-black"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleVideoChange(null)}
+                    aria-label={t("form.removeVideo")}
+                    className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition-colors outline-none hover:bg-white focus-visible:ring-2 focus-visible:ring-gold-dark/50"
+                  >
+                    <X aria-hidden="true" className="size-4" />
+                  </button>
+                </div>
+              ) : (
+                <p className="flex items-center gap-2 text-xs text-ink-muted">
+                  <Film aria-hidden="true" className="size-4" />
+                  {t("form.videoHint")}
+                </p>
+              )}
+            </>
           ) : (
-            <p className="flex items-center gap-2 text-xs text-ink-muted">
-              <Film aria-hidden="true" className="size-4" />
-              {t("form.videoHint")}
-            </p>
+            <>
+              <Input
+                id="presentation_video_url"
+                type="url"
+                inputMode="url"
+                placeholder={t("form.videoUrlPlaceholder")}
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                {...invalidProps("presentation_video_url")}
+              />
+              {errorFor("presentation_video_url")}
+              <p className="flex items-center gap-2 text-xs text-ink-muted">
+                <Film aria-hidden="true" className="size-4" />
+                {t("form.videoUrlHint")}
+              </p>
+            </>
           )}
         </div>
       </div>

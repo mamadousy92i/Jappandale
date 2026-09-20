@@ -125,6 +125,7 @@ export interface RecentContributor {
 export interface CampaignDetail extends CampaignListItem {
   description: string;
   presentation_video: string | null;
+  presentation_video_url: string | null;
   beneficiaries: string;
   funding_plan: string;
   project_timeline: string;
