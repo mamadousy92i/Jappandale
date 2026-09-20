@@ -1,0 +1,114 @@
+{
+  "homepage": {
+    "hero": {
+      "eyebrow": "Senegalese project platform",
+      "title": "Fund the projects moving Senegal forward.",
+      "intro": "Discover documented local projects, run by verified people, and concretely follow the planned use of funds and their progress.",
+      "ctaDiscover": "See published projects",
+      "ctaSubmit": "Submit a project",
+      "note": "Every contribution is recorded and can be tracked from your personal area.",
+      "imageAlt": "Tailor in his workshop in Dakar",
+      "imageCaption": "Sewing workshop — Medina, Dakar"
+    },
+    "published": {
+      "eyebrow": "In preparation",
+      "title": "Published projects",
+      "intro": "Each listing presents the need, location, beneficiaries and planned use of the funding.",
+      "seeAll": "All campaigns",
+      "empty": "Campaigns will be displayed here as soon as the service is available."
+    },
+    "modal": {
+      "previewLabel": "Journey preview",
+      "closeLabel": "Close preview",
+      "zoomedLabel": "Enlarged screenshot: {{title}}"
+    },
+    "today": {
+      "title": "Available today",
+      "items": [
+        "Account creation and project owner profile",
+        "Submission and manual review of KYC documents",
+        "Creation, moderation and publication of a campaign",
+        "Public browsing of published projects"
+      ]
+    },
+    "contribJourney": {
+      "title": "Contribution journey",
+      "text": "Choose an amount, confirm your contribution and immediately find its status in your personal history.",
+      "cta": "Create my account"
+    },
+    "eyebrow": "How it works",
+    "title": "A clear journey, from idea to follow-up",
+    "intro": "Jappandale guides each project through four simple steps, with transparency as a guiding principle.",
+    "stepLabel": "Step 0{{number}}",
+    "expandLabel": "Enlarge",
+    "steps": {
+      "create": {
+        "title": "Present the project",
+        "text": "Describe the need, beneficiaries, budget and planned steps."
+      },
+      "verify": {
+        "title": "Get the file verified",
+        "text": "Identity, activity and campaign information are reviewed before publication."
+      },
+      "mobilize": {
+        "title": "Mobilize contributors",
+        "text": "Share the public page and follow the fundraiser's progress with full clarity."
+      },
+      "report": {
+        "title": "Report back",
+        "text": "Manage your fundraisers and publish news about milestones reached."
+      }
+    },
+    "ctaDiscover": "Discover projects",
+    "ctaSubmit": "Submit a project",
+    "verified": {
+      "title": "What « verified project » means",
+      "intro": "Validation doesn't guarantee the project's success. It confirms that the project owner submitted the requested documents and that the campaign's information was reviewed before publication.",
+      "steps": {
+        "identity": {
+          "title": "Identity and activity",
+          "text": "The project owner submits their supporting documents. The team verifies the file before any publication."
+        },
+        "project": {
+          "title": "Project and funding need",
+          "text": "The amount, use of funds, beneficiaries and timeline are reviewed."
+        },
+        "publication": {
+          "title": "Controlled publication",
+          "text": "The campaign is only visible after validation. A rejection must be explained and corrected."
+        }
+      }
+    }
+  },
+  "trust": {
+    "eyebrow": "Trust and transparency",
+    "title": "What Jappandale checks — and what it doesn't promise.",
+    "intro": "Trust comes from accurate information, traceable decisions and honest communication about the service's limits.",
+    "principles": {
+      "identity": {
+        "title": "Checked identity",
+        "text": "A campaign is only published after verifying the project owner's required documents and a manual file review."
+      },
+      "budget": {
+        "title": "Visible budget",
+        "text": "Beneficiaries, planned use of funds, timeline and updates remain accessible on the project page."
+      },
+      "promises": {
+        "title": "Measured promises",
+        "text": "Verification confirms the file's consistency; it guarantees neither the project's success nor a financial return."
+      },
+      "contributions": {
+        "title": "Traceable contributions",
+        "text": "Every contribution is linked to a reference and remains viewable from the member's personal history."
+      },
+      "reports": {
+        "title": "Reviewed reports",
+        "text": "Any member can submit a confidential report. It is kept and processed from the back office."
+      }
+    },
+    "transparency": {
+      "title": "Transparency at every step",
+      "text": "The statuses of campaigns, verifications and contributions remain accessible in their respective areas to make tracking each operation easier."
+    }
+  }
+}

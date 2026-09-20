@@ -1,0 +1,59 @@
+{
+  "hero": {
+    "eyebrow": "About Jappandale",
+    "title": "Circulating trust as much as funding.",
+    "intro": "Jappandale is a Senegalese crowdfunding and financial matchmaking platform, designed to bring local projects closer to those who want to support them.",
+    "discover": "Discover projects",
+    "understand": "Understand the journey",
+    "imageAlt": "Jappandale logo — connecting projects to funding opportunities"
+  },
+  "why": {
+    "eyebrow": "Why Jappandale",
+    "title": "A local reality, a collective response",
+    "p1": "In Senegal and across the WAEMU region, access to funding remains a major obstacle for many entrepreneurs, SMEs, cooperatives and associations.",
+    "p2": "At the same time, the diaspora and local investors are looking for more structured ways to identify local projects, understand their needs and follow their progress.",
+    "p3": "Jappandale creates this meeting point: a common framework to present, review, fund and follow impactful initiatives."
+  },
+  "mission": {
+    "eyebrow": "Our mission",
+    "title": "Making funding clearer, closer and better followed",
+    "commitments": {
+      "connect": {
+        "title": "Connect",
+        "text": "Bring together Senegalese project owners, contributors, investors and the diaspora around concrete opportunities."
+      },
+      "evaluate": {
+        "title": "Review",
+        "text": "Check the identity of project owners and the consistency of their files before publication on the platform."
+      },
+      "follow": {
+        "title": "Follow",
+        "text": "Make each project's goals, planned use of funds and reported progress visible."
+      }
+    }
+  },
+  "roots": {
+    "eyebrow": "Our roots",
+    "title": "A platform built for the Senegalese ecosystem",
+    "p1": "Jappandale starts from the realities of the entrepreneurs, cooperatives, associations and communities who drive the local economy every day.",
+    "p2": "Our ambition is to put technology at the service of a more accessible financial relationship between local initiatives, the diaspora and their support communities.",
+    "imageAlt": "Economic activity in a Senegalese market"
+  },
+  "trustSection": {
+    "title": "Trust is built with evidence",
+    "text": "A verified campaign does not guarantee its success. It means the requested information and documents were reviewed before publication.",
+    "principles": [
+      "Campaigns reviewed before publication",
+      "Financial information presented clearly",
+      "Traceable decisions and statuses",
+      "Tracking accessible to project owners and contributors"
+    ]
+  },
+  "cta": {
+    "eyebrow": "Get involved",
+    "title": "A project to grow, or an initiative to support?",
+    "text": "Join Jappandale to present your project, discover published campaigns and help them move forward.",
+    "submit": "Submit a project",
+    "see": "See campaigns"
+  }
+}

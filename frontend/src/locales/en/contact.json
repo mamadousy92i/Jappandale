@@ -1,0 +1,17 @@
+{
+  "eyebrow": "Support",
+  "title": "How can we help you?",
+  "intro": "A question about a campaign, KYC or a contribution? Describe your situation without sharing any password or banking details.",
+  "reportNote": "To report concerning content, please use the « Report » button on the campaign in question instead.",
+  "sentTitle": "Request received",
+  "sentText": "It is now recorded in Jappandale's support area.",
+  "form": {
+    "name": "Full name",
+    "email": "Email address",
+    "subject": "Subject",
+    "message": "Your message",
+    "sending": "Sending…",
+    "submit": "Send request",
+    "error": "Your request could not be sent. Check the information entered."
+  }
+}

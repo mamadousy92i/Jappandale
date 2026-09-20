@@ -1,0 +1,208 @@
+{
+  "main": {
+    "roles": {
+      "PORTEUR": "Project owner",
+      "CONTRIBUTEUR": "Contributor",
+      "PARTENAIRE": "Financial partner",
+      "ADMIN": "Administrator"
+    },
+    "eyebrow": "My account",
+    "greeting": "Hello {{name}}",
+    "greetingFallback": "there",
+    "tabsLabel": "My account sections",
+    "tabs": {
+      "apercu": "Overview",
+      "profil": "Personal information",
+      "kyc": "Identity verification",
+      "contributions": "Contributions",
+      "guichet": "One-Stop Funding Desk"
+    },
+    "actionRequired": "Action required",
+    "avatar": {
+      "title": "Profile photo",
+      "hint": "JPG, PNG or WebP · 3 MB maximum.",
+      "change": "Change photo",
+      "add": "Add a photo",
+      "remove": "Remove",
+      "invalidFile": "Choose a JPG, PNG or WebP image of 3 MB maximum.",
+      "updated": "Your profile photo has been updated.",
+      "saveError": "Unable to save this photo.",
+      "removed": "The photo has been removed.",
+      "removeError": "Unable to remove this photo."
+    },
+    "emailNotVerified": {
+      "title": "Email address not verified",
+      "text": "Enter the code received by email to secure your account.",
+      "cta": "Verify now"
+    },
+    "form": {
+      "title": "Personal information",
+      "hint": "Your email address and role cannot be changed.",
+      "edit": "Edit",
+      "invalid": "Some information is invalid. Check the form.",
+      "genericError": "An error occurred. Please try again.",
+      "saved": "Your information has been saved.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "optional": "(optional)",
+      "diasporaLabel": "I live abroad (diaspora)",
+      "diasporaHint": "Enhanced verification (proof of residence and source of funds) will be requested in the Identity verification tab.",
+      "country": "Country of residence",
+      "countryPlaceholder": "— Select a country —",
+      "regions": {
+        "westAfrica": "West Africa",
+        "centralNorthAfrica": "Central and North Africa",
+        "europe": "Europe",
+        "northAmerica": "North America",
+        "middleEast": "Middle East",
+        "asia": "Asia"
+      },
+      "organization": "Organization",
+      "organizationPlaceholder": "Name of the association or activity",
+      "city": "City",
+      "bio": "Public presentation",
+      "bioPlaceholder": "Introduce your experience and what motivates you…",
+      "saving": "Saving…",
+      "save": "Save changes",
+      "cancel": "Cancel"
+    }
+  },
+  "score": {
+    "title": "Jappandale Score®",
+    "subtitle": "A reliability indicator calculated from your history.",
+    "manualOverride": "Manually validated",
+    "overrideNote": "Note from the Jappandale team: {{note}}",
+    "factors": {
+      "base": "Base score",
+      "kyc": "Identity verified",
+      "anciennete": "Account age",
+      "activite": "Published campaigns",
+      "reussite": "Success rate",
+      "montant_collecte": "Amount raised",
+      "litiges": "Disputes",
+      "signalements": "Reports",
+      "campagnes_rejetees": "Rejected/suspended campaigns"
+    },
+    "recentEvolution": "Recent evolution",
+    "historyLabel": "Recent Jappandale Score history",
+    "historyHint": "Each check updates your history based on platform data."
+  },
+  "passport": {
+    "title": "Jappandale Financial Passport®",
+    "subtitle": "Your consolidated history, exportable and verifiable.",
+    "exporting": "Generating…",
+    "export": "Export as PDF",
+    "exportError": "Unable to generate the PDF right now. Please try again.",
+    "stats": {
+      "campaignsTotal": "Campaigns created",
+      "campaignsSuccess": "Closed successfully",
+      "totalCollected": "Amount raised",
+      "distinctContributors": "Distinct funders",
+      "confirmedContributions": "Contributions received",
+      "disputesReceived": "Disputes received"
+    },
+    "exportsTitle": "Exported passports",
+    "exportsHint": "A verification link is private by default. Activate it only when you want to share it with a third party.",
+    "exportDate": "Export from {{date}}",
+    "linkActive": "Verification link active",
+    "linkPrivate": "Private link",
+    "copyLink": "Copy link",
+    "makePrivate": "Make private",
+    "allowSharing": "Allow sharing",
+    "sharingError": "Unable to change the sharing settings for this passport.",
+    "copyError": "Unable to copy the link. You can try again from a secure browser."
+  },
+  "guichet": {
+    "title": "One-Stop Funding Desk",
+    "subtitle": "The funding schemes your profile is eligible for.",
+    "empty": "No funding scheme is published at the moment. Check back soon.",
+    "eligible": "You are eligible",
+    "notEligible": "Not eligible",
+    "minScore": "Minimum score: {{score}}/100",
+    "goalRange": "Target {{min}} to {{max}}",
+    "websiteLink": "Scheme website",
+    "expressInterest": "Express my interest",
+    "referralPrefix": "Referral: {{status}}",
+    "eligibilityLostError": "You no longer meet the eligibility criteria for this scheme.",
+    "genericError": "Unable to record your interest at the moment."
+  },
+  "myContributions": {
+    "title": "My contributions",
+    "subtitle": "History of the contributions you've made on Jappandale.",
+    "loadError": "Unable to load your contributions.",
+    "empty": "You haven't contributed to a campaign yet.",
+    "anonymous": "Anonymous contribution",
+    "nameVisible": "Name visible",
+    "status": {
+      "INITIEE": "Pending",
+      "CONFIRMEE": "Confirmed",
+      "ECHOUEE": "Failed",
+      "REMBOURSEE": "Refunded"
+    },
+    "disputeStatusPrefix": "Dispute: {{status}}",
+    "openDispute": "Open a dispute",
+    "disputeForm": {
+      "reasonLabel": "Dispute reason",
+      "reasons": {
+        "PROJET_NON_CONFORME": "Project not as described / funds misused",
+        "PORTEUR_INJOIGNABLE": "Project owner unreachable",
+        "ERREUR_CONTRIBUTION": "Unwanted contribution / mistake",
+        "AUTRE": "Other reason"
+      },
+      "detailsLabel": "Dispute details",
+      "detailsPlaceholder": "Describe the issue you encountered…",
+      "cancel": "Cancel",
+      "submit": "Open dispute",
+      "missingDetails": "Describe the issue you encountered.",
+      "submitError": "Unable to open this dispute. Please try again."
+    }
+  },
+  "receivedContributions": {
+    "title": "Received contributions",
+    "subtitle": "Tracking of attempts and confirmations on your campaigns.",
+    "loadError": "Unable to load received contributions.",
+    "empty": "No contributions received yet.",
+    "net": "net {{amount}}"
+  },
+  "myCampaigns": {
+    "title": "My campaigns",
+    "subtitle": "Track your fundraising and submit your drafts for validation.",
+    "create": "Create a campaign",
+    "loadError": "Unable to load your campaigns. Check your connection and try again.",
+    "retry": "Retry",
+    "empty": {
+      "title": "No campaign yet",
+      "text": "Your first campaign is just a few clicks away: present your project and launch the fundraiser."
+    },
+    "status": {
+      "BROUILLON": "Draft",
+      "EN_MODERATION": "Under review",
+      "PUBLIEE": "Published",
+      "REJETEE": "Rejected",
+      "SUSPENDUE": "Suspended",
+      "CLOTUREE": "Closed"
+    },
+    "goalOf": "of {{amount}}",
+    "rejectionReason": "Reason for rejection",
+    "suspensionReason": "Reason for suspension",
+    "submitError": "The submission failed. Please try again.",
+    "edit": "Edit",
+    "rewards": "Rewards",
+    "viewPage": "View page",
+    "publishUpdate": "Publish an update",
+    "submitDraft": "Submit for validation",
+    "resubmit": "Resubmit for validation",
+    "submitting": "Sending…",
+    "fee": {
+      "title": "Filing fee",
+      "notRequested": "Before submitting this campaign for review, pay the filing fee to the Jappandale team, then request its validation.",
+      "pending": "Your request to validate the filing fee is being reviewed by an administrator.",
+      "rejectedFallback": "The filing fee was rejected. Contact the Jappandale team to sort out your file.",
+      "request": "Request fee validation",
+      "requestAgain": "Request validation again",
+      "requesting": "Sending…",
+      "requestError": "The request failed. Please try again."
+    }
+  }
+}

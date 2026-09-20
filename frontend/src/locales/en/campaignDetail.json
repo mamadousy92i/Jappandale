@@ -1,0 +1,61 @@
+{
+  "backToCampaigns": "All campaigns",
+  "verifiedOwner": "Verified project owner",
+  "flexibleCollection": "Flexible funding",
+  "byLine": "Run by",
+  "publishedOn": "Published on {{date}}",
+  "notFound": {
+    "title": "Campaign not found",
+    "text404": "This campaign doesn't exist or is no longer available.",
+    "textError": "Unable to load this campaign right now.",
+    "back": "Back to campaigns"
+  },
+  "about": "About the project",
+  "impact": "Expected impact",
+  "rewards": {
+    "title": "Rewards",
+    "soldOut": "Sold out",
+    "minimum": "minimum",
+    "unlimited": "Unlimited quantity",
+    "remaining": "{{remaining}} remaining out of {{limit}}"
+  },
+  "fundingPlan": "Use of funds",
+  "timeline": "Project timeline",
+  "verification": {
+    "title": "What was verified before publication",
+    "text": "The project owner's identity and the information declared in this campaign were reviewed by the moderation team. This verification is not a guarantee of results nor investment advice."
+  },
+  "owner": {
+    "eyebrow": "The project owner",
+    "loginPrompt": "Log in",
+    "loginSuffix": "to contact this project's owner.",
+    "messagePlaceholder": "Ask your question to the project owner…",
+    "messageLabel": "Your message to the project owner",
+    "sendError": "Unable to send this message. Check your identity (KYC) and try again.",
+    "sentPrefix": "Message sent. Find the conversation in",
+    "sentLinkText": "your Messages area",
+    "sending": "Sending…",
+    "contact": "Contact the project owner"
+  },
+  "contributors": "Recent contributions",
+  "updates": "Updates",
+  "donation": {
+    "collectedOutOf": "raised out of a goal of {{amount}}",
+    "ofGoal": "of the goal",
+    "daysLeft": "{{count}}d left",
+    "ended": "Ended",
+    "beforeClosing": "before closing",
+    "closed": "campaign closed",
+    "expectedReturn": "Expected return",
+    "contribute": "Contribute now",
+    "suspended": "Campaign temporarily suspended",
+    "endedButton": "Campaign closed",
+    "note": "Your contribution will be linked to your account and this campaign.",
+    "shareCopied": "Link copied",
+    "share": "Share this campaign",
+    "report": "Report this campaign"
+  },
+  "video": {
+    "title": "Presentation video"
+  }
+}

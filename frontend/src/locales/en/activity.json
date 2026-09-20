@@ -1,0 +1,81 @@
+{
+  "contribution": {
+    "genericError": "The operation failed. Check the information and try again.",
+    "notFound": "This campaign cannot be found or is unavailable.",
+    "loading": "Loading…",
+    "backToCampaigns": "Back to campaigns",
+    "amountRange": "The amount must be between 1,000 and 5,000,000 FCFA.",
+    "rewardMinimum": "The minimum amount for this reward is {{amount}}.",
+    "kycRequired": {
+      "title": "Identity verification required",
+      "text": "Your identity must be validated before contributing. Find the requested documents and your file's status in your account.",
+      "cta": "Go to my account"
+    },
+    "backToCampaign": "Back to campaign",
+    "eyebrow": "Contribution",
+    "title": "Contribute to {{campaign}}",
+    "verifyNote": "Check the amount and campaign information before confirming your contribution.",
+    "reward": {
+      "label": "Reward",
+      "none": "No reward — free donation",
+      "soldOut": "Sold out",
+      "from": "From {{amount}}",
+      "remaining": " · {{count}} remaining"
+    },
+    "amountLabel": "Amount in FCFA",
+    "hideNameLabel": "Hide my name from the public list of contributors",
+    "preparing": "Preparing…",
+    "continue": "Continue",
+    "confirmed": "Contribution confirmed",
+    "notConfirmed": "Contribution not confirmed",
+    "reference": "reference {{ref}}",
+    "seeCampaign": "View campaign",
+    "seeHistory": "View my history",
+    "reviewTitle": "Review your contribution",
+    "amount": "Amount",
+    "display": "Display",
+    "anonymous": "Anonymous",
+    "nameVisible": "Name visible",
+    "status": "Status",
+    "pending": "Awaiting confirmation",
+    "confirmHint": "Confirm the information above to finalize your contribution.",
+    "confirmSubmit": "Confirm contribution",
+    "cancel": "Cancel",
+    "shareholderLabel": "I would like to become a shareholder in this project",
+    "shareholderYes": "Yes, wants to become a shareholder",
+    "shareholderNo": "No, simple funding"
+  },
+  "notifications": {
+    "eyebrow": "My space",
+    "title": "Notifications",
+    "intro": "KYC decisions, campaigns and activity on your contributions.",
+    "markAllRead": "Mark all as read",
+    "loadError": "Unable to load your notifications.",
+    "retry": "Retry",
+    "emptyTitle": "Nothing new",
+    "emptyText": "Your next confirmations will appear here.",
+    "seeDetail": "View details →"
+  },
+  "messages": {
+    "eyebrow": "My space",
+    "title": "Messages",
+    "intro": "Your exchanges with project owners and funders.",
+    "empty": "No conversation yet.",
+    "selectConversation": "Select a conversation.",
+    "messagePlaceholder": "Write your message…",
+    "messageLabel": "Your message",
+    "report": "Report",
+    "reported": "Reported",
+    "reportReasonLabel": "Report reason",
+    "reportDetailsLabel": "Details",
+    "reportDetailsPlaceholder": "Details (optional)",
+    "cancel": "Cancel",
+    "reasons": {
+      "SPAM": "Spam or solicitation",
+      "HARCELEMENT": "Harassment",
+      "CONTENU_INAPPROPRIE": "Inappropriate content",
+      "TENTATIVE_CONTOURNEMENT": "Attempt to bypass the platform",
+      "AUTRE": "Other reason"
+    }
+  }
+}

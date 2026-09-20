@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "mainLabel": "Main navigation",
+    "mobileLabel": "Mobile navigation",
+    "campaigns": "Campaigns",
+    "myCampaigns": "My campaigns",
+    "partnerSpace": "Partner area",
+    "projectLibrary": "My documents",
+    "about": "About"
+  },
+  "header": {
+    "unreadMessages": "{{count}} unread message(s)",
+    "unreadNotifications": "{{count}} unread notification(s)",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "admin": "Administration",
+    "myProfile": "My profile",
+    "logout": "Log out",
+    "login": "Log in",
+    "register": "Create an account",
+    "seeCampaigns": "See campaigns",
+    "messages": "Messages",
+    "notifications": "Notifications"
+  },
+  "roles": {
+    "PORTEUR": "Project owner",
+    "CONTRIBUTEUR": "Contributor",
+    "PARTENAIRE": "Financial partner",
+    "ADMIN": "Administrator"
+  },
+  "footer": {
+    "tagline": "Crowdfunding for Senegalese projects. Together, let's bring local ideas to life.",
+    "understandLabel": "Understand",
+    "howItWorks": "How it works",
+    "about": "About",
+    "trust": "Trust and transparency",
+    "support": "Support",
+    "accountLabel": "Account",
+    "createAccount": "Create an account",
+    "login": "Log in",
+    "legalNavLabel": "Legal information",
+    "legalLabel": "Legal",
+    "legalNotice": "Legal notice",
+    "privacy": "Privacy",
+    "terms": "Terms of use",
+    "copyright": "© {{year}} Jappandale — Dakar, Senegal"
+  }
+}

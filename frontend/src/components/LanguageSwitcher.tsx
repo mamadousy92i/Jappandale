@@ -9,6 +9,7 @@ const languageLabels: Record<SupportedLanguage, string> = {
   wo: "Wolof",
   it: "Italiano",
   es: "Español",
+  en: "English",
 }
 
 const languageShortLabels: Record<SupportedLanguage, string> = {
@@ -16,9 +17,10 @@ const languageShortLabels: Record<SupportedLanguage, string> = {
   wo: "WO",
   it: "IT",
   es: "ES",
+  en: "EN",
 }
 
-/** Bascule la langue de l'interface (français / wolof / italien / espagnol), sous forme de liste déroulante. */
+/** Bascule la langue de l'interface (français / wolof / italien / espagnol / anglais), sous forme de liste déroulante. */
 export function LanguageSwitcher({
   className = "",
   align = "right",

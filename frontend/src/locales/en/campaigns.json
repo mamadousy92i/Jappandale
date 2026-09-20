@@ -1,0 +1,40 @@
+{
+  "categories": {
+    "ARTISANAT": "Crafts",
+    "COMMERCE": "Trade",
+    "AGRICULTURE": "Agriculture",
+    "EDUCATION": "Education",
+    "SANTE": "Health",
+    "TECHNOLOGIE": "Technology",
+    "CULTURE": "Culture",
+    "AUTRE": "Other"
+  },
+  "card": {
+    "amountOutOf": "of {{amount}}",
+    "ended": "Ended",
+    "daysLeft": "{{count}}d left"
+  },
+  "list": {
+    "eyebrowMine": "Project owner area",
+    "eyebrowAll": "Published projects",
+    "titleMine": "Manage your campaigns",
+    "titleAll": "Real needs, presented by their project owners",
+    "introMine": "Find your drafts, track their validation and publish updates on your fundraisers.",
+    "introAll": "Check the goals, planned use of funds and timeline of each campaign.",
+    "discover": "Discover projects",
+    "myCampaigns": "My campaigns",
+    "createCampaign": "Create a campaign",
+    "searchPlaceholder": "Search a project, a keyword…",
+    "searchLabel": "Search a campaign",
+    "filterLabel": "Filter by category",
+    "all": "All",
+    "errorTitle": "Unable to load campaigns",
+    "errorText": "An error occurred. Check your connection and try again.",
+    "retry": "Retry",
+    "emptyFilteredTitle": "No campaign matches",
+    "emptyTitle": "No campaign yet",
+    "emptyFilteredText": "Try another keyword or category. And what if the missing project were yours?",
+    "emptyText": "Be among the first: launch your project and lead the way.",
+    "launchProject": "Launch a project"
+  }
+}

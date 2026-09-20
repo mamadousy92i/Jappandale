@@ -1,0 +1,23 @@
+{
+  "eyebrow": "Trust and safety",
+  "title": "Report this campaign",
+  "intro": "Describe only precise facts. A report triggers a review but does not automatically remove the campaign.",
+  "reasonLabel": "Reason",
+  "reasons": {
+    "FRAUDE": "Suspected fraud",
+    "INFORMATION_TROMPEUSE": "Misleading information",
+    "CONTENU_INAPPROPRIE": "Inappropriate content",
+    "USURPATION": "Identity theft",
+    "AUTRE": "Other reason"
+  },
+  "detailsLabel": "Details",
+  "detailsPlaceholder": "Explain what needs to be verified and describe what you observed…",
+  "submitError": "The report could not be sent. It may have already been submitted.",
+  "submit": "Send report",
+  "submitting": "Sending…",
+  "sent": {
+    "title": "Report received",
+    "text": "Our team will review the information submitted. To protect those involved, follow-up remains confidential.",
+    "back": "Back to campaign"
+  }
+}

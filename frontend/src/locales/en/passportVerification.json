@@ -1,0 +1,19 @@
+{
+  "notFound": {
+    "title": "Document not found",
+    "unknown": "This verification ID does not match any Jappandale Financial Passport.",
+    "generic": "Unable to verify this document at the moment.",
+    "backHome": "Back to home"
+  },
+  "authentic": {
+    "title": "Authentic document",
+    "text": "This Financial Passport was issued by Jappandale on {{date}}."
+  },
+  "score": "Jappandale Score®: {{score}} / 100",
+  "stats": {
+    "campaignsTotal": "Campaigns created",
+    "campaignsSuccess": "Closed successfully",
+    "totalCollected": "Amount raised",
+    "distinctContributors": "Distinct funders"
+  }
+}
