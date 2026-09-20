@@ -40,7 +40,10 @@
     "pending": "Di xaar wóorloo",
     "confirmHint": "Wóorloo xibaar yii ci kaw ngir jeexal sa dokkal.",
     "confirmSubmit": "Wóorloo dokkal bi",
-    "cancel": "Bàyyi"
+    "cancel": "Bàyyi",
+    "shareholderLabel": "Dama bëgg a doon actionnaire ci porojet bii",
+    "shareholderYes": "Waaw, dafa bëgg a doon actionnaire",
+    "shareholderNo": "Déet, xaalis rekk"
   },
   "notifications": {
     "eyebrow": "Sama bérab",

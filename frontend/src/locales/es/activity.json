@@ -40,7 +40,10 @@
     "pending": "Pendiente de confirmación",
     "confirmHint": "Confirma la información anterior para finalizar tu contribución.",
     "confirmSubmit": "Confirmar la contribución",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "shareholderLabel": "Deseo convertirme en accionista de este proyecto",
+    "shareholderYes": "Sí, desea convertirse en accionista",
+    "shareholderNo": "No, simple financiación"
   },
   "notifications": {
     "eyebrow": "Mi espacio",

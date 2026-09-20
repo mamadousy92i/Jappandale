@@ -266,3 +266,64 @@ def test_mes_contributions_n_expose_pas_le_reversement():
 
     assert response.status_code == 200
     assert "payout_status" not in response.data[0]
+
+
+@pytest.mark.django_db
+def test_devenir_actionnaire_accepte_sur_investissement_participatif():
+    owner = make_user("owner-invest@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-invest@test.sn")
+    campaign = make_campaign(
+        owner,
+        campaign_type=Campaign.CampaignType.INVESTISSEMENT_PARTICIPATIF,
+        expected_return_rate=8,
+    )
+    client = authenticated_client(contributor)
+
+    response = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000, "wants_to_be_shareholder": True},
+        format="json",
+    )
+
+    assert response.status_code == 201
+    contribution = Contribution.objects.get(public_reference=response.data["public_reference"])
+    assert contribution.wants_to_be_shareholder is True
+
+
+@pytest.mark.django_db
+def test_devenir_actionnaire_refuse_hors_investissement_participatif():
+    owner = make_user("owner-don@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-don@test.sn")
+    campaign = make_campaign(owner, campaign_type=Campaign.CampaignType.DON_LIBRE)
+    client = authenticated_client(contributor)
+
+    response = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000, "wants_to_be_shareholder": True},
+        format="json",
+    )
+
+    assert response.status_code == 400
+    assert "wants_to_be_shareholder" in response.data
+
+
+@pytest.mark.django_db
+def test_actionnaire_faux_par_defaut():
+    owner = make_user("owner-defaut@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-defaut@test.sn")
+    campaign = make_campaign(
+        owner,
+        campaign_type=Campaign.CampaignType.INVESTISSEMENT_PARTICIPATIF,
+        expected_return_rate=8,
+    )
+    client = authenticated_client(contributor)
+
+    response = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000},
+        format="json",
+    )
+
+    assert response.status_code == 201
+    contribution = Contribution.objects.get(public_reference=response.data["public_reference"])
+    assert contribution.wants_to_be_shareholder is False

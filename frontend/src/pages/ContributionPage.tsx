@@ -29,6 +29,7 @@ export default function ContributionPage() {
   const [amount, setAmount] = useState(10_000)
   const [selectedRewardId, setSelectedRewardId] = useState<number | null>(null)
   const [anonymous, setAnonymous] = useState(false)
+  const [wantsShareholder, setWantsShareholder] = useState(false)
   const [contribution, setContribution] = useState<Contribution | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -73,6 +74,8 @@ export default function ContributionPage() {
           amount,
           anonymous,
           reward_id: selectedRewardId,
+          wants_to_be_shareholder:
+            campaign?.campaign_type === "INVESTISSEMENT_PARTICIPATIF" ? wantsShareholder : false,
         }),
       })
       setContribution(data as Contribution)
@@ -209,6 +212,12 @@ export default function ContributionPage() {
               <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} className="mt-0.5 size-4 accent-[#d4a900]" />
               {t("contribution.hideNameLabel")}
             </label>
+            {campaign.campaign_type === "INVESTISSEMENT_PARTICIPATIF" && (
+              <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm text-ink-secondary">
+                <input type="checkbox" checked={wantsShareholder} onChange={(event) => setWantsShareholder(event.target.checked)} className="mt-0.5 size-4 accent-[#d4a900]" />
+                {t("contribution.shareholderLabel")}
+              </label>
+            )}
             <Button onClick={() => void initiate()} disabled={submitting} className="mt-7 h-12 w-full rounded-full bg-gold font-semibold text-ink hover:bg-gold-light">{submitting ? t("contribution.preparing") : t("contribution.continue")}</Button>
           </div>
         ) : finished ? (
@@ -221,7 +230,7 @@ export default function ContributionPage() {
         ) : (
           <div className="mt-8">
             <h2 className="font-heading text-xl font-bold text-ink">{t("contribution.reviewTitle")}</h2>
-            <dl className="mt-5 space-y-3 rounded-2xl bg-surface-alt p-5 text-sm"><div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.amount")}</dt><dd className="font-bold text-ink">{formatFcfa(contribution.amount)}</dd></div>{contribution.reward && <div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.reward.label")}</dt><dd className="font-medium text-ink">{contribution.reward.title}</dd></div>}<div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.display")}</dt><dd className="font-medium text-ink">{contribution.anonymous ? t("contribution.anonymous") : t("contribution.nameVisible")}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.status")}</dt><dd className="font-medium text-ink">{t("contribution.pending")}</dd></div></dl>
+            <dl className="mt-5 space-y-3 rounded-2xl bg-surface-alt p-5 text-sm"><div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.amount")}</dt><dd className="font-bold text-ink">{formatFcfa(contribution.amount)}</dd></div>{contribution.reward && <div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.reward.label")}</dt><dd className="font-medium text-ink">{contribution.reward.title}</dd></div>}{campaign.campaign_type === "INVESTISSEMENT_PARTICIPATIF" && <div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.shareholderLabel")}</dt><dd className="font-medium text-ink">{contribution.wants_to_be_shareholder ? t("contribution.shareholderYes") : t("contribution.shareholderNo")}</dd></div>}<div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.display")}</dt><dd className="font-medium text-ink">{contribution.anonymous ? t("contribution.anonymous") : t("contribution.nameVisible")}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.status")}</dt><dd className="font-medium text-ink">{t("contribution.pending")}</dd></div></dl>
             <p className="mt-5 text-sm leading-relaxed text-ink-secondary">{t("contribution.confirmHint")}</p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2"><Button onClick={() => void confirm("SUCCESS")} disabled={submitting} className="h-12 rounded-full bg-emerald-600 font-semibold text-white hover:bg-emerald-700">{t("contribution.confirmSubmit")}</Button><Button onClick={() => void confirm("FAILURE")} disabled={submitting} variant="outline" className="h-12 rounded-full border-red-200 text-red-700 hover:bg-red-50">{t("contribution.cancel")}</Button></div>
           </div>

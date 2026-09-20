@@ -72,6 +72,11 @@ class Contribution(models.Model):
     )
     amount = models.PositiveBigIntegerField("montant (FCFA)")
     anonymous = models.BooleanField("contribution anonyme", default=False)
+    wants_to_be_shareholder = models.BooleanField(
+        "souhaite devenir actionnaire",
+        default=False,
+        help_text="Uniquement significatif pour une campagne d'investissement participatif.",
+    )
     status = models.CharField(
         "statut", max_length=20, choices=Status.choices, default=Status.INITIEE
     )

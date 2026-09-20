@@ -28,13 +28,16 @@ def recalculate_campaign_total(campaign):
 
 
 @db_transaction.atomic
-def create_pending_contribution(*, contributor, campaign, amount, anonymous, reward=None):
+def create_pending_contribution(
+    *, contributor, campaign, amount, anonymous, reward=None, wants_to_be_shareholder=False
+):
     contribution = Contribution.objects.create(
         contributor=contributor,
         campaign=campaign,
         reward=reward,
         amount=amount,
         anonymous=anonymous,
+        wants_to_be_shareholder=wants_to_be_shareholder,
     )
     Transaction.objects.create(contribution=contribution)
     return contribution

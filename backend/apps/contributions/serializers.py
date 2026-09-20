@@ -50,6 +50,7 @@ class ContributionSerializer(serializers.ModelSerializer):
             "reward",
             "amount",
             "anonymous",
+            "wants_to_be_shareholder",
             "status",
             "contributor_display",
             "created_at",
@@ -83,6 +84,7 @@ class ContributionCreateSerializer(serializers.Serializer):
     amount = serializers.IntegerField(min_value=1000, max_value=5_000_000)
     anonymous = serializers.BooleanField(default=False)
     reward_id = serializers.IntegerField(required=False, allow_null=True)
+    wants_to_be_shareholder = serializers.BooleanField(default=False)
 
     def validate(self, attrs):
         close_finished_campaigns()
@@ -103,6 +105,19 @@ class ContributionCreateSerializer(serializers.Serializer):
         if campaign.owner_id == self.context["request"].user.id:
             raise serializers.ValidationError(
                 {"campaign_slug": "Vous ne pouvez pas contribuer à votre propre campagne."}
+            )
+
+        if (
+            attrs.get("wants_to_be_shareholder")
+            and campaign.campaign_type != Campaign.CampaignType.INVESTISSEMENT_PARTICIPATIF
+        ):
+            raise serializers.ValidationError(
+                {
+                    "wants_to_be_shareholder": (
+                        "Devenir actionnaire n'est possible que sur une campagne "
+                        "d'investissement participatif."
+                    )
+                }
             )
 
         reward_id = attrs.get("reward_id")

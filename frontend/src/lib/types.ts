@@ -153,6 +153,7 @@ export interface Contribution {
   reward: Pick<Reward, "id" | "title" | "minimum_amount"> | null;
   amount: number;
   anonymous: boolean;
+  wants_to_be_shareholder: boolean;
   status: ContributionStatus;
   contributor_display: string;
   created_at: string;
