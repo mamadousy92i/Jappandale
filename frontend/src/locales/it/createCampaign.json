@@ -85,7 +85,10 @@
     "saveSubmit": "Salvare le modifiche",
     "createSubmit": "Creare la mia campagna",
     "editNote": "Dopo le tue correzioni, torna in «Le mie campagne» per rinviarla in convalida.",
-    "createNote": "La tua campagna sarà prima registrata come bozza. Potrai inviarla per la convalida dalla tua area «Le mie campagne»."
+    "createNote": "La tua campagna sarà prima registrata come bozza. Potrai inviarla per la convalida dalla tua area «Le mie campagne».",
+    "video": "Video di presentazione",
+    "videoHint": "Un breve video (MP4 o WebM, 80 MB massimo) invoglia ancora di più a contribuire.",
+    "removeVideo": "Rimuovere il video selezionato"
   },
   "update": {
     "notFound": "Questa campagna è introvabile o non ti appartiene.",

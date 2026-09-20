@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from rest_framework.test import APIClient
 
@@ -346,3 +347,68 @@ def test_un_membre_ne_peut_pas_signaler_deux_fois_la_meme_campagne():
 
     assert response.status_code == 400
     assert CampaignReport.objects.filter(campaign=campagne, reporter=reporter).count() == 1
+
+
+@pytest.mark.django_db
+def test_video_de_presentation_acceptee_si_mp4_valide():
+    porteur = _porteur_valide()
+    client = APIClient()
+    client.force_authenticate(porteur)
+    video = SimpleUploadedFile(
+        "presentation.mp4",
+        b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 32,
+        content_type="video/mp4",
+    )
+    data = {**DONNEES_CAMPAGNE, "presentation_video": video}
+    response = client.post("/api/campaigns/", data, format="multipart")
+    assert response.status_code == 201
+    campagne = Campaign.objects.get(slug=response.data["slug"])
+    assert campagne.presentation_video.name
+
+
+@pytest.mark.django_db
+def test_video_de_presentation_refusee_si_contenu_invalide():
+    porteur = _porteur_valide()
+    client = APIClient()
+    client.force_authenticate(porteur)
+    faux_video = SimpleUploadedFile(
+        "presentation.mp4",
+        b"ceci n'est pas une vraie video, juste renommee en .mp4",
+        content_type="video/mp4",
+    )
+    data = {**DONNEES_CAMPAGNE, "presentation_video": faux_video}
+    response = client.post("/api/campaigns/", data, format="multipart")
+    assert response.status_code == 400
+    assert "presentation_video" in response.data
+
+
+@pytest.mark.django_db
+def test_video_de_presentation_refusee_si_extension_non_autorisee():
+    porteur = _porteur_valide()
+    client = APIClient()
+    client.force_authenticate(porteur)
+    script = SimpleUploadedFile(
+        "presentation.exe",
+        b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 32,
+        content_type="application/octet-stream",
+    )
+    data = {**DONNEES_CAMPAGNE, "presentation_video": script}
+    response = client.post("/api/campaigns/", data, format="multipart")
+    assert response.status_code == 400
+    assert "presentation_video" in response.data
+
+
+@pytest.mark.django_db
+def test_video_de_presentation_refusee_si_trop_volumineuse():
+    porteur = _porteur_valide()
+    client = APIClient()
+    client.force_authenticate(porteur)
+    trop_grosse = SimpleUploadedFile(
+        "presentation.mp4",
+        b"\x00\x00\x00\x18ftypmp42" + b"\x00" * (81 * 1024 * 1024),
+        content_type="video/mp4",
+    )
+    data = {**DONNEES_CAMPAGNE, "presentation_video": trop_grosse}
+    response = client.post("/api/campaigns/", data, format="multipart")
+    assert response.status_code == 400
+    assert "presentation_video" in response.data

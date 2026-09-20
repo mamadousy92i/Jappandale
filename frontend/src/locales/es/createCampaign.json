@@ -85,7 +85,10 @@
     "saveSubmit": "Guardar los cambios",
     "createSubmit": "Crear mi campaña",
     "editNote": "Después de tus correcciones, vuelve a «Mis campañas» para reenviarla a validación.",
-    "createNote": "Tu campaña se registrará primero como borrador. Podrás enviarla a validación desde tu área «Mis campañas»."
+    "createNote": "Tu campaña se registrará primero como borrador. Podrás enviarla a validación desde tu área «Mis campañas».",
+    "video": "Video de presentación",
+    "videoHint": "Un breve video (MP4 o WebM, 80 MB como máximo) da aún más ganas de contribuir.",
+    "removeVideo": "Quitar el video seleccionado"
   },
   "update": {
     "notFound": "Esta campaña no se encuentra o no te pertenece.",

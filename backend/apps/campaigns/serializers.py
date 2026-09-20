@@ -1,7 +1,11 @@
+from pathlib import Path
+
 from django.utils import timezone
 from rest_framework import serializers
 
 from .models import Campaign, CampaignReport, CampaignUpdate, Reward
+
+MAX_VIDEO_SIZE = 80 * 1024 * 1024  # 80 Mo
 
 
 class CampaignUpdateSerializer(serializers.ModelSerializer):
@@ -159,6 +163,7 @@ class CampaignDetailSerializer(serializers.ModelSerializer):
             "goal_amount",
             "collected_amount",
             "cover_image",
+            "presentation_video",
             "deadline",
             "status",
             "status_display",
@@ -197,6 +202,7 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
             "category",
             "goal_amount",
             "cover_image",
+            "presentation_video",
             "deadline",
             "status",
         ]
@@ -206,6 +212,23 @@ class CampaignWriteSerializer(serializers.ModelSerializer):
         if value < 1000:
             raise serializers.ValidationError("L'objectif doit être d'au moins 1 000 FCFA.")
         return value
+
+    def validate_presentation_video(self, uploaded_file):
+        if uploaded_file.size > MAX_VIDEO_SIZE:
+            raise serializers.ValidationError("La vidéo ne doit pas dépasser 80 Mo.")
+
+        extension = Path(uploaded_file.name).suffix.lower()
+        if extension not in {".mp4", ".webm"}:
+            raise serializers.ValidationError("Formats acceptés : MP4 ou WebM.")
+
+        header = uploaded_file.read(12)
+        uploaded_file.seek(0)
+        is_mp4 = len(header) >= 8 and header[4:8] == b"ftyp"
+        is_webm = header[:4] == b"\x1a\x45\xdf\xa3"
+        if not (is_mp4 or is_webm):
+            raise serializers.ValidationError("Le fichier vidéo est invalide ou corrompu.")
+
+        return uploaded_file
 
     def validate_campaign_type(self, value):
         if (

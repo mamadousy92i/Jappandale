@@ -3,6 +3,7 @@ import type { FormEvent, ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
+  Film,
   ImagePlus,
   Plus,
   ShieldCheck,
@@ -49,6 +50,7 @@ const fieldNames = [
   "goal_amount",
   "deadline",
   "cover_image",
+  "presentation_video",
 ];
 
 type FundingItem = { label: string; amount: string };
@@ -169,6 +171,10 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
   const [coverPreview, setCoverPreview] = useState<string | null>(
     campaign?.cover_image ?? null,
   );
+  const [video, setVideo] = useState<File | null>(null);
+  const [videoPreview, setVideoPreview] = useState<string | null>(
+    campaign?.presentation_video ?? null,
+  );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -207,6 +213,14 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
     });
   };
 
+  const handleVideoChange = (file: File | null) => {
+    setVideo(file);
+    setVideoPreview((previous) => {
+      if (previous) URL.revokeObjectURL(previous);
+      return file ? URL.createObjectURL(file) : null;
+    });
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFieldErrors({});
@@ -239,6 +253,7 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
     data.append("goal_amount", goalAmount);
     data.append("deadline", deadline);
     if (coverImage) data.append("cover_image", coverImage);
+    if (video) data.append("presentation_video", video);
 
     try {
       await authFetch(
@@ -707,6 +722,45 @@ function CreateCampaignForm({ campaign }: { campaign?: CampaignDetail }) {
             <p className="flex items-center gap-2 text-xs text-ink-muted">
               <ImagePlus aria-hidden="true" className="size-4" />
               {t("form.coverHint")}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="presentation_video" className="text-ink">
+            {t("form.video")}{" "}
+            <span className="font-normal text-ink-muted">{t("form.optional")}</span>
+          </Label>
+          <input
+            id="presentation_video"
+            type="file"
+            accept="video/mp4,video/webm"
+            onChange={(e) => handleVideoChange(e.target.files?.[0] ?? null)}
+            className="block min-h-14 w-full rounded-xl border border-black/10 bg-surface text-base text-ink-secondary file:mr-4 file:min-h-14 file:cursor-pointer file:border-0 file:bg-gold/15 file:px-5 file:py-3.5 file:font-medium file:text-gold-dark hover:file:bg-gold/25"
+            {...invalidProps("presentation_video")}
+          />
+          {errorFor("presentation_video")}
+          {videoPreview ? (
+            <div className="relative mt-3 overflow-hidden rounded-2xl border border-black/5">
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              <video
+                src={videoPreview}
+                controls
+                className="aspect-video w-full bg-black"
+              />
+              <button
+                type="button"
+                onClick={() => handleVideoChange(null)}
+                aria-label={t("form.removeVideo")}
+                className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-white/90 text-ink shadow-sm backdrop-blur transition-colors outline-none hover:bg-white focus-visible:ring-2 focus-visible:ring-gold-dark/50"
+              >
+                <X aria-hidden="true" className="size-4" />
+              </button>
+            </div>
+          ) : (
+            <p className="flex items-center gap-2 text-xs text-ink-muted">
+              <Film aria-hidden="true" className="size-4" />
+              {t("form.videoHint")}
             </p>
           )}
         </div>

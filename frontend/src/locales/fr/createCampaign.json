@@ -85,7 +85,10 @@
     "saveSubmit": "Enregistrer les modifications",
     "createSubmit": "Créer ma campagne",
     "editNote": "Après vos corrections, revenez dans « Mes campagnes » pour la renvoyer en validation.",
-    "createNote": "Votre campagne sera d’abord enregistrée en brouillon. Vous pourrez la soumettre à validation depuis votre espace « Mes campagnes »."
+    "createNote": "Votre campagne sera d’abord enregistrée en brouillon. Vous pourrez la soumettre à validation depuis votre espace « Mes campagnes ».",
+    "video": "Vidéo de présentation",
+    "videoHint": "Une courte vidéo (MP4 ou WebM, 80 Mo maximum) donne encore plus envie de contribuer.",
+    "removeVideo": "Retirer la vidéo sélectionnée"
   },
   "update": {
     "notFound": "Cette campagne est introuvable ou ne vous appartient pas.",

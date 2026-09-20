@@ -85,7 +85,10 @@
     "saveSubmit": "Denc soppi yi",
     "createSubmit": "Sos sama kanpaañ",
     "editNote": "Ginaaw sa soppi yi, dellusi ci « Sama kanpaañ yi » ngir yónnee ko ci wóoral.",
-    "createNote": "Sa kanpaañ dina njëkk denc ni dàkkantal. Mën ngaa ko yónnee ci wóoral ci sa bérabu « Sama kanpaañ yi »."
+    "createNote": "Sa kanpaañ dina njëkk denc ni dàkkantal. Mën ngaa ko yónnee ci wóoral ci sa bérabu « Sama kanpaañ yi ».",
+    "video": "Widéwo bu wone porojet bi",
+    "videoHint": "Ab widéwo bu gàtt (MP4 walla WebM, 80 Mo bu gën a bare) dinañu gën a soxla ñu dokkal.",
+    "removeVideo": "Far widéwo bi nga tann"
   },
   "update": {
     "notFound": "Kanpaañ bii gisul walla boroom moo ko.",

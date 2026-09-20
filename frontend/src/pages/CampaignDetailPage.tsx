@@ -377,6 +377,26 @@ function CampaignDetailPage() {
             </p>
           </section>
 
+          {campaign.presentation_video && (
+            <section aria-labelledby="video-presentation" className="mt-8">
+              <h2
+                id="video-presentation"
+                className="text-xs font-semibold tracking-[4px] text-gold-dark uppercase"
+              >
+                {t("video.title")}
+              </h2>
+              <div className="mt-5 overflow-hidden rounded-2xl border border-black/5 bg-black shadow-sm">
+                {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                <video
+                  src={campaign.presentation_video}
+                  controls
+                  preload="metadata"
+                  className="aspect-video w-full"
+                />
+              </div>
+            </section>
+          )}
+
           {campaign.beneficiaries && (
             <div className="mt-8 flex items-start gap-4 border-l-4 border-gold bg-[#fbfaf6] px-5 py-4">
               <UsersRound aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-gold-dark" />

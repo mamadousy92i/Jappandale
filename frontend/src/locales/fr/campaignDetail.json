@@ -54,5 +54,8 @@
     "shareCopied": "Lien copié",
     "share": "Partager cette campagne",
     "report": "Signaler cette campagne"
+  },
+  "video": {
+    "title": "Vidéo de présentation"
   }
 }

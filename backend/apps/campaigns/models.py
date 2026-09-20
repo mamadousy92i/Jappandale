@@ -73,6 +73,9 @@ class Campaign(models.Model):
     cover_image = models.ImageField(
         "image de couverture", upload_to="campaigns/%Y/%m/", blank=True
     )
+    presentation_video = models.FileField(
+        "vidéo de présentation", upload_to="campaigns/videos/%Y/%m/", blank=True
+    )
     deadline = models.DateField("échéance")
     status = models.CharField(
         "statut", max_length=20, choices=Status.choices, default=Status.BROUILLON
