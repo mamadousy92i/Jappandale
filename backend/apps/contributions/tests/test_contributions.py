@@ -327,3 +327,108 @@ def test_actionnaire_faux_par_defaut():
     assert response.status_code == 201
     contribution = Contribution.objects.get(public_reference=response.data["public_reference"])
     assert contribution.wants_to_be_shareholder is False
+
+
+@pytest.mark.django_db
+def test_statut_actionnaire_en_attente_des_la_creation():
+    owner = make_user("owner-statut@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-statut@test.sn")
+    campaign = make_campaign(
+        owner,
+        campaign_type=Campaign.CampaignType.INVESTISSEMENT_PARTICIPATIF,
+        expected_return_rate=8,
+    )
+    client = authenticated_client(contributor)
+
+    response = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000, "wants_to_be_shareholder": True},
+        format="json",
+    )
+
+    contribution = Contribution.objects.get(public_reference=response.data["public_reference"])
+    assert contribution.shareholder_status == Contribution.ShareholderStatus.EN_ATTENTE
+    assert response.data["shareholder_status"] == Contribution.ShareholderStatus.EN_ATTENTE
+
+
+@pytest.mark.django_db
+def test_le_paiement_confirme_ne_change_pas_le_statut_actionnaire_en_attente():
+    owner = make_user("owner-confirme@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-confirme@test.sn")
+    campaign = make_campaign(
+        owner,
+        campaign_type=Campaign.CampaignType.INVESTISSEMENT_PARTICIPATIF,
+        expected_return_rate=8,
+    )
+    client = authenticated_client(contributor)
+    created = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000, "wants_to_be_shareholder": True},
+        format="json",
+    )
+
+    response = client.post(
+        f"/api/contributions/{created.data['public_reference']}/confirm/",
+        {"outcome": "SUCCESS"},
+        format="json",
+    )
+
+    assert response.data["status"] == Contribution.Status.CONFIRMEE
+    assert response.data["shareholder_status"] == Contribution.ShareholderStatus.EN_ATTENTE
+
+
+@pytest.mark.django_db
+def test_statut_actionnaire_reinitialise_si_paiement_echoue():
+    owner = make_user("owner-echec@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-echec@test.sn")
+    campaign = make_campaign(
+        owner,
+        campaign_type=Campaign.CampaignType.INVESTISSEMENT_PARTICIPATIF,
+        expected_return_rate=8,
+    )
+    client = authenticated_client(contributor)
+    created = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000, "wants_to_be_shareholder": True},
+        format="json",
+    )
+
+    response = client.post(
+        f"/api/contributions/{created.data['public_reference']}/confirm/",
+        {"outcome": "FAILURE"},
+        format="json",
+    )
+
+    assert response.data["status"] == Contribution.Status.ECHOUEE
+    assert response.data["shareholder_status"] == Contribution.ShareholderStatus.NON_DEMANDE
+
+
+@pytest.mark.django_db
+def test_statut_actionnaire_reinitialise_si_rembourse():
+    owner = make_user("owner-remb@test.sn", User.Role.PORTEUR)
+    contributor = make_user("contrib-remb@test.sn")
+    campaign = make_campaign(
+        owner,
+        campaign_type=Campaign.CampaignType.INVESTISSEMENT_PARTICIPATIF,
+        expected_return_rate=8,
+    )
+    client = authenticated_client(contributor)
+    created = client.post(
+        "/api/contributions/",
+        {"campaign_slug": campaign.slug, "amount": 20_000, "wants_to_be_shareholder": True},
+        format="json",
+    )
+    client.post(
+        f"/api/contributions/{created.data['public_reference']}/confirm/",
+        {"outcome": "SUCCESS"},
+        format="json",
+    )
+    contribution = Contribution.objects.get(public_reference=created.data["public_reference"])
+    contribution.shareholder_status = Contribution.ShareholderStatus.VALIDE
+    contribution.save(update_fields=["shareholder_status"])
+
+    refund_contribution(contribution)
+
+    contribution.refresh_from_db()
+    assert contribution.status == Contribution.Status.REMBOURSEE
+    assert contribution.shareholder_status == Contribution.ShareholderStatus.NON_DEMANDE

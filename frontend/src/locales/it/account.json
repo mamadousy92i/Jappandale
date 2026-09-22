@@ -156,14 +156,16 @@
       "submit": "Aprire la controversia",
       "missingDetails": "Descrivi il problema riscontrato.",
       "submitError": "Impossibile aprire questa controversia. Riprova."
-    }
+    },
+    "shareholderStatusPrefix": "{{status}}"
   },
   "receivedContributions": {
     "title": "Contributi ricevuti",
     "subtitle": "Monitoraggio dei tentativi e delle conferme sulle tue campagne.",
     "loadError": "Impossibile caricare i contributi ricevuti.",
     "empty": "Nessun contributo ricevuto al momento.",
-    "net": "netto {{amount}}"
+    "net": "netto {{amount}}",
+    "shareholderStatusPrefix": "{{status}}"
   },
   "myCampaigns": {
     "title": "Le mie campagne",
@@ -203,6 +205,14 @@
       "requestAgain": "Richiedere di nuovo la convalida",
       "requesting": "Invio…",
       "requestError": "La richiesta non è riuscita. Riprova."
+    }
+  },
+  "shareholder": {
+    "status": {
+      "NON_DEMANDE": "Non richiesto",
+      "EN_ATTENTE": "Stato di azionista in attesa di convalida",
+      "VALIDE": "Stato di azionista convalidato",
+      "REJETE": "Stato di azionista rifiutato"
     }
   }
 }

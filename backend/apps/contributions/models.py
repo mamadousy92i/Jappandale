@@ -47,6 +47,12 @@ class Contribution(models.Model):
         EN_SEQUESTRE = "EN_SEQUESTRE", "En séquestre"
         REVERSEE = "REVERSEE", "Reversée"
 
+    class ShareholderStatus(models.TextChoices):
+        NON_DEMANDE = "NON_DEMANDE", "Non demandé"
+        EN_ATTENTE = "EN_ATTENTE", "En attente de validation"
+        VALIDE = "VALIDE", "Validé"
+        REJETE = "REJETE", "Rejeté"
+
     public_reference = models.UUIDField(
         "référence publique", default=uuid.uuid4, unique=True, editable=False
     )
@@ -76,6 +82,26 @@ class Contribution(models.Model):
         "souhaite devenir actionnaire",
         default=False,
         help_text="Uniquement significatif pour une campagne d'investissement participatif.",
+    )
+    shareholder_status = models.CharField(
+        "statut actionnaire",
+        max_length=20,
+        choices=ShareholderStatus.choices,
+        default=ShareholderStatus.NON_DEMANDE,
+    )
+    shareholder_note = models.CharField(
+        "motif du refus (actionnariat)", max_length=1500, blank=True
+    )
+    shareholder_reviewed_at = models.DateTimeField(
+        "actionnariat examiné le", null=True, blank=True
+    )
+    shareholder_reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="actionnariat examiné par",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_shareholder_requests",
     )
     status = models.CharField(
         "statut", max_length=20, choices=Status.choices, default=Status.INITIEE

@@ -156,14 +156,16 @@
       "submit": "Ubbi jumtukaay bi",
       "missingDetails": "Wax jafe-jafe bi nga jot.",
       "submitError": "Manunu ubbi jumtukaay bi. Jéema beneen yoon."
-    }
+    },
+    "shareholderStatusPrefix": "{{status}}"
   },
   "receivedContributions": {
     "title": "Dokkal yu ñu am",
     "subtitle": "Toppatoo dokkal yi ñu jéem ak yi wóor ci say kanpaañ.",
     "loadError": "Manunu yóbbu dokkal yi ñu am.",
     "empty": "Amagul benn dokkal tey.",
-    "net": "net {{amount}}"
+    "net": "net {{amount}}",
+    "shareholderStatusPrefix": "{{status}}"
   },
   "myCampaigns": {
     "title": "Sama kanpaañ yi",
@@ -203,6 +205,14 @@
       "requestAgain": "Laajaat wóoral bi",
       "requesting": "Di yónnee…",
       "requestError": "Laaj bi baaxul. Jéema beneen yoon."
+    }
+  },
+  "shareholder": {
+    "status": {
+      "NON_DEMANDE": "Ñu ko laajul",
+      "EN_ATTENTE": "Ñuy xaar ndax actionnaire",
+      "VALIDE": "Nangu nañu ko ni actionnaire",
+      "REJETE": "Bañu ko ni actionnaire"
     }
   }
 }

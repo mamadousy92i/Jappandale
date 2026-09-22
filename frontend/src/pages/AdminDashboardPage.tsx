@@ -20,7 +20,7 @@ type Person = {
   phone: string
   role: string
 }
-type MetricKey = "pending_kyc" | "pending_campaigns" | "pending_fee_campaigns" | "open_reports" | "open_support" | "open_message_reports" | "open_disputes"
+type MetricKey = "pending_kyc" | "pending_campaigns" | "pending_fee_campaigns" | "pending_shareholder_contributions" | "open_reports" | "open_support" | "open_message_reports" | "open_disputes"
 type CampaignStatus = "EN_MODERATION" | "PUBLIEE" | "SUSPENDUE"
 
 interface DashboardData {
@@ -67,6 +67,13 @@ interface DashboardData {
     title: string
     goal_amount: number
     owner: Person
+    requested_at: string
+  }>
+  shareholder_requests: Array<{
+    id: number
+    amount: number
+    campaign: { slug: string; title: string }
+    contributor: Person
     requested_at: string
   }>
   reports: Array<{
@@ -820,6 +827,12 @@ export default function AdminDashboardPage() {
       target: "campaigns",
     },
     {
+      label: "Actionnariat à valider",
+      value: data.metrics.pending_shareholder_contributions,
+      icon: Landmark,
+      target: "campaigns",
+    },
+    {
       label: "Signalements ouverts",
       value: data.metrics.open_reports,
       icon: ShieldAlert,
@@ -1260,6 +1273,83 @@ export default function AdminDashboardPage() {
                                 "Le porteur pourra soumettre sa campagne à modération.",
                                 "Valider",
                                 () => perform(`/backoffice/campaigns/${item.id}/frais/`, "POST", { decision: "VALIDE", note: "" }, "Frais de dossier validés."),
+                              )
+                            }
+                            className="rounded-full bg-emerald-600 text-white"
+                          >
+                            Valider
+                          </Button>
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {data.shareholder_requests.length > 0 && (
+              <div className="space-y-3 rounded-[20px] border border-gold/30 bg-gold/5 p-5">
+                <h3 className="font-heading text-lg font-bold text-ink">
+                  Actionnariat à valider ({data.shareholder_requests.length})
+                </h3>
+                <p className="text-sm text-ink-secondary">
+                  Ces contributeurs ont réglé leur contribution et demandé à devenir actionnaire. Le paiement est
+                  déjà confirmé : cette décision porte uniquement sur leur statut d'actionnaire.
+                </p>
+                <div className="space-y-3">
+                  {data.shareholder_requests.map((item) => {
+                    const key = `shareholder-${item.id}`
+                    const note = drafts[key] ?? ""
+                    return (
+                      <article key={item.id} className="rounded-2xl border border-black/5 bg-white p-4">
+                        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+                          <div>
+                            <h4 className="font-heading text-base font-bold text-ink">{item.campaign.title}</h4>
+                            <p className="text-xs text-ink-muted">
+                              {item.contributor.name} · {item.contributor.email} · {formatFcfa(item.amount)}
+                            </p>
+                          </div>
+                          <Link
+                            to={`/campagnes/${item.campaign.slug}`}
+                            target="_blank"
+                            className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-ink-secondary hover:text-ink"
+                          >
+                            Voir la campagne
+                            <ExternalLink className="size-4" />
+                          </Link>
+                        </div>
+                        <div className="mt-3">
+                          <NoteField
+                            value={note}
+                            onChange={(value) => setDrafts((current) => ({ ...current, [key]: value }))}
+                            placeholder="Motif obligatoire en cas de refus"
+                            rows={2}
+                          />
+                        </div>
+                        <div className="mt-3 flex flex-wrap justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            disabled={!note.trim()}
+                            onClick={() =>
+                              askWithNote(
+                                note,
+                                "Refuser ce statut d'actionnaire ?",
+                                "Le contributeur recevra le motif. Sa contribution reste confirmée, seul son statut d'actionnaire est refusé.",
+                                "Refuser",
+                                () => perform(`/backoffice/contributions/${item.id}/actionnariat/`, "POST", { decision: "REJETE", note }, "Statut d'actionnaire refusé."),
+                              )
+                            }
+                            className="rounded-full border-red-200 text-red-700"
+                          >
+                            Refuser
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              ask(
+                                "Valider ce statut d'actionnaire ?",
+                                "Le contributeur sera reconnu comme actionnaire de ce projet.",
+                                "Valider",
+                                () => perform(`/backoffice/contributions/${item.id}/actionnariat/`, "POST", { decision: "VALIDE", note: "" }, "Statut d'actionnaire validé."),
                               )
                             }
                             className="rounded-full bg-emerald-600 text-white"

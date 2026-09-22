@@ -147,6 +147,7 @@ export type ContributionStatus =
   "INITIEE" | "CONFIRMEE" | "ECHOUEE" | "REMBOURSEE";
 export type TransactionStatus = ContributionStatus;
 export type PayoutStatus = "EN_SEQUESTRE" | "REVERSEE";
+export type ShareholderStatus = "NON_DEMANDE" | "EN_ATTENTE" | "VALIDE" | "REJETE";
 
 export interface Contribution {
   public_reference: string;
@@ -155,6 +156,9 @@ export interface Contribution {
   amount: number;
   anonymous: boolean;
   wants_to_be_shareholder: boolean;
+  shareholder_status: ShareholderStatus;
+  shareholder_status_display: string;
+  shareholder_note: string;
   status: ContributionStatus;
   contributor_display: string;
   created_at: string;

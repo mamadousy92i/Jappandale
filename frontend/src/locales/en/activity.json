@@ -43,7 +43,8 @@
     "cancel": "Cancel",
     "shareholderLabel": "I would like to become a shareholder in this project",
     "shareholderYes": "Yes, wants to become a shareholder",
-    "shareholderNo": "No, simple funding"
+    "shareholderNo": "No, simple funding",
+    "shareholderPendingHint": "The payment is confirmed right away. Shareholder status itself stays pending until reviewed and approved by the Jappandale team."
   },
   "notifications": {
     "eyebrow": "My space",

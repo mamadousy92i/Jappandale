@@ -154,6 +154,13 @@ export function MyContributions() {
                   </div>
                   <span className="font-heading font-bold text-ink">{formatFcfa(item.amount)}</span>
                 </div>
+                {item.shareholder_status !== "NON_DEMANDE" && (
+                  <p className="text-xs font-medium text-ink-secondary">
+                    {t("myContributions.shareholderStatusPrefix", {
+                      status: t(`shareholder.status.${item.shareholder_status}`),
+                    })}
+                  </p>
+                )}
                 {item.status === "CONFIRMEE" && (
                   active ? (
                     <p className="text-xs font-semibold text-ink-secondary">

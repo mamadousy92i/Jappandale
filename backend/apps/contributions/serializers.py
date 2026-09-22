@@ -41,6 +41,9 @@ class ContributionSerializer(serializers.ModelSerializer):
     reward = RewardContributionSerializer(read_only=True)
     contributor_display = serializers.SerializerMethodField()
     transaction = TransactionSerializer(read_only=True)
+    shareholder_status_display = serializers.CharField(
+        source="get_shareholder_status_display", read_only=True
+    )
 
     class Meta:
         model = Contribution
@@ -51,6 +54,9 @@ class ContributionSerializer(serializers.ModelSerializer):
             "amount",
             "anonymous",
             "wants_to_be_shareholder",
+            "shareholder_status",
+            "shareholder_status_display",
+            "shareholder_note",
             "status",
             "contributor_display",
             "created_at",

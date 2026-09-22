@@ -156,14 +156,16 @@
       "submit": "Abrir la disputa",
       "missingDetails": "Describe el problema encontrado.",
       "submitError": "No se pudo abrir esta disputa. Vuelve a intentarlo."
-    }
+    },
+    "shareholderStatusPrefix": "{{status}}"
   },
   "receivedContributions": {
     "title": "Contribuciones recibidas",
     "subtitle": "Seguimiento de los intentos y confirmaciones en tus campañas.",
     "loadError": "No se pudieron cargar las contribuciones recibidas.",
     "empty": "Ninguna contribución recibida por el momento.",
-    "net": "neto {{amount}}"
+    "net": "neto {{amount}}",
+    "shareholderStatusPrefix": "{{status}}"
   },
   "myCampaigns": {
     "title": "Mis campañas",
@@ -203,6 +205,14 @@
       "requestAgain": "Volver a solicitar la validación",
       "requesting": "Enviando…",
       "requestError": "La solicitud ha fallado. Vuelve a intentarlo."
+    }
+  },
+  "shareholder": {
+    "status": {
+      "NON_DEMANDE": "No solicitado",
+      "EN_ATTENTE": "Estado de accionista pendiente de validación",
+      "VALIDE": "Estado de accionista validado",
+      "REJETE": "Estado de accionista rechazado"
     }
   }
 }

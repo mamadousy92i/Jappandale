@@ -39,6 +39,7 @@ from .serializers import (
     CampaignDecisionSerializer,
     CampaignFeeDecisionSerializer,
     CampaignWorkflowSerializer,
+    ContributionShareholderDecisionSerializer,
     DisputeReviewSerializer,
     KycDecisionSerializer,
     MessageReportReviewSerializer,
@@ -117,6 +118,13 @@ class DashboardView(APIView):
             .select_related("owner")
             .order_by("updated_at")[:30]
         )
+        pending_shareholder_contributions = (
+            Contribution.objects.filter(
+                shareholder_status=Contribution.ShareholderStatus.EN_ATTENTE,
+            )
+            .select_related("campaign", "contributor")
+            .order_by("created_at")[:30]
+        )
         open_reports = (
             CampaignReport.objects.exclude(
                 status__in=[CampaignReport.Status.RESOLU, CampaignReport.Status.CLASSE]
@@ -170,6 +178,7 @@ class DashboardView(APIView):
                         status=Campaign.Status.EN_MODERATION
                     ).count(),
                     "pending_fee_campaigns": pending_fee_campaigns.count(),
+                    "pending_shareholder_contributions": pending_shareholder_contributions.count(),
                     "open_reports": CampaignReport.objects.exclude(
                         status__in=[CampaignReport.Status.RESOLU, CampaignReport.Status.CLASSE]
                     ).count(),
@@ -257,6 +266,19 @@ class DashboardView(APIView):
                         "requested_at": campaign.updated_at,
                     }
                     for campaign in pending_fee_campaigns
+                ],
+                "shareholder_requests": [
+                    {
+                        "id": contribution.id,
+                        "amount": contribution.amount,
+                        "campaign": {
+                            "slug": contribution.campaign.slug,
+                            "title": contribution.campaign.title,
+                        },
+                        "contributor": _person(contribution.contributor),
+                        "requested_at": contribution.created_at,
+                    }
+                    for contribution in pending_shareholder_contributions
                 ],
                 "reports": [
                     {
@@ -560,6 +582,59 @@ class CampaignFeeDecisionView(APIView):
             action_url="/compte?onglet=mes-campagnes",
         )
         return Response({"detail": "Décision sur les frais de dossier enregistrée."})
+
+
+class ContributionShareholderDecisionView(APIView):
+    permission_classes = [IsJappandaleAdmin]
+
+    @transaction.atomic
+    def post(self, request, contribution_id):
+        serializer = ContributionShareholderDecisionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        contribution = get_object_or_404(
+            Contribution,
+            pk=contribution_id,
+            shareholder_status=Contribution.ShareholderStatus.EN_ATTENTE,
+        )
+        decision = serializer.validated_data["decision"]
+        note = serializer.validated_data.get("note", "").strip()
+        contribution.shareholder_status = decision
+        contribution.shareholder_note = note if decision == "REJETE" else ""
+        contribution.shareholder_reviewed_at = timezone.now()
+        contribution.shareholder_reviewed_by = request.user
+        contribution.save(
+            update_fields=[
+                "shareholder_status",
+                "shareholder_note",
+                "shareholder_reviewed_at",
+                "shareholder_reviewed_by",
+            ]
+        )
+        validated = decision == "VALIDE"
+        notify_user(
+            recipient=contribution.contributor,
+            kind=(
+                Notification.Kind.SHAREHOLDER_VALIDATED
+                if validated
+                else Notification.Kind.SHAREHOLDER_REJECTED
+            ),
+            subject=(
+                "Votre statut d'actionnaire est validé"
+                if validated
+                else "Votre demande d'actionnariat n'a pas été retenue"
+            ),
+            message=(
+                f"Votre demande de devenir actionnaire de « {contribution.campaign.title} » "
+                "est validée."
+                if validated
+                else (
+                    f"Votre demande de devenir actionnaire de « {contribution.campaign.title} » "
+                    f"n'a pas été retenue. Motif : {note}"
+                )
+            ),
+            action_url="/compte?onglet=contributions",
+        )
+        return Response({"detail": "Décision sur l'actionnariat enregistrée."})
 
 
 class ReportReviewView(APIView):

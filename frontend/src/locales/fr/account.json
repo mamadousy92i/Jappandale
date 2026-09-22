@@ -156,14 +156,16 @@
       "submit": "Ouvrir le litige",
       "missingDetails": "Décrivez le problème rencontré.",
       "submitError": "Impossible d’ouvrir ce litige. Réessayez."
-    }
+    },
+    "shareholderStatusPrefix": "{{status}}"
   },
   "receivedContributions": {
     "title": "Contributions reçues",
     "subtitle": "Suivi des tentatives et confirmations sur vos campagnes.",
     "loadError": "Impossible de charger les contributions reçues.",
     "empty": "Aucune contribution reçue pour le moment.",
-    "net": "net {{amount}}"
+    "net": "net {{amount}}",
+    "shareholderStatusPrefix": "{{status}}"
   },
   "myCampaigns": {
     "title": "Mes campagnes",
@@ -203,6 +205,14 @@
       "requestAgain": "Redemander la validation",
       "requesting": "Envoi…",
       "requestError": "La demande a échoué. Réessayez."
+    }
+  },
+  "shareholder": {
+    "status": {
+      "NON_DEMANDE": "Non demandé",
+      "EN_ATTENTE": "Actionnariat en attente de validation",
+      "VALIDE": "Actionnariat validé",
+      "REJETE": "Actionnariat refusé"
     }
   }
 }

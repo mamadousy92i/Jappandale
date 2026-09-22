@@ -41,6 +41,13 @@ export function ReceivedContributions() {
                 <div>
                   <p className="font-semibold text-ink">{item.contributor_display}</p>
                   <p className="mt-1 text-xs text-ink-muted">{item.campaign.title} · {item.status.toLowerCase()}</p>
+                  {item.shareholder_status !== "NON_DEMANDE" && (
+                    <p className="mt-1 text-xs font-medium text-ink-secondary">
+                      {t("receivedContributions.shareholderStatusPrefix", {
+                        status: t(`shareholder.status.${item.shareholder_status}`),
+                      })}
+                    </p>
+                  )}
                 </div>
                 <div className="text-right">
                   <span className="font-heading font-bold text-ink">{formatFcfa(item.amount)}</span>

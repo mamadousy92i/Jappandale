@@ -13,9 +13,10 @@ class ContributionAdmin(admin.ModelAdmin):
         "amount",
         "anonymous",
         "status",
+        "shareholder_status",
         "created_at",
     )
-    list_filter = ("status", "anonymous", "campaign")
+    list_filter = ("status", "anonymous", "shareholder_status", "campaign")
     search_fields = ("public_reference", "contributor__email", "campaign__title")
     readonly_fields = (
         "public_reference",

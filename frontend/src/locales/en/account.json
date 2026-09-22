@@ -156,14 +156,16 @@
       "submit": "Open dispute",
       "missingDetails": "Describe the issue you encountered.",
       "submitError": "Unable to open this dispute. Please try again."
-    }
+    },
+    "shareholderStatusPrefix": "{{status}}"
   },
   "receivedContributions": {
     "title": "Received contributions",
     "subtitle": "Tracking of attempts and confirmations on your campaigns.",
     "loadError": "Unable to load received contributions.",
     "empty": "No contributions received yet.",
-    "net": "net {{amount}}"
+    "net": "net {{amount}}",
+    "shareholderStatusPrefix": "{{status}}"
   },
   "myCampaigns": {
     "title": "My campaigns",
@@ -203,6 +205,14 @@
       "requestAgain": "Request validation again",
       "requesting": "Sending…",
       "requestError": "The request failed. Please try again."
+    }
+  },
+  "shareholder": {
+    "status": {
+      "NON_DEMANDE": "Not requested",
+      "EN_ATTENTE": "Shareholder status pending validation",
+      "VALIDE": "Shareholder status validated",
+      "REJETE": "Shareholder status rejected"
     }
   }
 }

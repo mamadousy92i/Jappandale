@@ -38,6 +38,11 @@ def create_pending_contribution(
         amount=amount,
         anonymous=anonymous,
         wants_to_be_shareholder=wants_to_be_shareholder,
+        shareholder_status=(
+            Contribution.ShareholderStatus.EN_ATTENTE
+            if wants_to_be_shareholder
+            else Contribution.ShareholderStatus.NON_DEMANDE
+        ),
     )
     Transaction.objects.create(contribution=contribution)
     return contribution
@@ -108,7 +113,11 @@ def process_simulated_payment(*, contribution, outcome):
         locked.status = Contribution.Status.ECHOUEE
         payment_transaction.status = Transaction.Status.ECHOUEE
         payment_transaction.failure_reason = result.failure_reason
-        locked.save(update_fields=["status"])
+        update_fields = ["status"]
+        if locked.shareholder_status == Contribution.ShareholderStatus.EN_ATTENTE:
+            locked.shareholder_status = Contribution.ShareholderStatus.NON_DEMANDE
+            update_fields.append("shareholder_status")
+        locked.save(update_fields=update_fields)
 
     payment_transaction.save(
         update_fields=["status", "failure_reason", "processed_at"]
@@ -142,7 +151,14 @@ def refund_contribution(contribution):
     now = timezone.now()
     locked.status = Contribution.Status.REMBOURSEE
     locked.refunded_at = now
-    locked.save(update_fields=["status", "refunded_at"])
+    update_fields = ["status", "refunded_at"]
+    if locked.shareholder_status in (
+        Contribution.ShareholderStatus.EN_ATTENTE,
+        Contribution.ShareholderStatus.VALIDE,
+    ):
+        locked.shareholder_status = Contribution.ShareholderStatus.NON_DEMANDE
+        update_fields.append("shareholder_status")
+    locked.save(update_fields=update_fields)
     payment_transaction = Transaction.objects.select_for_update().get(
         contribution=locked
     )

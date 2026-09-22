@@ -16,6 +16,8 @@ class Notification(models.Model):
         CAMPAIGN_CLOSED = "CAMPAIGN_CLOSED", "Campagne clôturée"
         CAMPAIGN_FEE_VALIDATED = "CAMPAIGN_FEE_VALIDATED", "Frais de dossier validés"
         CAMPAIGN_FEE_REJECTED = "CAMPAIGN_FEE_REJECTED", "Frais de dossier rejetés"
+        SHAREHOLDER_VALIDATED = "SHAREHOLDER_VALIDATED", "Statut actionnaire validé"
+        SHAREHOLDER_REJECTED = "SHAREHOLDER_REJECTED", "Statut actionnaire rejeté"
         CONTRIBUTION_CONFIRMED = "CONTRIBUTION_CONFIRMED", "Contribution confirmée"
         CONTRIBUTION_RECEIVED = "CONTRIBUTION_RECEIVED", "Contribution reçue"
         GOAL_REACHED = "GOAL_REACHED", "Objectif atteint"

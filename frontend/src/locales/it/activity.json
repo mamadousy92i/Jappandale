@@ -43,7 +43,8 @@
     "cancel": "Annullare",
     "shareholderLabel": "Desidero diventare azionista di questo progetto",
     "shareholderYes": "Sì, desidera diventare azionista",
-    "shareholderNo": "No, semplice finanziamento"
+    "shareholderNo": "No, semplice finanziamento",
+    "shareholderPendingHint": "Il pagamento viene confermato subito. Lo stato di azionista invece resta in attesa di convalida da parte del team Jappandale."
   },
   "notifications": {
     "eyebrow": "Il mio spazio",

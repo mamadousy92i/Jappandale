@@ -43,7 +43,8 @@
     "cancel": "Cancelar",
     "shareholderLabel": "Deseo convertirme en accionista de este proyecto",
     "shareholderYes": "Sí, desea convertirse en accionista",
-    "shareholderNo": "No, simple financiación"
+    "shareholderNo": "No, simple financiación",
+    "shareholderPendingHint": "El pago se confirma de inmediato. El estado de accionista, en cambio, queda pendiente de validación por parte del equipo de Jappandale."
   },
   "notifications": {
     "eyebrow": "Mi espacio",

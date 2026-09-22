@@ -43,7 +43,8 @@
     "cancel": "Bàyyi",
     "shareholderLabel": "Dama bëgg a doon actionnaire ci porojet bii",
     "shareholderYes": "Waaw, dafa bëgg a doon actionnaire",
-    "shareholderNo": "Déet, xaalis rekk"
+    "shareholderNo": "Déet, xaalis rekk",
+    "shareholderPendingHint": "Ñu nangu na fen fenn payement bi. Wante statut actionnaire bi dina xaar ba équipe Jappandale nangu ko."
   },
   "notifications": {
     "eyebrow": "Sama bérab",
