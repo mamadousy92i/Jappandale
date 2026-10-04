@@ -752,7 +752,7 @@
         <h3>Parcours n° 7 — Paiement PayTech, mode test (~5 min)</h3>
         <p>
           À dérouler une fois PayTech activé sur la démo (variable <code>PAYMENT_PROVIDER=paytech</code>). En mode
-          test, PayTech ne débite aucun vrai argent.
+          test, PayTech débite un petit montant aléatoire (100 à 150 FCFA) au lieu du montant réel.
         </p>
         <ol>
           <li><strong>Frais de dossier</strong> : avec un porteur, ouvrir « Mes campagnes » sur un brouillon. Le
@@ -1249,7 +1249,7 @@
         <p>
           Si PayTech encaisse un paiement alors que la contribution ne peut plus être créditée (campagne close
           entre-temps, contrepartie épuisée), les administrateurs sont prévenus pour procéder à un remboursement.
-          En mode <strong>test</strong> de PayTech (bac à sable), aucun vrai argent n'est débité.
+          En mode <strong>test</strong> de PayTech (bac à sable), le montant débité est un petit montant aléatoire (100 à 150 FCFA selon la documentation PayTech), et non le montant réel de la contribution.
         </p>
 
         <h3>Séquestre et reversement</h3>
@@ -1662,7 +1662,7 @@
         <div class="status-row">
           <span class="pill pill--info">Partiel</span>
           <p><strong>Paiement réel.</strong> PayTech (Wave, Orange Money, cartes) est intégré pour les contributions
-            et les frais de dossier, aujourd'hui en <strong>mode test</strong> (bac à sable, aucun vrai débit). Reste à
+            et les frais de dossier, aujourd'hui en <strong>mode test</strong> (bac à sable : un petit montant aléatoire est débité à la place du montant réel). Reste à
             faire pour passer en réel : activer le compte PayTech, basculer <code>PAYTECH_ENV</code> en
             « prod » et réussir un paiement de bout en bout. Le simulateur reste actif sur cette démo tant que
             PayTech n'y est pas branché.</p>

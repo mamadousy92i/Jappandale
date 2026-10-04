@@ -113,6 +113,16 @@ Utilisez une valeur différente pour `SECRET_KEY` et pour `INTERNAL_API_KEY`.
 en production (voir l'audit de sécurité — c'est le garde-fou qui empêche
 quiconque de valider un faux paiement).
 
+**Paiements PayTech** : renseignez `PAYMENT_PROVIDER=paytech`,
+`API_KEY_PAYTECH` et `SECRET_KEY_PAYTECH` (espace PayTech > Paramètres > API),
+et laissez `PAYTECH_ENV=test` (bac à sable : PayTech débite un petit montant
+aléatoire de 100 à 150 FCFA, pas le montant réel) jusqu'à l'activation de votre
+compte PayTech. PayTech confirme chaque paiement en appelant
+`https://<votre-domaine>/api/payments/paytech/ipn/` : cette URL doit donc être
+joignable publiquement en HTTPS. Les frais de dossier (20 000 FCFA par défaut)
+se règlent aussi via PayTech. Quand PayTech est actif, le simulateur est coupé
+automatiquement.
+
 ## 6. Démarrer la plateforme
 
 ```bash
@@ -235,8 +245,9 @@ volontairement, en connaissance de cause.
   serveur, avec le vrai domaine déjà pointé.
 - **Le paiement réel** (Wave, Orange Money...) : voir l'audit de sécurité —
   c'est un chantier à part entière, à traiter avant l'ouverture au grand
-  public. Le simulateur de paiement reste désactivé en production
-  (`SIMULATED_PAYMENTS_ENABLED=False`).
+  public. PayTech est intégré (voir l'étape 5) ; reste à activer le compte
+  PayTech et à passer `PAYTECH_ENV` en `prod`. Le simulateur de paiement reste
+  désactivé en production (`SIMULATED_PAYMENTS_ENABLED=False`).
 - **La supervision/alerting** (être prévenu si le serveur tombe) et
   l'intégration continue (déploiement automatique à chaque commit) n'ont pas
   été mis en place — hors du périmètre de cette préparation.
