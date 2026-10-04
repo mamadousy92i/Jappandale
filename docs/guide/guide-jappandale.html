@@ -565,9 +565,11 @@
 
       <div class="callout">
         <span class="callout-label">Adresse de la démo</span>
-        <a href="https://152-228-141-27.sslip.io"><strong>https://152-228-141-27.sslip.io</strong></a><br>
-        Environnement de <strong>test</strong> : les données sont fictives, aucun paiement réel n'a lieu, et le
-        contenu peut être réinitialisé à tout moment. Ne pas y déposer de vraies pièces d'identité.
+        <a href="https://jappandale.tech"><strong>https://jappandale.tech</strong></a>
+        (aussi accessible via <code>www.jappandale.tech</code>)<br>
+        Environnement de <strong>test</strong> : les données sont fictives, les paiements se font en <strong>mode
+        test PayTech</strong> (un petit montant aléatoire de 100 à 150 FCFA est débité, pas le montant affiché),
+        et le contenu peut être réinitialisé à tout moment. Ne pas y déposer de vraies pièces d'identité.
       </div>
 
       <div class="prose">
@@ -751,8 +753,9 @@
 
         <h3>Parcours n° 7 — Paiement PayTech, mode test (~5 min)</h3>
         <p>
-          À dérouler une fois PayTech activé sur la démo (variable <code>PAYMENT_PROVIDER=paytech</code>). En mode
-          test, PayTech débite un petit montant aléatoire (100 à 150 FCFA) au lieu du montant réel.
+          PayTech est actif sur la démo en mode test. PayTech débite alors un petit montant aléatoire (100 à 150
+          FCFA) au lieu du montant réel : prévoir au moins 150 FCFA sur le portefeuille Wave ou Orange Money
+          utilisé.
         </p>
         <ol>
           <li><strong>Frais de dossier</strong> : avec un porteur, ouvrir « Mes campagnes » sur un brouillon. Le
@@ -771,15 +774,13 @@
 
       <div class="callout">
         <span class="callout-label">La démo est prête — vérifié de bout en bout</span>
-        Les e-mails partent réellement (code d'inscription, code administrateur, notifications), le simulateur de
-        paiement est actif — une contribution peut donc être confirmée et créditer la campagne — et l'accès
-        administrateur fonctionne.
+        Les e-mails partent réellement (code d'inscription, code administrateur, notifications), le paiement passe
+        par PayTech en <strong>mode test</strong> — la contribution n'est créditée qu'une fois la notification
+        signée de PayTech reçue — et l'accès administrateur fonctionne. Le simulateur de paiement est désactivé.
         <br><br>
-        <strong>Un seul point de vigilance :</strong> le simulateur de paiement, activé ici pour permettre les
-        tests, permet à n'importe qui de valider une contribution sans payer. C'est acceptable sur une démo à
-        données fictives, mais il devra impérativement être désactivé
-        (<code>SIMULATED_PAYMENTS_ENABLED=False</code>) sur la future production réelle, où un vrai prestataire de
-        paiement prendra le relais.
+        <strong>Point de vigilance :</strong> en mode test, PayTech débite quand même un petit montant aléatoire
+        sur le portefeuille utilisé (100 à 150 FCFA). Pour encaisser de vrais paiements, le compte PayTech de
+        l'entreprise doit d'abord être activé par PayTech (voir module 18).
       </div>
 
       <div class="callout">
@@ -787,14 +788,19 @@
         Les échéances des campagnes de démonstration sont réelles : une campagne dont la date limite est dépassée
         se clôture automatiquement, comme en production. Avant toute présentation, lancer
         <code>bash scripts/rafraichir-demo.sh</code> depuis le dépôt remet à jour le code du serveur et republie
-        les campagnes closes par expiration (jamais celles closes par un vrai succès).
+        les campagnes closes par expiration (jamais celles closes par un vrai succès). Le script vise par défaut
+        le serveur de <code>jappandale.tech</code> ; une autre adresse peut lui être passée en paramètre.
       </div>
 
       <div class="prose">
         <h3>Limites connues de cette démo</h3>
         <ul>
-          <li><strong>Aucun paiement réel</strong> — le prestataire (Wave, Orange Money…) n'est pas encore
-            intégré ; les contributions sont simulées (voir modules 15 et 17).</li>
+          <li><strong>Paiement en mode test</strong> — PayTech est intégré mais pas encore activé en
+            production : aucun vrai encaissement. Les reversements aux porteurs et les remboursements sont
+            seulement enregistrés dans la plateforme, sans mouvement d'argent chez PayTech (voir modules 07 et 18).</li>
+          <li><strong>Les comptes de démonstration</strong> (mot de passe public, écrit dans ce guide) existent aussi
+            sur ce serveur : ils doivent être supprimés ou leurs mots de passe changés avant toute ouverture
+            au public.</li>
           <li><strong>Les pièces d'identité n'ont pas été copiées</strong> depuis l'environnement local : ce sont
             des documents personnels réels, délibérément laissés hors d'un serveur de démonstration. Les dossiers
             KYC existent mais leurs fichiers s'afficheront comme manquants.</li>
@@ -1588,8 +1594,9 @@
         <ul>
           <li><strong>Paiement falsifiable.</strong> Un contributeur pouvait déclarer lui-même sa contribution
             comme « payée », sans paiement réel — démontré en créditant une campagne de test de 500 000 FCFA sans
-            jamais payer. Le module de paiement est un simulateur : il est actif sur cette démo pour les tests,
-            mais doit rester désactivé sur une production commerciale tant qu'un vrai prestataire n'est pas branché.</li>
+            jamais payer. À l'époque, le module de paiement était un simulateur. Depuis, PayTech est intégré :
+            seule sa notification signée confirme un paiement, et le simulateur est coupé automatiquement dès que
+            PayTech est actif (voir module 07).</li>
           <li><strong>Auto-promotion administrateur.</strong> Un compte avec un simple accès technique Django
             (sans le rôle métier ni la double authentification) pouvait accéder au back-office et s'attribuer
             lui-même le rôle administrateur — démontré en direct. L'accès au back-office ne dépend plus que du
@@ -1607,8 +1614,8 @@
         </p>
         <div class="callout">
           <span class="callout-label">Reste ouvert</span>
-          Rien de tout cela ne remplace l'intégration d'un vrai prestataire de paiement : c'est une brique
-          produit à construire, pas un correctif de code (voir module 18).
+          L'intégration de PayTech (module 07) a fermé la faille de paiement falsifiable. Reste à faire activer
+          le compte PayTech de l'entreprise pour encaisser en réel (voir module 18).
         </div>
       </div>
     </section>
@@ -1620,25 +1627,67 @@
         <h2 class="module-title">Déploiement</h2>
       </div>
       <p class="module-standfirst">
-        La démo est déployée et accessible en HTTPS sur le VPS. L'application, la base de données, les fichiers
-        média et les données de démonstration y sont déjà en ligne.
+        Jappandale est en ligne sur <a href="https://jappandale.tech">jappandale.tech</a>, sur un serveur dédié
+        (VPS Hostinger, Ubuntu). L'application, la base de données, les fichiers média et les données de
+        démonstration y sont en place.
       </p>
       <div class="prose">
+        <h3>Ce qui tourne</h3>
         <p>
           Toute la plateforme tourne dans des conteneurs Docker : le site React/Django, la base de données
-          PostgreSQL, une tâche planifiée quotidienne de clôture des campagnes et le serveur web. L'instance de
-          démonstration est publiée à <a href="https://152-228-141-27.sslip.io">152-228-141-27.sslip.io</a>, avec une redirection HTTP vers HTTPS et un certificat Let's Encrypt valide.
+          PostgreSQL, une tâche planifiée quotidienne de clôture des campagnes et le serveur web (Caddy). Le site
+          répond sur <code>jappandale.tech</code> et <code>www.jappandale.tech</code>, avec une redirection
+          automatique de HTTP vers HTTPS et des certificats Let's Encrypt obtenus et renouvelés tout seuls.
         </p>
         <p>
-          Un principe de sécurité central de cette configuration : le serveur web ne sert jamais directement les
-          documents d'identité (KYC) déposés par les utilisateurs — seuls sont exposés en accès direct les
-          éléments publics comme les photos de profil ou les images de campagne, exactement comme décrit au
-          module 03.
+          Principe de sécurité central : le serveur web ne sert jamais directement les documents d'identité (KYC)
+          déposés par les utilisateurs — seuls sont exposés en accès direct les éléments publics comme les photos
+          de profil ou les images de campagne, exactement comme décrit au module 03.
         </p>
+
+        <h3>Protection du serveur</h3>
+        <ul>
+          <li><strong>Pare-feu</strong> : seuls les accès SSH, HTTP (80) et HTTPS (443) sont ouverts.</li>
+          <li><strong>Accès SSH par clé uniquement</strong> : la connexion par mot de passe est désactivée, ce qui
+            neutralise les tentatives de devinette automatiques ; un outil (fail2ban) bloque en plus les adresses
+            qui insistent. L'accès de secours passe par la console web de Hostinger.</li>
+          <li><strong>Mises à jour de sécurité automatiques</strong> du système.</li>
+          <li><strong>Secrets propres à ce serveur</strong> : clé Django, mot de passe de base de données et clé de
+            l'API interne ont été générés sur le serveur et ne sont jamais écrits dans le dépôt de code. Les clés
+            e-mail et PayTech sont copiées par un script qui ne les affiche jamais
+            (<code>scripts/copier-secrets-vers-serveur.sh</code>).</li>
+        </ul>
+
+        <h3>Sauvegardes</h3>
         <p>
-          L'ensemble de la chaîne est vérifié en ligne : construction des images, migrations automatiques,
-          fichiers statiques, API de santé, e-mail SMTP, connexion utilisateur et données de démonstration.
+          Chaque nuit à 3 h, la base de données et les fichiers média (pièces KYC comprises) sont sauvegardés dans
+          un dossier réservé à l'administrateur du serveur, et les 7 dernières sauvegardes sont conservées. Elles
+          se trouvent sur le même serveur : les sauvegardes automatiques de Hostinger (hPanel) restent
+          indispensables en complément, pour survivre à la perte du serveur lui-même.
         </p>
+
+        <h3>Les données</h3>
+        <p>
+          Les comptes, campagnes, contributions et fichiers publics (avatars, images de campagne, documents de
+          projet) ont été transférés depuis la première instance de démonstration. Aucune pièce d'identité réelle
+          n'a été copiée.
+        </p>
+
+        <h3>Paiements en ligne</h3>
+        <p>
+          PayTech confirme chaque paiement en appelant l'adresse
+          <code>https://jappandale.tech/api/payments/paytech/ipn/</code>. Cette adresse est publique, mais ne fait
+          rien sans la signature cryptographique de PayTech. Le mode (<code>test</code> ou <code>prod</code>) se
+          règle dans la configuration du serveur.
+        </p>
+
+        <h3>Mettre à jour le site</h3>
+        <p>
+          Après un nouveau commit : se connecter au serveur, puis <code>cd /opt/jappandale &amp;&amp; git pull &amp;&amp;
+          docker compose up -d --build</code>. Les migrations et la collecte des fichiers statiques se relancent
+          toutes seules.
+        </p>
+
         <p>
           <strong>Compatibilité des navigateurs.</strong> Le site s'affiche correctement sur les navigateurs de 2020
           et plus récents (Chrome 80+, Edge 88+, Firefox 78+, Safari 13+). Un test avec un Chrome de 2022 a montré
@@ -1648,9 +1697,9 @@
         </p>
         <div class="callout">
           <span class="callout-label">Précaution pour une ouverture publique</span>
-          Cette adresse est une instance de démonstration. Avant une ouverture commerciale, il faut relier un nom
-          de domaine Jappandale définitif, remplacer les mots de passe de démonstration et désactiver le simulateur
-          de paiement dès que PayTech est actif (il est alors coupé automatiquement).
+          Avant d'ouvrir au grand public : supprimer les comptes de démonstration (ou changer leurs mots de
+          passe), faire activer le compte PayTech de l'entreprise puis passer <code>PAYTECH_ENV</code> en
+          « prod », et activer les sauvegardes automatiques de Hostinger.
         </div>
       </div>
     </section>
@@ -1671,13 +1720,33 @@
           <p><strong>Paiement réel.</strong> PayTech (Wave, Orange Money, cartes) est intégré pour les contributions
             et les frais de dossier, aujourd'hui en <strong>mode test</strong> (bac à sable : un petit montant aléatoire est débité à la place du montant réel). Reste à
             faire pour passer en réel : activer le compte PayTech, basculer <code>PAYTECH_ENV</code> en
-            « prod » et réussir un paiement de bout en bout. Le simulateur reste actif sur cette démo tant que
-            PayTech n'y est pas branché.</p>
+            « prod » et réussir un paiement de bout en bout. Le simulateur est désactivé : PayTech est le seul
+            moyen de paiement.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">À faire</span>
+          <p><strong>Compte PayTech de l'entreprise.</strong> Le compte actuel est un compte de développement.
+            Pour encaisser en réel, l'entreprise qui reçoit l'argent doit créer son propre compte PayTech et
+            demander son activation (NINEA, pièce d'identité, registre de commerce, statuts, justificatif de
+            domicile ; jusqu'à 48 h), puis fournir ses clés API.</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">À faire</span>
+          <p><strong>Reversements et remboursements réels.</strong> Aujourd'hui, reverser les fonds à un porteur ou
+            rembourser un contributeur est enregistré dans la plateforme sans qu'aucun argent ne bouge chez
+            PayTech : ces opérations se font encore à la main.</p>
         </div>
         <div class="status-row">
           <span class="pill pill--ok">Réalisé</span>
-          <p><strong>Déploiement de démonstration.</strong> Le VPS, HTTPS, PostgreSQL, les données locales, les
-            médias et l'e-mail SMTP sont actifs (voir module 17).</p>
+          <p><strong>Déploiement sur serveur dédié.</strong> VPS, nom de domaine jappandale.tech, HTTPS,
+            PostgreSQL, e-mail SMTP, pare-feu, accès SSH par clé et sauvegardes nocturnes sont en place (voir
+            module 17).</p>
+        </div>
+        <div class="status-row">
+          <span class="pill pill--pending">À faire</span>
+          <p><strong>Sauvegardes hors serveur et supervision.</strong> Les sauvegardes nocturnes restent sur le
+            serveur lui-même, et personne n'est prévenu automatiquement si le site tombe : à compléter par les
+            sauvegardes Hostinger et un outil de surveillance.</p>
         </div>
         <div class="status-row">
           <span class="pill pill--pending">À faire</span>

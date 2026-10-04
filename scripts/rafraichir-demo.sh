@@ -4,13 +4,15 @@
 # (une campagne close par succès n'est jamais touchée).
 #
 # Utilisation, depuis n'importe où sur cette machine :
-#   bash scripts/rafraichir-demo.sh
+#   bash scripts/rafraichir-demo.sh [utilisateur@adresse]
+#
+# Sans argument, vise le serveur de https://jappandale.tech (root@191.215.43.63).
 #
 # Nécessite la clé SSH configurée précédemment (~/.ssh/jappandale_vps).
 
 set -e
 
-SERVEUR="ubuntu@152.228.141.27"
+SERVEUR="${1:-root@191.215.43.63}"
 CLE="$HOME/.ssh/jappandale_vps"
 
 if [ ! -f "$CLE" ]; then
@@ -30,4 +32,4 @@ ssh -i "$CLE" "$SERVEUR" '
 '
 
 echo
-echo "Terminé. La démo est prête : https://152-228-141-27.sslip.io"
+echo "Terminé. La démo est prête."

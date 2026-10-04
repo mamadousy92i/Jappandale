@@ -251,3 +251,38 @@ volontairement, en connaissance de cause.
 - **La supervision/alerting** (être prévenu si le serveur tombe) et
   l'intégration continue (déploiement automatique à chaque commit) n'ont pas
   été mis en place — hors du périmètre de cette préparation.
+
+## Notes d'exploitation (instance jappandale.tech)
+
+Ce qui a été mis en place sur le VPS Hostinger (Ubuntu), en plus des étapes ci-dessus :
+
+- **Accès** : connexion SSH par clé uniquement (mot de passe désactivé dans
+  `/etc/ssh/sshd_config.d/00-jappandale.conf`), pare-feu `ufw` (SSH, 80, 443), `fail2ban`,
+  mises à jour de sécurité automatiques, 2 Go de swap pour absorber la construction du site.
+  Accès de secours : console web du VPS dans hPanel.
+- **Domaine** : enregistrements DNS `A` pour `@` et `www` vers l'IP du VPS (zone gérée dans
+  hPanel > Domaines > DNS). Caddy sert `DOMAIN` et `www.DOMAIN` et obtient les certificats.
+- **Secrets** : générés sur le serveur au premier déploiement. Pour copier le mot de passe e-mail et
+  les clés PayTech depuis `backend/.env` (poste local) sans les afficher :
+
+  ```bash
+  bash scripts/copier-secrets-vers-serveur.sh root@IP_DU_VPS
+  ```
+
+- **Sauvegardes** : `/usr/local/bin/jappandale-backup.sh`, lancé chaque nuit à 3 h par
+  `/etc/cron.d/jappandale-backup`. Il écrit dans `/opt/backups` (accès root uniquement) un dump de la base
+  et une archive des médias, et garde 7 jours. Ces sauvegardes sont sur le même serveur : activez aussi les
+  sauvegardes automatiques de Hostinger.
+- **Reprise de données depuis une autre instance** (base + médias publics, sans les pièces KYC) :
+
+  ```bash
+  # base de données
+  ssh ANCIEN 'cd /opt/jappandale && docker compose exec -T db pg_dump -U <user> -d <base> --clean --if-exists --no-owner' \
+    | ssh NOUVEAU 'cd /opt/jappandale && docker compose exec -T db psql -U <user> -d <base> -q -v ON_ERROR_STOP=1'
+  # médias
+  ssh ANCIEN 'docker run --rm -v jappandale_media_data:/m:ro alpine tar czf - -C /m .' \
+    | ssh NOUVEAU 'docker run --rm -i -v jappandale_media_data:/m alpine tar xzf - -C /m'
+  ```
+
+  Arrêter `backend` et `cron` sur le nouveau serveur pendant la restauration, puis les relancer.
+- **Rafraîchir la démo** (campagnes closes par expiration) : `bash scripts/rafraichir-demo.sh`.
