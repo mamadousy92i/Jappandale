@@ -748,6 +748,25 @@
           <li>Se reconnecter avec le compte concerné pour vérifier que son statut a changé dans son historique,
             et qu'une notification a été reçue.</li>
         </ol>
+
+        <h3>Parcours n° 7 — Paiement PayTech, mode test (~5 min)</h3>
+        <p>
+          À dérouler une fois PayTech activé sur la démo (variable <code>PAYMENT_PROVIDER=paytech</code>). En mode
+          test, PayTech ne débite aucun vrai argent.
+        </p>
+        <ol>
+          <li><strong>Frais de dossier</strong> : avec un porteur, ouvrir « Mes campagnes » sur un brouillon. Le
+            cadre « Frais de dossier » propose « Payer 20 000 F CFA ». Payer sur la page PayTech, revenir sur le
+            site : un message « Vérification du paiement… » apparaît, puis le bouton « Soumettre à validation »
+            s'affiche tout seul.</li>
+          <li><strong>Contribution</strong> : avec un contributeur, contribuer à une campagne publiée. Le bouton
+            final devient « Payer … F CFA » et mène à PayTech ; au retour, la contribution est confirmée une fois
+            la notification de PayTech reçue.</li>
+          <li><strong>Annulation</strong> : lors d'un paiement, annuler sur la page PayTech. On revient sur le
+            site avec « Le paiement a été annulé » et la contribution reste en attente, relançable.</li>
+          <li><strong>Côté administrateur</strong> : les frais payés apparaissent comme validés dans l'historique de
+            la campagne, avec la mention « Payés en ligne via PayTech ».</li>
+        </ol>
       </div>
 
       <div class="callout">
@@ -1077,6 +1096,16 @@
           contrôles.
         </p>
 
+        <h3>Les frais de dossier</h3>
+        <p>
+          Avant de pouvoir soumettre une campagne à modération, le porteur règle des <strong>frais de dossier
+          de 20 000 FCFA</strong>. Depuis « Mes campagnes », le bouton « Payer 20 000 F CFA » l'envoie sur la page
+          de paiement sécurisée de PayTech (Wave, Orange Money, carte). Dès que PayTech confirme le paiement, les
+          frais passent automatiquement en « validés » et la soumission devient possible — sans intervention de
+          l'équipe. L'administrateur garde un bouton de secours (valider ou refuser à la main) pour les cas
+          particuliers, par exemple une exonération. Le montant se règle dans la configuration du serveur.
+        </p>
+
         <h3>Le cycle de vie d'une campagne</h3>
         <p>Une campagne traverse une suite d'états précis, et ne peut passer de l'un à l'autre que selon des
           règles strictes :</p>
@@ -1203,6 +1232,26 @@
           contributeur voit ce statut évoluer dans son historique de contributions, et le porteur le voit
           aussi dans ses contributions reçues.
         </p>
+        <h3>Le paiement : PayTech</h3>
+        <p>
+          Une fois la contribution vérifiée, le bouton « Payer » redirige vers la page de paiement PayTech (Wave,
+          Orange Money, carte). Le contributeur paie là-bas puis revient sur Jappandale, qui affiche
+          « Vérification du paiement… » le temps de recevoir la confirmation de PayTech (quelques secondes). Si le
+          paiement est annulé, la contribution reste en attente et peut être relancée.
+        </p>
+        <div class="callout">
+          <span class="callout-label">Règle de sécurité</span>
+          Seule la <strong>notification envoyée par PayTech aux serveurs de Jappandale</strong>, authentifiée par
+          une signature cryptographique (HMAC-SHA256), confirme un paiement. Revenir sur le site après avoir payé
+          — ou taper l'adresse de retour à la main — ne crédite jamais rien. Une notification sans signature
+          valide est refusée sans aucun effet, et une notification rejouée ne compte qu'une fois.
+        </div>
+        <p>
+          Si PayTech encaisse un paiement alors que la contribution ne peut plus être créditée (campagne close
+          entre-temps, contrepartie épuisée), les administrateurs sont prévenus pour procéder à un remboursement.
+          En mode <strong>test</strong> de PayTech (bac à sable), aucun vrai argent n'est débité.
+        </p>
+
         <h3>Séquestre et reversement</h3>
         <p>
           Dès qu'une contribution est confirmée, l'argent n'est pas immédiatement transféré au porteur : il est
@@ -1594,7 +1643,7 @@
           <span class="callout-label">Précaution pour une ouverture publique</span>
           Cette adresse est une instance de démonstration. Avant une ouverture commerciale, il faut relier un nom
           de domaine Jappandale définitif, remplacer les mots de passe de démonstration et désactiver le simulateur
-          de paiement jusqu'à l'intégration d'un prestataire réel.
+          de paiement dès que PayTech est actif (il est alors coupé automatiquement).
         </div>
       </div>
     </section>
@@ -1611,10 +1660,12 @@
       </p>
       <div class="status-table">
         <div class="status-row">
-          <span class="pill pill--pending">À faire</span>
-          <p><strong>Paiement réel.</strong> Les contributions sont aujourd'hui simulées ; l'intégration Wave,
-            Orange Money et une passerelle internationale pour la diaspora reste à brancher. Le simulateur est
-            activé sur cette démo pour permettre les tests, mais ne constitue pas un paiement réel.</p>
+          <span class="pill pill--info">Partiel</span>
+          <p><strong>Paiement réel.</strong> PayTech (Wave, Orange Money, cartes) est intégré pour les contributions
+            et les frais de dossier, aujourd'hui en <strong>mode test</strong> (bac à sable, aucun vrai débit). Reste à
+            faire pour passer en réel : activer le compte PayTech, basculer <code>PAYTECH_ENV</code> en
+            « prod » et réussir un paiement de bout en bout. Le simulateur reste actif sur cette démo tant que
+            PayTech n'y est pas branché.</p>
         </div>
         <div class="status-row">
           <span class="pill pill--ok">Réalisé</span>
