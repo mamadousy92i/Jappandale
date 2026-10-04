@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.financial_passport",
     "apps.guichet",
     "apps.partners",
+    "apps.payments",
 ]
 
 MIDDLEWARE = [
@@ -182,6 +183,18 @@ INTERNAL_API_KEY = env("INTERNAL_API_KEY", default="")
 # lui-même (voir apps/contributions/providers.SimulatedPaymentProvider). Ce comportement
 # ne doit jamais être actif en production tant qu'un vrai prestataire n'est pas branché.
 SIMULATED_PAYMENTS_ENABLED = env.bool("SIMULATED_PAYMENTS_ENABLED", default=DEBUG)
+
+# Prestataire de paiement réel : PayTech (Wave, Orange Money, cartes…). Le choix est
+# explicite (PAYMENT_PROVIDER=paytech) : la simple présence des clés ne bascule rien.
+# Quand PayTech est actif, le simulateur est toujours désactivé, même si
+# SIMULATED_PAYMENTS_ENABLED est resté à True par erreur.
+PAYMENT_PROVIDER = env("PAYMENT_PROVIDER", default="simulated").strip().lower()
+PAYTECH_API_KEY = env("API_KEY_PAYTECH", default="")
+PAYTECH_API_SECRET = env("SECRET_KEY_PAYTECH", default="")
+# "test" = bac à sable PayTech (débite 100 à 150 FCFA aléatoires, pas le vrai montant) ;
+# "prod" uniquement une fois le compte PayTech activé.
+PAYTECH_ENV = env("PAYTECH_ENV", default="test").strip().lower()
+DOSSIER_FEE_AMOUNT = env.int("DOSSIER_FEE_AMOUNT", default=20_000)
 PASSWORD_RESET_TIMEOUT = env.int("PASSWORD_RESET_TIMEOUT", default=3600)
 
 LOGGING = {

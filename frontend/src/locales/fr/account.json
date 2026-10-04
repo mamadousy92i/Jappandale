@@ -204,7 +204,12 @@
       "request": "Demander la validation des frais",
       "requestAgain": "Redemander la validation",
       "requesting": "Envoi…",
-      "requestError": "La demande a échoué. Réessayez."
+      "requestError": "La demande a échoué. Réessayez.",
+      "payText": "Les frais de dossier sont de {{amount}}. Réglez-les en ligne : ils sont validés automatiquement dès la confirmation du paiement, puis vous pourrez soumettre votre campagne.",
+      "pay": "Payer {{amount}}",
+      "redirecting": "Redirection vers PayTech…",
+      "verifying": "Vérification du paiement des frais de dossier en cours… cette page se met à jour toute seule.",
+      "cancelled": "Le paiement des frais de dossier a été annulé. Vous pouvez le relancer quand vous voulez."
     }
   },
   "shareholder": {

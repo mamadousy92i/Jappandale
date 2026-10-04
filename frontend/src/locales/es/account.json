@@ -204,7 +204,12 @@
       "request": "Solicitar la validación de los gastos",
       "requestAgain": "Volver a solicitar la validación",
       "requesting": "Enviando…",
-      "requestError": "La solicitud ha fallado. Vuelve a intentarlo."
+      "requestError": "La solicitud ha fallado. Vuelve a intentarlo.",
+      "payText": "Los gastos de expediente son de {{amount}}. Págalos en línea: se validan automáticamente al confirmarse el pago y después podrás enviar tu campaña.",
+      "pay": "Pagar {{amount}}",
+      "redirecting": "Redirigiendo a PayTech…",
+      "verifying": "Verificando el pago de los gastos de expediente… esta página se actualiza sola.",
+      "cancelled": "El pago de los gastos de expediente fue cancelado. Puedes reiniciarlo cuando quieras."
     }
   },
   "shareholder": {

@@ -204,7 +204,12 @@
       "request": "Laaj wóoral xaalis yi",
       "requestAgain": "Laajaat wóoral bi",
       "requesting": "Di yónnee…",
-      "requestError": "Laaj bi baaxul. Jéema beneen yoon."
+      "requestError": "Laaj bi baaxul. Jéema beneen yoon.",
+      "payText": "Frais de dossier yi ñu {{amount}} la. Fey leen ko ci internet: dina nangu ci boppam bu fey bi weesoo, ba noppi mën nga yónnee sa kampañ.",
+      "pay": "Fey {{amount}}",
+      "redirecting": "Dem ci PayTech…",
+      "verifying": "Danuy seetlu fey bu frais de dossier bi… xët wii dina bokk soppeeku ci boppam.",
+      "cancelled": "Fey bu frais de dossier bi dañu ko faat. Mën nga ko tàmbali ba noppi bu nga ko bëggee."
     }
   },
   "shareholder": {

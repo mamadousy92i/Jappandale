@@ -44,7 +44,13 @@
     "shareholderLabel": "Dama bëgg a doon actionnaire ci porojet bii",
     "shareholderYes": "Waaw, dafa bëgg a doon actionnaire",
     "shareholderNo": "Déet, xaalis rekk",
-    "shareholderPendingHint": "Ñu nangu na fen fenn payement bi. Wante statut actionnaire bi dina xaar ba équipe Jappandale nangu ko."
+    "shareholderPendingHint": "Ñu nangu na fen fenn payement bi. Wante statut actionnaire bi dina xaar ba équipe Jappandale nangu ko.",
+    "payNow": "Fey {{amount}}",
+    "redirecting": "Dem ci PayTech…",
+    "paymentUnavailable": "Fey bi ci internet manul a doxal léegi. Jéemaatal ci ay minit.",
+    "paymentCancelled": "Fey bi dañu ko faat. Mën nga ko jéemaat bu nga ko bëggee.",
+    "verifyingTitle": "Seetlu ci fey bi…",
+    "verifyingText": "Danuy xaar PayTech nangu ko, mu ngi nekk lu gatt. Bul tëj xët wii."
   },
   "notifications": {
     "eyebrow": "Sama bérab",

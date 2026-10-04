@@ -48,8 +48,28 @@ def create_pending_contribution(
     return contribution
 
 
-@db_transaction.atomic
+DEFAULT_FAILURE_REASON = "La contribution n’a pas été confirmée."
+
+
 def process_simulated_payment(*, contribution, outcome):
+    result = SimulatedPaymentProvider().process(outcome)
+    return settle_contribution_payment(
+        contribution=contribution,
+        success=result.success,
+        failure_reason=result.failure_reason,
+        provider=Transaction.Provider.SIMULATED,
+    )
+
+
+@db_transaction.atomic
+def settle_contribution_payment(
+    *, contribution, success, failure_reason="", provider=Transaction.Provider.SIMULATED
+):
+    """Applique le résultat d'un paiement à une contribution (idempotent).
+
+    Appelée par le simulateur (développement) et par la notification serveur de
+    PayTech (production) : c'est le seul endroit qui confirme une contribution.
+    """
     locked = Contribution.objects.select_for_update().get(pk=contribution.pk)
     campaign = Campaign.objects.select_for_update().get(pk=locked.campaign_id)
     goal_was_reached = campaign.collected_amount >= campaign.goal_amount
@@ -57,14 +77,16 @@ def process_simulated_payment(*, contribution, outcome):
     if locked.status != Contribution.Status.INITIEE:
         return locked
 
+    result = PaymentResult(
+        success=success, failure_reason=failure_reason or DEFAULT_FAILURE_REASON
+    )
     if campaign.status != Campaign.Status.PUBLIEE or campaign.deadline < timezone.now().date():
-        outcome = SimulatedPaymentProvider.FAILURE
+        result = PaymentResult(success=False, failure_reason=DEFAULT_FAILURE_REASON)
 
     reward = None
     if locked.reward_id:
         reward = Reward.objects.select_for_update().get(pk=locked.reward_id)
 
-    result = SimulatedPaymentProvider().process(outcome)
     if result.success and reward is not None and reward.sold_out:
         result = PaymentResult(success=False, failure_reason="Contrepartie épuisée.")
 
@@ -72,6 +94,7 @@ def process_simulated_payment(*, contribution, outcome):
     payment_transaction = Transaction.objects.select_for_update().get(
         contribution=locked
     )
+    payment_transaction.provider = provider
     payment_transaction.processed_at = now
 
     if result.success:
@@ -120,7 +143,7 @@ def process_simulated_payment(*, contribution, outcome):
         locked.save(update_fields=update_fields)
 
     payment_transaction.save(
-        update_fields=["status", "failure_reason", "processed_at"]
+        update_fields=["provider", "status", "failure_reason", "processed_at"]
     )
     recalculate_campaign_total(campaign)
     campaign.refresh_from_db(fields=["status", "collected_amount"])

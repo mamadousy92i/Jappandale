@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { formatFcfa } from "@/lib/format";
+import { isPaytechUrl, usePaymentConfig } from "@/lib/payments";
 import type { CampaignListItem, CampaignStatus } from "@/lib/types";
 
 function toMessage(value: unknown): string {
@@ -62,6 +63,8 @@ function CampaignRow({
   const [error, setError] = useState<string | null>(null);
   const [requestingFee, setRequestingFee] = useState(false);
   const [feeError, setFeeError] = useState(false);
+  const payment = usePaymentConfig();
+  const payOnline = payment?.provider === "PAYTECH";
 
   const canEdit = ["BROUILLON", "REJETEE", "SUSPENDUE"].includes(
     campaign.status,
@@ -94,6 +97,21 @@ function CampaignRow({
           : t("myCampaigns.submitError"),
       );
       setSubmitting(false);
+    }
+  };
+
+  const handlePayFee = async () => {
+    setFeeError(false);
+    setRequestingFee(true);
+    try {
+      const data = (await authFetch(`/payments/campaigns/${campaign.slug}/fee/start/`, {
+        method: "POST",
+      })) as { redirect_url?: string };
+      if (!isPaytechUrl(data.redirect_url)) throw new Error("redirect");
+      window.location.assign(data.redirect_url);
+    } catch {
+      setFeeError(true);
+      setRequestingFee(false);
     }
   };
 
@@ -182,18 +200,37 @@ function CampaignRow({
                 {t("myCampaigns.fee.title")}
               </p>
               <p className="mt-1.5 leading-relaxed">
-                {campaign.dossier_fee_status === "EN_ATTENTE"
-                  ? t("myCampaigns.fee.pending")
-                  : campaign.dossier_fee_status === "REJETE"
-                    ? campaign.dossier_fee_note || t("myCampaigns.fee.rejectedFallback")
-                    : t("myCampaigns.fee.notRequested")}
+                {campaign.dossier_fee_status === "REJETE"
+                  ? campaign.dossier_fee_note || t("myCampaigns.fee.rejectedFallback")
+                  : payOnline
+                    ? t("myCampaigns.fee.payText", {
+                        amount: formatFcfa(payment.dossier_fee_amount),
+                      })
+                    : campaign.dossier_fee_status === "EN_ATTENTE"
+                      ? t("myCampaigns.fee.pending")
+                      : t("myCampaigns.fee.notRequested")}
               </p>
               {feeError && (
                 <p role="alert" className="mt-2 text-sm text-red-600">
                   {t("myCampaigns.fee.requestError")}
                 </p>
               )}
-              {canRequestFee && (
+              {payOnline && (
+                <Button
+                  size="sm"
+                  disabled={requestingFee}
+                  onClick={() => void handlePayFee()}
+                  className="mt-3 rounded-full bg-ink font-semibold text-surface shadow-sm transition-all hover:bg-ink/85"
+                >
+                  <Banknote aria-hidden="true" className="size-3.5" />
+                  {requestingFee
+                    ? t("myCampaigns.fee.redirecting")
+                    : t("myCampaigns.fee.pay", {
+                        amount: formatFcfa(payment.dossier_fee_amount),
+                      })}
+                </Button>
+              )}
+              {!payOnline && canRequestFee && (
                 <Button
                   size="sm"
                   disabled={requestingFee}
@@ -298,23 +335,61 @@ export function MyCampaigns() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    setError(false);
-    authFetch("/campaigns/mine/")
-      .then((data) => {
-        setCampaigns(data as CampaignListItem[]);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError(true);
-        setLoading(false);
-      });
-  }, [authFetch]);
+  const [searchParams] = useSearchParams();
+  const feeReturn = searchParams.get("frais");
+  const [verifyingFee, setVerifyingFee] = useState(feeReturn === "retour");
+
+  const load = useCallback(
+    (silent = false) => {
+      if (!silent) setLoading(true);
+      setError(false);
+      return authFetch("/campaigns/mine/")
+        .then((data) => {
+          setCampaigns(data as CampaignListItem[]);
+          setLoading(false);
+          return data as CampaignListItem[];
+        })
+        .catch(() => {
+          setError(true);
+          setLoading(false);
+          return null;
+        });
+    },
+    [authFetch],
+  );
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
+
+  // Retour de PayTech : la validation des frais arrive par la notification serveur de
+  // PayTech, parfois quelques secondes après la redirection. On interroge un court instant.
+  useEffect(() => {
+    if (feeReturn !== "retour") return;
+    let cancelled = false;
+    let attempts = 0;
+    let baseline: number | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const countValidated = (items: CampaignListItem[]) =>
+      items.filter((item) => item.dossier_fee_status === "VALIDE").length;
+    const poll = async () => {
+      const items = await load(true);
+      if (cancelled || !items) return;
+      const validated = countValidated(items);
+      if (baseline === null) baseline = validated;
+      attempts += 1;
+      if (validated > baseline || attempts >= 10) {
+        setVerifyingFee(false);
+        return;
+      }
+      timer = setTimeout(() => void poll(), 3000);
+    };
+    void poll();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [feeReturn, load]);
 
   return (
     <div className="rounded-[20px] border border-black/5 bg-surface p-8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.08)] sm:p-10">
@@ -338,6 +413,17 @@ export function MyCampaigns() {
         </Button>
       </div>
 
+      {verifyingFee && (
+        <p role="status" className="mt-6 rounded-xl bg-gold/10 px-4 py-3 text-sm text-ink-secondary">
+          {t("myCampaigns.fee.verifying")}
+        </p>
+      )}
+      {feeReturn === "annule" && (
+        <p role="status" className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {t("myCampaigns.fee.cancelled")}
+        </p>
+      )}
+
       <div className="mt-6">
         {loading ? (
           <div className="space-y-3" aria-hidden="true">
@@ -356,7 +442,7 @@ export function MyCampaigns() {
             <Button
               variant="outline"
               size="sm"
-              onClick={load}
+              onClick={() => void load()}
               className="rounded-full border-black/10 font-medium text-ink transition-all hover:border-gold hover:bg-gold/10 hover:text-gold-dark"
             >
               <RefreshCw aria-hidden="true" className="size-3.5" />
@@ -384,7 +470,7 @@ export function MyCampaigns() {
               <CampaignRow
                 key={campaign.id}
                 campaign={campaign}
-                onReload={load}
+                onReload={() => void load()}
               />
             ))}
           </ul>

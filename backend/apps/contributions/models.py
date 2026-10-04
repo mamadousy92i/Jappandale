@@ -153,6 +153,7 @@ class Transaction(models.Model):
 
     class Provider(models.TextChoices):
         SIMULATED = "SIMULATED", "Contribution Jappandale"
+        PAYTECH = "PAYTECH", "PayTech"
 
     class Status(models.TextChoices):
         INITIEE = "INITIEE", "Initiée"

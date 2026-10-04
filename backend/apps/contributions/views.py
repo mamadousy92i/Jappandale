@@ -28,6 +28,20 @@ class ContributionCreateView(generics.CreateAPIView):
         )
 
 
+class ContributionDetailView(generics.RetrieveAPIView):
+    """Une contribution de l'utilisateur, par sa référence (suivi après paiement)."""
+
+    serializer_class = ContributionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "public_reference"
+    lookup_url_kwarg = "reference"
+
+    def get_queryset(self):
+        return Contribution.objects.filter(contributor=self.request.user).select_related(
+            "campaign", "contributor", "transaction"
+        )
+
+
 class MyContributionsView(generics.ListAPIView):
     serializer_class = ContributionSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -60,7 +74,7 @@ class ConfirmContributionView(APIView):
         # paiement (outcome). Tant qu'un vrai prestataire (Wave, Orange Money…) n'est
         # pas branché, ce comportement doit rester strictement limité au développement
         # local : en production, cet endpoint créditerait une campagne sans paiement réel.
-        if not settings.SIMULATED_PAYMENTS_ENABLED:
+        if not settings.SIMULATED_PAYMENTS_ENABLED or settings.PAYMENT_PROVIDER == "paytech":
             return Response(
                 {"detail": "La confirmation de paiement n'est pas disponible : aucun prestataire de paiement réel n'est configuré."},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,

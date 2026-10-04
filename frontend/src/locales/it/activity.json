@@ -44,7 +44,13 @@
     "shareholderLabel": "Desidero diventare azionista di questo progetto",
     "shareholderYes": "Sì, desidera diventare azionista",
     "shareholderNo": "No, semplice finanziamento",
-    "shareholderPendingHint": "Il pagamento viene confermato subito. Lo stato di azionista invece resta in attesa di convalida da parte del team Jappandale."
+    "shareholderPendingHint": "Il pagamento viene confermato subito. Lo stato di azionista invece resta in attesa di convalida da parte del team Jappandale.",
+    "payNow": "Paga {{amount}}",
+    "redirecting": "Reindirizzamento a PayTech…",
+    "paymentUnavailable": "Il pagamento online non è disponibile al momento. Riprova tra qualche istante.",
+    "paymentCancelled": "Il pagamento è stato annullato. Puoi riprovare quando vuoi.",
+    "verifyingTitle": "Verifica del pagamento…",
+    "verifyingText": "Stiamo aspettando la conferma di PayTech, di solito bastano pochi secondi. Non chiudere questa pagina."
   },
   "notifications": {
     "eyebrow": "Il mio spazio",

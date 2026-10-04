@@ -21,6 +21,7 @@ urlpatterns = [
     path("api/passeport/", include("apps.financial_passport.urls")),
     path("api/guichet/", include("apps.guichet.urls")),
     path("api/partenaires/", include("apps.partners.urls")),
+    path("api/payments/", include("apps.payments.urls")),
 ]
 
 if settings.DEBUG:

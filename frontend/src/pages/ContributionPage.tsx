@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, useSearchParams } from "react-router-dom"
 import { ArrowLeft, CheckCircle2, Gift, ShieldCheck, TriangleAlert } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { ApiError, apiFetch } from "@/lib/api"
 import { useAuth } from "@/lib/auth"
 import { formatFcfa } from "@/lib/format"
+import { isPaytechUrl, usePaymentConfig } from "@/lib/payments"
 import type { CampaignDetail, Contribution } from "@/lib/types"
 
 const suggestedAmounts = [5_000, 10_000, 25_000, 50_000]
@@ -34,6 +35,51 @@ export default function ContributionPage() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [searchParams] = useSearchParams()
+  const returnRef = searchParams.get("ref")
+  const returnState = searchParams.get("paiement")
+  const payment = usePaymentConfig()
+  const [verifying, setVerifying] = useState(false)
+  const [cancelledNotice, setCancelledNotice] = useState(false)
+
+  // Retour depuis PayTech : la contribution n'est confirmée que par la notification
+  // serveur de PayTech, qui peut arriver quelques secondes après la redirection.
+  useEffect(() => {
+    if (!returnRef || !user) return
+    let cancelled = false
+    let attempts = 0
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const load = async () => {
+      try {
+        const data = (await authFetch(`/contributions/${returnRef}/`)) as Contribution
+        if (cancelled) return
+        setContribution(data)
+        if (data.status !== "INITIEE") {
+          setVerifying(false)
+        } else if (returnState === "annule") {
+          setVerifying(false)
+          setCancelledNotice(true)
+        } else if (returnState === "retour" && attempts < 15) {
+          attempts += 1
+          setVerifying(true)
+          timer = setTimeout(() => void load(), 3000)
+        } else {
+          setVerifying(false)
+        }
+      } catch {
+        if (!cancelled) {
+          setVerifying(false)
+          setError(t("contribution.genericError"))
+        }
+      }
+    }
+    void load()
+    return () => {
+      cancelled = true
+      if (timer) clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [returnRef, returnState, user?.id])
 
   useEffect(() => {
     apiFetch(`/campaigns/${slug}/`)
@@ -99,6 +145,23 @@ export default function ContributionPage() {
     } catch (err) {
       setError(apiMessage(err, t("contribution.genericError")))
     } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const startPayment = async () => {
+    if (!contribution) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      const data = (await authFetch(
+        `/payments/contributions/${contribution.public_reference}/start/`,
+        { method: "POST" },
+      )) as { redirect_url?: string }
+      if (!isPaytechUrl(data.redirect_url)) throw new Error("redirect")
+      window.location.assign(data.redirect_url)
+    } catch (err) {
+      setError(apiMessage(err, t("contribution.paymentUnavailable")))
       setSubmitting(false)
     }
   }
@@ -228,13 +291,20 @@ export default function ContributionPage() {
             {contribution.status === "CONFIRMEE" && contribution.shareholder_status === "EN_ATTENTE" && <p className="mx-auto mt-3 max-w-sm rounded-xl bg-gold/10 px-4 py-3 text-sm leading-relaxed text-ink-secondary">{t("contribution.shareholderPendingHint")}</p>}
             <div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full bg-gold text-ink"><Link to={`/campagnes/${campaign.slug}`}>{t("contribution.seeCampaign")}</Link></Button><Button asChild variant="outline" className="rounded-full"><Link to="/compte?onglet=contributions">{t("contribution.seeHistory")}</Link></Button></div>
           </div>
+        ) : verifying ? (
+          <div className="mt-9 text-center" role="status">
+            <div className="mx-auto size-10 animate-spin rounded-full border-4 border-gold/30 border-t-gold-dark" />
+            <h2 className="mt-5 font-heading text-xl font-bold text-ink">{t("contribution.verifyingTitle")}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink-secondary">{t("contribution.verifyingText")}</p>
+          </div>
         ) : (
           <div className="mt-8">
+            {cancelledNotice && <p role="status" className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">{t("contribution.paymentCancelled")}</p>}
             <h2 className="font-heading text-xl font-bold text-ink">{t("contribution.reviewTitle")}</h2>
             <dl className="mt-5 space-y-3 rounded-2xl bg-surface-alt p-5 text-sm"><div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.amount")}</dt><dd className="font-bold text-ink">{formatFcfa(contribution.amount)}</dd></div>{contribution.reward && <div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.reward.label")}</dt><dd className="font-medium text-ink">{contribution.reward.title}</dd></div>}{campaign.campaign_type === "INVESTISSEMENT_PARTICIPATIF" && <div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.shareholderLabel")}</dt><dd className="font-medium text-ink">{contribution.wants_to_be_shareholder ? t("contribution.shareholderYes") : t("contribution.shareholderNo")}</dd></div>}<div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.display")}</dt><dd className="font-medium text-ink">{contribution.anonymous ? t("contribution.anonymous") : t("contribution.nameVisible")}</dd></div><div className="flex justify-between gap-4"><dt className="text-ink-muted">{t("contribution.status")}</dt><dd className="font-medium text-ink">{t("contribution.pending")}</dd></div></dl>
             {contribution.wants_to_be_shareholder && <p className="mt-3 rounded-xl bg-gold/10 px-4 py-3 text-sm leading-relaxed text-ink-secondary">{t("contribution.shareholderPendingHint")}</p>}
             <p className="mt-5 text-sm leading-relaxed text-ink-secondary">{t("contribution.confirmHint")}</p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2"><Button onClick={() => void confirm("SUCCESS")} disabled={submitting} className="h-12 rounded-full bg-emerald-600 font-semibold text-white hover:bg-emerald-700">{t("contribution.confirmSubmit")}</Button><Button onClick={() => void confirm("FAILURE")} disabled={submitting} variant="outline" className="h-12 rounded-full border-red-200 text-red-700 hover:bg-red-50">{t("contribution.cancel")}</Button></div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">{payment?.provider === "PAYTECH" ? (<><Button onClick={() => void startPayment()} disabled={submitting} className="h-12 rounded-full bg-emerald-600 font-semibold text-white hover:bg-emerald-700">{submitting ? t("contribution.redirecting") : t("contribution.payNow", { amount: formatFcfa(contribution.amount) })}</Button><Button onClick={() => { setContribution(null); setCancelledNotice(false) }} disabled={submitting} variant="outline" className="h-12 rounded-full border-red-200 text-red-700 hover:bg-red-50">{t("contribution.cancel")}</Button></>) : (<><Button onClick={() => void confirm("SUCCESS")} disabled={submitting || !payment} className="h-12 rounded-full bg-emerald-600 font-semibold text-white hover:bg-emerald-700">{t("contribution.confirmSubmit")}</Button><Button onClick={() => void confirm("FAILURE")} disabled={submitting || !payment} variant="outline" className="h-12 rounded-full border-red-200 text-red-700 hover:bg-red-50">{t("contribution.cancel")}</Button></>)}</div>
           </div>
         )}
         {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}

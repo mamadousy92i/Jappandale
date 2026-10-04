@@ -204,7 +204,12 @@
       "request": "Richiedere la convalida delle spese",
       "requestAgain": "Richiedere di nuovo la convalida",
       "requesting": "Invio…",
-      "requestError": "La richiesta non è riuscita. Riprova."
+      "requestError": "La richiesta non è riuscita. Riprova.",
+      "payText": "Le spese di pratica sono di {{amount}}. Pagale online: vengono convalidate automaticamente alla conferma del pagamento, poi potrai inviare la tua campagna.",
+      "pay": "Paga {{amount}}",
+      "redirecting": "Reindirizzamento a PayTech…",
+      "verifying": "Verifica del pagamento delle spese di pratica in corso… questa pagina si aggiorna da sola.",
+      "cancelled": "Il pagamento delle spese di pratica è stato annullato. Puoi riavviarlo quando vuoi."
     }
   },
   "shareholder": {

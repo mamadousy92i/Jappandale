@@ -204,7 +204,12 @@
       "request": "Request fee validation",
       "requestAgain": "Request validation again",
       "requesting": "Sending…",
-      "requestError": "The request failed. Please try again."
+      "requestError": "The request failed. Please try again.",
+      "payText": "The filing fee is {{amount}}. Pay it online: it is validated automatically as soon as the payment is confirmed, then you can submit your campaign.",
+      "pay": "Pay {{amount}}",
+      "redirecting": "Redirecting to PayTech…",
+      "verifying": "Verifying the filing fee payment… this page updates by itself.",
+      "cancelled": "The filing fee payment was cancelled. You can restart it whenever you like."
     }
   },
   "shareholder": {
