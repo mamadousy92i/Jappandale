@@ -5,7 +5,8 @@
 	email {$CADDY_ACME_EMAIL}
 }
 
-{$DOMAIN} {
+# Le domaine nu et sa version « www » servent la même application (même certificat).
+{$DOMAIN}, www.{$DOMAIN} {
 	encode zstd gzip
 
 	# API, back-office Django, admin technique : tout part vers gunicorn.
