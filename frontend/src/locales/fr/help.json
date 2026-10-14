@@ -8,7 +8,9 @@
       "ctaSubmit": "Déposer un projet",
       "note": "Chaque contribution est enregistrée et peut être suivie depuis votre espace personnel.",
       "imageAlt": "Tailleur dans son atelier à Dakar",
-      "imageCaption": "Atelier de couture — Médina, Dakar"
+      "imageCaption": "Atelier de couture — Médina, Dakar",
+      "carouselLabel": "Projets à la une",
+      "slide": "Voir le projet {{n}}"
     },
     "published": {
       "eyebrow": "En cours de préparation",

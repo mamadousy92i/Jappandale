@@ -8,7 +8,9 @@
       "ctaSubmit": "Presentar un proyecto",
       "note": "Cada contribución queda registrada y puede seguirse desde tu espacio personal.",
       "imageAlt": "Sastre en su taller en Dakar",
-      "imageCaption": "Taller de costura — Medina, Dakar"
+      "imageCaption": "Taller de costura — Medina, Dakar",
+      "carouselLabel": "Proyectos destacados",
+      "slide": "Ver el proyecto {{n}}"
     },
     "published": {
       "eyebrow": "En preparación",

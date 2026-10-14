@@ -8,7 +8,9 @@
       "ctaSubmit": "Submit a project",
       "note": "Every contribution is recorded and can be tracked from your personal area.",
       "imageAlt": "Tailor in his workshop in Dakar",
-      "imageCaption": "Sewing workshop — Medina, Dakar"
+      "imageCaption": "Sewing workshop — Medina, Dakar",
+      "carouselLabel": "Featured projects",
+      "slide": "Show project {{n}}"
     },
     "published": {
       "eyebrow": "In preparation",

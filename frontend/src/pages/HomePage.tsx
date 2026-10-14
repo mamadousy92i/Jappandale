@@ -9,13 +9,13 @@ import {
   FileSearch,
   FileText,
   HandCoins,
-  MapPin,
   Maximize2,
   ShieldCheck,
   X,
 } from "lucide-react";
 
 import { CampaignCard } from "@/components/campaigns/CampaignCard";
+import { HeroCarousel } from "@/components/campaigns/HeroCarousel";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/api";
 import type { CampaignListItem } from "@/lib/types";
@@ -52,6 +52,7 @@ const journeyStepKeys = [
 function HomePage() {
   const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
+  const [allCampaigns, setAllCampaigns] = useState<CampaignListItem[]>([]);
 
   const journeySteps = journeyStepKeys.map(({ key, icon, image, alt }) => ({
     key,
@@ -74,8 +75,15 @@ function HomePage() {
 
   useEffect(() => {
     apiFetch("/campaigns/")
-      .then((data) => setCampaigns((data as CampaignListItem[]).slice(0, 3)))
-      .catch(() => setCampaigns([]));
+      .then((data) => {
+        const list = data as CampaignListItem[];
+        setAllCampaigns(list);
+        setCampaigns(list.slice(0, 3));
+      })
+      .catch(() => {
+        setAllCampaigns([]);
+        setCampaigns([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -132,20 +140,7 @@ function HomePage() {
             </p>
           </div>
 
-          <figure className="relative">
-            <img
-              src="/photos/porteur.jpg"
-              alt={t("homepage.hero.imageAlt")}
-              width={1200}
-              height={900}
-              fetchPriority="high"
-              className="aspect-[4/3] w-full rounded-[24px] object-cover shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)]"
-            />
-            <figcaption className="absolute right-4 bottom-4 left-4 flex items-center gap-2 rounded-xl bg-black/70 px-4 py-3 text-sm text-white backdrop-blur-sm">
-              <MapPin aria-hidden="true" className="size-4 text-gold" />
-              {t("homepage.hero.imageCaption")}
-            </figcaption>
-          </figure>
+          <HeroCarousel campaigns={allCampaigns} />
         </div>
       </section>
 

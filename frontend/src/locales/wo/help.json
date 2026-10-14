@@ -8,7 +8,9 @@
       "ctaSubmit": "Yónnee sa porojet",
       "note": "Dokkal bu ne dañu koy denc, te mën nga koy toppatoo ci sa kont.",
       "imageAlt": "Ab tayeur ci ateliye bi, Dakar",
-      "imageCaption": "Ateliye taaru — Medina, Dakar"
+      "imageCaption": "Ateliye taaru — Medina, Dakar",
+      "carouselLabel": "Porojet yi ñuy gën a wone",
+      "slide": "Wone porojet {{n}}"
     },
     "published": {
       "eyebrow": "Di waajtu",

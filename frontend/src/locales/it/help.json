@@ -8,7 +8,9 @@
       "ctaSubmit": "Presentare un progetto",
       "note": "Ogni contributo viene registrato e può essere seguito dal tuo spazio personale.",
       "imageAlt": "Sarto nel suo laboratorio a Dakar",
-      "imageCaption": "Laboratorio di cucito — Medina, Dakar"
+      "imageCaption": "Laboratorio di cucito — Medina, Dakar",
+      "carouselLabel": "Progetti in evidenza",
+      "slide": "Mostra il progetto {{n}}"
     },
     "published": {
       "eyebrow": "In fase di preparazione",
